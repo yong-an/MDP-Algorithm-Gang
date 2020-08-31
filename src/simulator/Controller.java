@@ -31,7 +31,7 @@ import tcpcomm.PCClient;
 
 public class Controller {
 	
-	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/arena.txt";
+	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/Sample arena 1.txt";
 	private static final int THRESHOLD_BUFFER_TIME = 10;
 	private static final int EXPLORE_TIME_LIMIT = 360;
 	private static final int FFP_TIME_LIMIT = 120;
