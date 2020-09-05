@@ -9,17 +9,6 @@ public class VirtualMap {
 	private static VirtualMap _instance;
 	
 	private VirtualMap() {
-		
-		//testing - check result of exploration
-/*		System.out.println("=========Explore Result===========");
-		for (int a = Arena.MAP_WIDTH - 1; a >= 0; a--) {
-			for (int b =0; b < Arena.MAP_LENGTH; b++) {
-				System.out.print(mazeRef[b][a] + " ");
-			}
-			System.out.println();
-		}
-		System.out.println("==============END=================");*/
-		
 		_visited = new boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_cleared = new boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 	}
@@ -30,7 +19,6 @@ public class VirtualMap {
         }
         return _instance;
     }
-	
 	
 	public void updateVirtualMap(int[][] mazeRef) {
 
@@ -75,8 +63,16 @@ public class VirtualMap {
 		
 	}
 	
-	
-	
-	
+	//testing - check result of exploration
+	/*	
+	System.out.println("=========Explore Result===========");
+	for (int a = Arena.MAP_WIDTH - 1; a >= 0; a--) {
+		for (int b =0; b < Arena.MAP_LENGTH; b++) {
+			System.out.print(mazeRef[b][a] + " ");
+		}
+		System.out.println();
+	}
+	System.out.println("==============END=================");
+	*/
 	
 }

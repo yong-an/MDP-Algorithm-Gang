@@ -10,13 +10,11 @@ import java.net.UnknownHostException;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
-
 import algorithms.AStarPathFinder;
 import algorithms.MazeExplorer;
 import algorithms.Path;
@@ -28,15 +26,16 @@ import simulator.arena.FileReaderWriter;
 import simulator.robot.Robot;
 import tcpcomm.PCClient;
 
+/* This Java file handles the simulator UI logic / real run logic -> depending on RPI whether is it connected or not.*/
 
 public class Controller {
 	
-	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/Sample arena 1.txt";
+	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/Map-Descriptor-Output.txt";
 	private static final int THRESHOLD_BUFFER_TIME = 10;
 	private static final int EXPLORE_TIME_LIMIT = 360;
 	private static final int FFP_TIME_LIMIT = 120;
 	private static final int EXPLORE_REAL_RUN_SPEED = 1;
-	
+
 	private static Controller _instance;
 	private UI _ui;
 	private Timer _exploreTimer, _ffpTimer;
@@ -48,36 +47,40 @@ public class Controller {
 	private PCClient _pcClient;
 	private Path _fastestPath;
 
+	//This function will generate the UI.
 	private Controller() {
 		_ui = new UI();
 	}
 	
+	//This function will generate a controller instance.
 	public static Controller getInstance() {
 		if (_instance == null) {
 			_instance = new Controller();
 		}
 		return _instance;
 	}
-
+	
+	//This function handles the run logic.
+	//It check if it's a real run or just a simulated run.
+	//And display the UI accordingly.
 	public void run() {
 		_ui.setVisible(true);
 		
 		if (RobotSystem.isRealRun()) {
 	
 			_pcClient = PCClient.getInstance();
-			
 			SwingWorker<Void, Void> connectWithRPi = new SwingWorker<Void, Void>() {
 			
 				@Override
 				protected Void doInBackground() throws Exception {
 					
 					try {
-						//Connect with RPi
+						//Connect to RPI.
 						_ui.setStatus("waiting for connection...");
 						_pcClient.setUpConnection(PCClient.RPI_IP_ADDRESS, PCClient.RPI_PORT);
 						_ui.setStatus("connected with RPi");
 						
-						//Read initial robot position
+						//Read initial robot position.
 						String msgRobotPosition = _pcClient.readMessage();
 						while (!msgRobotPosition.matches("[0-9]+,[0-9]+")) {
 							msgRobotPosition = _pcClient.readMessage();
@@ -85,7 +88,7 @@ public class Controller {
 						int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
 						resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
 						
-						//Get explore command
+						//Get the explore command.
 						String msgExplore = _pcClient.readMessage();
 						while (!msgExplore.equals(Message.START_EXPLORATION)) {
 							msgExplore = _pcClient.readMessage();
@@ -108,7 +111,6 @@ public class Controller {
 					return posInput;
 				}
 				
-				
 			};
 			
 			connectWithRPi.execute();
@@ -117,19 +119,25 @@ public class Controller {
 			_ui.refreshExploreInput();
 		}
 	}
-
+	
+	//Function will return the UI.
 	public UI getUI() {
 		return _ui;
 	}
 	
+	//Function will return the PC client.
 	public PCClient getPCClient() {
 		return _pcClient;
 	}
 	
+	//Function to let you know if you ran out of time.
 	public boolean hasReachedTimeThreshold() {
 		return _hasReachedTimeThreshold;
 	}
 	
+	//Function to handle the toggling of grids.
+	//Green = no obstacle.
+	//Red = obstacle.
 	public void toggleObstacle(JButton[][] mapGrids, int x, int y) {
 		if (mapGrids[x][y].getBackground() == Color.GREEN) {
 			mapGrids[x][y].setBackground(Color.RED);
@@ -137,12 +145,14 @@ public class Controller {
 			mapGrids[x][y].setBackground(Color.GREEN);
 		}
 	}
-
+	
+	//Function to handle the logic behind switching of 2 different layout for the middle panel.
 	public void switchComboBox(JComboBox cb, JPanel cardPanel) {
 		CardLayout cardLayout = (CardLayout) (cardPanel.getLayout());
 		cardLayout.show(cardPanel, (String) cb.getSelectedItem());
 	}
-
+	
+	//Function to handle to logic behind load map button.
 	public void loadMap(JButton[][] mapGrids) {
 		Arena arena = Arena.getInstance();
 		arena.setLayout(mapGrids);
@@ -170,7 +180,8 @@ public class Controller {
 		
 		_ui.setStatus("finished map loading");
 	}
-
+	
+	//Function to handle to logic behind clear map button.
 	public void clearMap(JButton[][] mapGrids) {
 		for (int x = 0; x < Arena.MAP_WIDTH; x++) {
 			for (int y = 0; y < Arena.MAP_LENGTH; y++) {
@@ -185,7 +196,8 @@ public class Controller {
 		
 		_ui.setStatus("finished map clearing");
 	}
-
+	
+	//Function to reset the simulator robot position if it somehow run out of scope.
 	public void resetRobotInMaze(JButton[][] mazeGrids, int x, int y) {
 		if (x < 2 || x > 14 || y < 2 || y > 9) {
 			_ui.setStatus("warning: robot position out of range");
@@ -221,7 +233,8 @@ public class Controller {
 			_ui.setStatus("robot initial position set");
 		}
 	}
-
+	
+	//Function to reset the maze grids.
 	public void resetMaze(JButton[][] mazeGrids) {
 		for (int x = 0; x < Arena.MAP_WIDTH; x++) {
 			for (int y = 0; y < Arena.MAP_LENGTH; y++) {
@@ -232,16 +245,22 @@ public class Controller {
 			}
 		}
 	}
-
+	
+	//Function to overwrite and set the robot speed.
+	//This is the text box in the middle panel.
 	public void setRobotSpeed(int speed) {
 		_speed = speed;
 		_ui.setStatus("robot speed set");
 	}
-
+	
+	//Function to overwrite and set the robot orientation.
+    //This is the text box in the middle panel.
 	public void setRobotOrientation(Orientation ori) {
 		_robotOrientation = ori;
 	}
 
+	//Function to overwrite and set the robot coverage.
+	//This is the text box in the middle panel.
 	public void setCoverage(int coverage) {
 		if (coverage > 100) {
 			_ui.setStatus("warning: target coverage out of range");
@@ -251,22 +270,28 @@ public class Controller {
 		}
 	}
 
+	//Function to overwrite and set the time limit for exploration.
+	//This is the text box in the middle panel.
 	public void setExploreTimeLimit(int limit) {
 		_exploreTimeLimit = limit;
 		_ui.setStatus("time limit for exploring set");
 	}
 
+	//Function to overwrite and set the time limit for fastest path.
+	//This is the text box in the middle panel.
 	public void setFFPTimeLimit(int limit) {
 		_ffpTimeLimit = limit;
 		_ui.setStatus("time limit for fastest path set");
 	}
 	
+	//Function to command the simulator robot to stop exploring and return to starting point.
 	public void stopExploring() {
 		_hasReachedTimeThreshold = true;
 		_exploreTimer.stop();
 		_ui.setTimerMessage("Stopping exploration");
 	}
 	
+	//This class handles exploration logic of the maze.
 	class ExploreTimeClass implements ActionListener {
 		int _counter; 
 		
@@ -322,6 +347,7 @@ public class Controller {
 		}
 	}
 	
+	//Function handles exploration of the maze.
 	public void exploreMaze() {
 		
 		if (!RobotSystem.isRealRun()) {
@@ -358,7 +384,7 @@ public class Controller {
 				
 				explorer.explore(_robotPosition, _robotOrientation);
 				
-				//Compute the fastest path right after exploration for real run
+				//Compute the fastest path right after exploration for real run.
 				if (RobotSystem.isRealRun()) {
 					AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 					_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
@@ -374,14 +400,14 @@ public class Controller {
 				
 				_hasReachedStart = true;
 				
-				//Generate P1 & P2 map descriptors
+				//Generate P1 & P2 map descriptors.
 				String P1Descriptor, P2Descriptor;
 				P1Descriptor = explorer.getP1Descriptor();
 				P2Descriptor = explorer.getP2Descriptor();	
 				System.out.println("P1 descriptor: " + P1Descriptor);
 				System.out.println("P2 descriptor: " + P2Descriptor);
 			
-				//Set simulator console status
+				//Set simulator console status.
 				_ui.setCoverageUpdate("actual coverage (%): " + String.format("%.1f", _actualCoverage));			
 				if (!_ui.getTimerMessage().equals("exploration: time out")) {
 					_ui.setTimerMessage("explored within time limit");
@@ -399,7 +425,7 @@ public class Controller {
 				}
 				
 				
-				//Waiting for fastest path command for real run
+				//Waiting for fastest path command for real run.
 				if (!RobotSystem.isRealRun()) {
 					_ui.setExploreBtnEnabled(true);
 				} else {
@@ -451,7 +477,7 @@ public class Controller {
 		
 	}
 
-
+	//This class handles Fastest Path logic of the maze.
 	class FastestPathTimeClass implements ActionListener {
 		int _timeLimit;
 		int _counter; 

@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.FileSystems;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -22,21 +21,19 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
-
 import main.RobotSystem;
 import simulator.arena.Arena;
 import simulator.arena.FileReaderWriter;
-
 import java.awt.Font;
-
 import javax.swing.JTextField;
-
 import java.awt.FlowLayout;
+
+/* This Java file handles the simulator UI settings.*/
 
 public class UI extends JFrame implements ActionListener {
 
-	private static final String EXPLORE_PANEL = "Explore arena";
-	private static final String FFP_PANEL = "Find fastest path";
+	private static final String EXPLORE_PANEL = "Explore Arena";
+	private static final String FFP_PANEL = "Fastest Path";
 	private static final long serialVersionUID = 1L;
 	private JPanel _contentPane, _mapPane, _ctrlPane, _mazePane;
 	private JLabel _status, _timer, _coverageUpdate;
@@ -44,12 +41,10 @@ public class UI extends JFrame implements ActionListener {
 	private Controller _controller;
 	private JTextField[] _exploreTextFields, _ffpTextFields;
 	private JButton _exploreBtn, _ffpBtn, _stopExploreBtn;
-
-	/**
-	 * Create the simulator.
-	 */
+	
+	//Creation of the simulator UI.
 	public UI() {
-		super("MDP Simulator - Arena Exploration & Fastest Path Computation");
+		super("MDP Simulator - GRP23 - Exploration & Fastest Path");
 		setResizable(false);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		_contentPane = new JPanel();
@@ -59,35 +54,37 @@ public class UI extends JFrame implements ActionListener {
 		initContentPane(_contentPane);
 		pack();
 	}
-
+	
+	//Function to enable / disable the explore button.
 	public void setExploreBtnEnabled(boolean value) {
 		_exploreBtn.setEnabled(value);
 	}
 		
+	//Function to enable / disable the fastest path button.
 	public void setFfpBtnEnabled(boolean value) {
 		_ffpBtn.setEnabled(value);
 	}
 	
-	
+	//Function to return the UI content pane.
 	public JPanel getContentPane() {
 		return _contentPane;
 	}
 	
+	//Function to return the maze grids.
 	public JButton[][] getMazeGrids() {
 		return _mazeGrids;
 	}
 	
+	//Function to set the maze grids.
 	public void setMazeGrids(JButton[][] mazeGrids) {
 		_mazeGrids = mazeGrids;
 	}
 	
-	
+	//Function to create the left, middle, right panels.
+	//Starting with the left panel.
+	//Which includes a plottable reference map.
+	//2 Control buttons [load] & [clear] map.
 	private void initContentPane(JPanel contentPane) {
-
-		/*
-		 * Add right panel: the reference map and two control buttons
-		 * (load/clear).
-		 */
 		_mapPane = new JPanel(new FlowLayout());
 		_mapPane.setPreferredSize(new Dimension(450, 650));
 		JPanel map = new JPanel();
@@ -139,17 +136,17 @@ public class UI extends JFrame implements ActionListener {
 			clearMap.setActionCommand("ClearMap");
 			clearMap.addActionListener(this);
 		}
-		
-		
 		_mapPane.add(loadMap);
 		_mapPane.add(clearMap);
 		contentPane.add(_mapPane, BorderLayout.WEST);
+		
+		//==============================================================================================
+		//Followed by the middle panel.
+		//Which includes a drop down list to change the settings to exploration / fastest path.
+		//A few text boxes to change the simulator settings.
+		//And a current status panel.
 
-		/*
-		 * Add middle panel: the explore/fastest path control panel.
-		 */
-
-		// Add control switch (combo box).
+		//Combo box drop down list [Exploration / Fastest Path].
 		_ctrlPane = new JPanel(new BorderLayout());
 		_ctrlPane.setBorder(new EmptyBorder(50, 20, 50, 20));
 		String comboBoxItems[] = { EXPLORE_PANEL, FFP_PANEL };
@@ -160,10 +157,9 @@ public class UI extends JFrame implements ActionListener {
 		cbCtrlSwitch.setActionCommand("SwitchCtrl");
 		_ctrlPane.add(cbCtrlSwitch, BorderLayout.NORTH);
 
-		// Add control panel for exploring.
+		//Controls for the Exploration.
 		JLabel[] exploreCtrlLabels = new JLabel[4];
 		_exploreTextFields = new JTextField[4];
-		
 		_exploreBtn = new JButton("Explore");
 		_stopExploreBtn = new JButton("Stop Exploration");
 		_stopExploreBtn.setEnabled(false);
@@ -235,11 +231,8 @@ public class UI extends JFrame implements ActionListener {
 		exploreCtrlPane.add(exploreInputPane);
 		exploreCtrlPane.add(exploreBtnPane);
 		exploreCtrlPane.setBorder(new EmptyBorder(20, 20, 20, 20));
-		
-		//ADD ALGORITHM RADIO BUTTON HERE
-		//************************
-
-		// Add control panel for finding fastest path.
+	
+		//Controls for the Fastest Path
 		JLabel[] ffpCtrlLabels = new JLabel[2];
 		_ffpTextFields = new JTextField[2];
 		_ffpBtn = new JButton("Navigate");
@@ -287,14 +280,14 @@ public class UI extends JFrame implements ActionListener {
 		ffpCtrlPane.add(ffpBtnPane);
 		ffpCtrlPane.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-		// Add card panel to switch between explore and shortest path panels.
+		//A card panel to swap the controls panels based on what u select on the combo box.
 		JPanel cardPane = new JPanel(new CardLayout());
 		cardPane.add(exploreCtrlPane, EXPLORE_PANEL);
 		cardPane.add(ffpCtrlPane, FFP_PANEL);
 		cardPane.setPreferredSize(new Dimension(280, 300));
 		_ctrlPane.add(cardPane, BorderLayout.CENTER);
 
-		// Add status panel.
+		//Create the status panel.
 		JPanel statusPane = new JPanel(new BorderLayout());
 		JLabel statusLabel = new JLabel("Status Console:");
 		statusPane.add(statusLabel, BorderLayout.NORTH);
@@ -312,12 +305,12 @@ public class UI extends JFrame implements ActionListener {
 		statusConsole.add(_timer);
 		statusPane.add(statusConsole, BorderLayout.CENTER);
 		_ctrlPane.add(statusPane, BorderLayout.SOUTH);
-
 		contentPane.add(_ctrlPane, BorderLayout.CENTER);
-
-		/*
-		 * Add left panel: the maze panel.
-		 */
+		
+		//==============================================================================================
+		//Lastly the right panel.
+		//Which displays the simulated run.
+		
 		_mazePane = new JPanel(new FlowLayout());
 		_mazePane.setPreferredSize(new Dimension(450, 650));
 		JPanel maze = new JPanel();
@@ -350,7 +343,8 @@ public class UI extends JFrame implements ActionListener {
 		_mazePane.add(maze);
 		contentPane.add(_mazePane, BorderLayout.EAST);
 	}
-
+	
+	//This function handles the buttons listener on the entire UI.
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		String cmd = e.getActionCommand();
@@ -382,34 +376,41 @@ public class UI extends JFrame implements ActionListener {
 			
 		}
 	}
-
+	
+	//This function allows you to set the status message.
 	public void setStatus(String message) {
 		_status.setText(message);
 	}
-
+	
+	//This function allows you to set status timer.
 	public void setTimer (int timeLeft) {
 		_timer.setText("Time left (sec): " + timeLeft);
 	}
 	
+	//This function will return you the status timer message value.
 	public String getTimerMessage () {
 		return _timer.getText();
 	}
 	
+	//This function allows you to set the status timer message.
 	public void setTimerMessage (String message) {
 		_timer.setText(message);
 	}
 	
+	//This function calculates the overall explored tiles left by returning a % value.
 	public void setCoverageUpdate (Float coverage) {
 		_coverageUpdate.setText("Coverage (%): " + 	String.format("%.1f", coverage));
 	}
 	
+	//This function allows the setting of coverage status.
 	public void setCoverageUpdate (String message) {
 		_coverageUpdate.setText(message);
 	}
 	
-	/*
-	 * Add a document listener class to dynamically show robot position.
-	 */
+	//==============================================================================================
+	//This document listener class will dynamically update the simulator robot position.
+	//As it moves [Live update].
+	
 	class InitialPositionListener implements DocumentListener {
 		public void insertUpdate(DocumentEvent e) {
 			update(e);
@@ -495,8 +496,13 @@ public class UI extends JFrame implements ActionListener {
 		}
 
 	}
-	//Arena.MAP_LENGTH * i gives me each row, j gives me position in each row
-	//_mapGrids array will be exactly the same as the map in the UI
+	
+	//After plotting the obstacles at the reference map.
+	//Click load -> it will generate and save map-descriptor text file for future reference.
+	//This function will then load the map-descriptor text file and set it as the current arena. 
+	//Take note: Arena.MAP_LENGTH * i returns each row.
+	//While j gives the position in each row. 
+	//The _mapGrids array will be exactly the same as reference map UI.
 	private void loadArenaFromDisk() {
 		FileReaderWriter fileReader;
 		try {
@@ -519,13 +525,15 @@ public class UI extends JFrame implements ActionListener {
 		Arena arena = Arena.getInstance();
 		arena.setLayout(_mapGrids);
 	}
-
+	
+	//This function will refresh the explore input.
 	public void refreshExploreInput() {
 		for (int i = 0; i < 4; i++) {
 			_exploreTextFields[i].setText(_exploreTextFields[i].getText());
 		}
 	}
 	
+	//This function will refresh the fastest path input.
 	public void refreshFfpInput() {
 		for (int i = 0; i < 2; i++) {
 			_ffpTextFields[i].setText(_ffpTextFields[i].getText());
@@ -533,9 +541,8 @@ public class UI extends JFrame implements ActionListener {
 
 	}
 	
-	// Check if Explorer Input is valid
+	//This function will verify if the exploration input is valid.
 	public boolean isIntExploreInput() {
-
 		String[] exploreInput = new String[4];
 		for (int i = 0; i < 4; i++) {
 			exploreInput[i] = _exploreTextFields[i].getText();
@@ -569,6 +576,7 @@ public class UI extends JFrame implements ActionListener {
 		return true;
 	}
 
+	//This function will verify if the fastest path input is valid.
 	public boolean isIntFFPInput() {
 		String[] ffpInput = new String[2];
 		for (int i = 0; i < 2; i++) {
@@ -578,7 +586,7 @@ public class UI extends JFrame implements ActionListener {
 		if (! ffpInput[0].matches("[0-9]+") || ! ffpInput[1].matches("[0-9]+")) {
 			return false;
 		}
-		
+
 		return true;
 	}
 	

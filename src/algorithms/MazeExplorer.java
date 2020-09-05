@@ -3,7 +3,6 @@ package algorithms;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
 import datatypes.Message;
 import datatypes.Movement;
 import datatypes.Orientation;
@@ -1296,10 +1295,11 @@ public class MazeExplorer {
 		}
 		return move;
 	}
-// Tell me how many blocks away are the obstacles
-// Arduino needs to know threshold to know if there is obstacles or not
-// If sensor senses nothing within its range, return max block cleared.
-// Else, return blocks depending on how much range it sense
+	
+	// Tell me how many blocks away are the obstacles
+	// Arduino needs to know threshold to know if there is obstacles or not
+	// If sensor senses nothing within its range, return max block cleared.
+	// Else, return blocks depending on how much range it sense
 	private int parseSensorValue(String msgSensorValues, SensorPosition sensorPosition) {
 		String sensorValues = msgSensorValues.substring(0, msgSensorValues.length() - 1);
 		List<String> valueList = Arrays.asList(sensorValues.split(":"));

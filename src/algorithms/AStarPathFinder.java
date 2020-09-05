@@ -2,10 +2,8 @@ package algorithms;
 
 import java.util.ArrayList;
 import java.util.Collections;
-
 import datatypes.Movement;
 import datatypes.Orientation;
-import main.RobotSystem;
 import simulator.arena.Arena;
 import simulator.robot.Robot;
 

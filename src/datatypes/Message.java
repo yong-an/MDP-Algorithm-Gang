@@ -1,5 +1,7 @@
 package datatypes;
 
+/* This Java file contains the data types for general commands settings. */
+
 public class Message {
 	public static final String TURN_LEFT = "A";
 	public static final String TURN_RIGHT = "D";
