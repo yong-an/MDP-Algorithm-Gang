@@ -43,7 +43,7 @@ public class UI extends JFrame implements ActionListener {
     private JButton[][] _mapGrids, _mazeGrids;
     private Controller _controller;
     private JTextField[] _exploreTextFields, _ffpTextFields;
-    private JButton _exploreBtn, _ffpBtn, _stopExploreBtn;
+    private JButton _exploreBtn, _ffpBtn, _stopExploreBtn, _loadBtn;
 
     /**
      * Creation of the simulator UI.
@@ -152,20 +152,22 @@ public class UI extends JFrame implements ActionListener {
         }
 
         _mapPane.add(map);
-        JButton loadMap = new JButton("Load Map");
+        _loadBtn = new JButton("Load Map ==>");
         JButton clearMap = new JButton("Clear Obstacles");
 
         if (RobotSystem.isRealRun()) {
-            loadMap.setEnabled(false);
+            _loadBtn.setEnabled(false);
             clearMap.setEnabled(false);
         } else {
-            loadMap.setActionCommand("LoadMap");
-            loadMap.addActionListener(this);
+            _loadBtn.setActionCommand("LoadMap");
+            _loadBtn.addActionListener(this);
+            // disable button when first loaded
+            _loadBtn.setEnabled(false);
 
             clearMap.setActionCommand("ClearMap");
             clearMap.addActionListener(this);
         }
-        _mapPane.add(loadMap);
+        _mapPane.add(_loadBtn);
         _mapPane.add(clearMap);
         contentPane.add(_mapPane, BorderLayout.WEST);
 
@@ -387,6 +389,8 @@ public class UI extends JFrame implements ActionListener {
             int x = Integer.parseInt(cmd.substring(17, index));
             int y = Integer.parseInt(cmd.substring(index + 1));
             _controller.toggleObstacle(_mapGrids, x, y);
+            // enable load map button when map layout change
+            _loadBtn.setEnabled(true);
             System.out.println("Toggle at " + x + ", " + y);
         } else if (cmd.equals("SwitchCtrl")) {
             JComboBox cb = (JComboBox) e.getSource();
@@ -394,6 +398,8 @@ public class UI extends JFrame implements ActionListener {
             _controller.switchComboBox(cb, cardPanel);
         } else if (cmd.equals("LoadMap")) {
             _controller.loadMap(_mapGrids);
+            // disable load map button when map layout has been loaded
+            _loadBtn.setEnabled(false);
         } else if (cmd.equals("ClearMap")) {
             _controller.clearMap(_mapGrids);
         } else if (cmd.equals("ExploreMaze")) {
