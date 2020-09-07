@@ -215,7 +215,7 @@ public class Controller {
             e.printStackTrace();
         }
 
-        _ui.setStatus("finished map loading");
+        _ui.setStatus("finished map loading, ready to explore");
     }
 
     /**
