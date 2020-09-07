@@ -8,43 +8,62 @@ import simulator.Controller;
 import simulator.arena.Arena;
 import tcpcomm.PCClient;
 
-/* This Java file handles the simulator robot settings */
-
+/**
+ * This Java file handles the simulator robot settings
+ */
 public class Robot {
 	
 	private static Robot _instance;
 	private int _speed;
 	private int _stepsSinceLastCalibration;
-	
-	//Constructor that will handle the calibration counter.
+
+	/**
+	 * Constructor that will handle the calibration counter.
+	 */
 	private Robot() {
 		_stepsSinceLastCalibration = 0;
 	}
-	
-	//This function will generate a Robot instance.
+
+	/**
+	 * This function will generate a Robot instance.
+	 * @return
+	 */
 	public static Robot getInstance() {
 		if (_instance == null) {
 			_instance = new Robot();
 		}
 		return _instance;
 	}
-	
-	//This function will change the speed of the simulator robot.
+
+	/**
+	 * This function will change the speed of the simulator robot.
+	 * @param speed
+	 */
 	public void setSpeed(int speed) {
 		_speed = speed;
 	}
-	
-	//This function will return you the number of steps since last calibration.
+
+	/**
+	 * This function will return you the number of steps since last calibration.
+	 * @return
+	 */
 	public int getStepsSinceLastCalibration(){
 		return _stepsSinceLastCalibration;
 	}
-	
-	//This function will reset the calibration steps to 0.
+
+	/**
+	 * This function will reset the calibration steps to 0.
+	 */
 	public void resetStepsSinceLastCalibration(){
 		_stepsSinceLastCalibration = 0;
 	}
-	
-	//This function handles the front sensor.
+
+	/**
+	 * This function handles the front sensor.
+	 * @param sensorPosition
+	 * @param robotOrientation
+	 * @return
+	 */
 	public int senseFront(int[] sensorPosition, Orientation robotOrientation) {
 		Arena arena = Arena.getInstance();
 		int numOfClearGrids;
@@ -55,8 +74,13 @@ public class Robot {
 		}
 		return numOfClearGrids;
 	}
-	
-	//This function handles the front side sensor.
+
+	/**
+	 * This function handles the front side sensor.
+	 * @param sensorPosition
+	 * @param robotOrientation
+	 * @return
+	 */
 	public int senseSideFront (int[] sensorPosition, Orientation robotOrientation) {
 		Arena arena = Arena.getInstance();
 		int numOfClearGrids;
@@ -67,8 +91,13 @@ public class Robot {
 		}
 		return numOfClearGrids;
 	}
-	
-	//This function handles the left sensor.
+
+	/**
+	 * This function handles the left sensor.
+	 * @param sensorPosition
+	 * @param robotOrientation
+	 * @return
+	 */
 	public int senseLeft(int[] sensorPosition, Orientation robotOrientation) {
 		Arena arena = Arena.getInstance();
 		int numOfClearGrids;
@@ -95,8 +124,13 @@ public class Robot {
 		}
 		return numOfClearGrids;
 	}
-	
-	//This function handles the right sensor.
+
+	/**
+	 * This function handles the right sensor.
+	 * @param sensorPosition
+	 * @param robotOrientation
+	 * @return
+	 */
 	public int senseRight(int[] sensorPosition, Orientation robotOrientation) {
 		Arena arena = Arena.getInstance();
 		int numOfClearGrids;
@@ -123,8 +157,10 @@ public class Robot {
 		}
 		return numOfClearGrids;
 	}
-	
-	//This function handles rotate right of the simulator robot.
+
+	/**
+	 * This function handles rotate right of the simulator robot.
+	 */
 	public void turnRight() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
@@ -149,8 +185,10 @@ public class Robot {
 		}
 		controller.turnRobotRight();
 	}
-	
-	//This function handles rotate left of the simulator robot.
+
+	/**
+	 * This function handles rotate left of the simulator robot.
+	 */
 	public void turnLeft() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
@@ -176,7 +214,9 @@ public class Robot {
 		controller.turnRobotLeft();
 	}
 
-	//This function handles movement forward.
+	/**
+	 * This function handles movement forward.
+	 */
 	public void moveForward() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
@@ -202,7 +242,10 @@ public class Robot {
 		controller.moveRobotForward();
 	}
 
-	//This function overloads the previous function by allowing you to select the amount of grids to move forward.
+	/**
+	 * This function overloads the previous function by allowing you to select the amount of grids to move forward.
+	 * @param count
+	 */
 	public void moveForward(int count) {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
@@ -239,7 +282,9 @@ public class Robot {
 		}
 	}
 
-	//This function handles the robot position calibration.
+	/**
+	 * This function handles the robot position calibration.
+	 */
 	public void calibrateRobotPosition() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
@@ -253,8 +298,12 @@ public class Robot {
 			e.printStackTrace();
 		}
 	}
-	
-	//This function handles the robot calibration at the start zone.
+
+	/**
+	 * This function handles the robot calibration at the start zone.
+	 * @param ori
+	 * @return
+	 */
 	public Orientation calibrateAtStartZone(Orientation ori) {	
 		switch (ori) {
 			case NORTH:

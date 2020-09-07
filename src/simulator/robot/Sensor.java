@@ -1,7 +1,8 @@
 package simulator.robot;
 
-/* This Java file handles the simulator robot sensor settings */
-
+/**
+ * This Java file handles the simulator robot sensor settings
+ */
 public class Sensor {
 	
 	public static final int SHORT_RANGE = 3;
