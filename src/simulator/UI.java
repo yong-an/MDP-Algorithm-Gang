@@ -131,10 +131,10 @@ public class UI extends JFrame implements ActionListener {
                     _mapGrids[x][y].setActionCommand("ToggleObstacleAt " + x + "," + y);
                     _mapGrids[x][y].addActionListener(this);
                     _mapGrids[x][y].setBorder(BorderFactory.createLineBorder(Color.GRAY));
-                    _mapGrids[x][y].setBackground(Color.GREEN);
+                    _mapGrids[x][y].setBackground(Color.WHITE);
                     if ((x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
                         _mapGrids[x][y].setEnabled(false);
-                        _mapGrids[x][y].setBackground(Color.PINK);
+                        _mapGrids[x][y].setBackground(Color.CYAN);
                         if (x == 1 & y == 13) {
                             _mapGrids[x][y].setText("E");
                         } else if (x == 18 && y == 1) {
@@ -362,7 +362,7 @@ public class UI extends JFrame implements ActionListener {
                 maze.add(_mazeGrids[x][y]);
                 if ((x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
                     _mazeGrids[x][y].setEnabled(false);
-                    _mazeGrids[x][y].setBackground(Color.ORANGE);
+                    _mazeGrids[x][y].setBackground(Color.PINK);
                     if (x == 1 & y == 13) {
                         _mazeGrids[x][y].setText("G");
                     } else if (x == 18 && y == 1) {

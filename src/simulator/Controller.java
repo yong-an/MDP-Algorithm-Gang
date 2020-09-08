@@ -159,7 +159,7 @@ public class Controller {
 
     /**
      * Function to handle the toggling of grids.
-     * Green = no obstacle.
+     * White = no obstacle.
      * Red = obstacle.
      *
      * @param mapGrids
@@ -167,10 +167,10 @@ public class Controller {
      * @param y
      */
     public void toggleObstacle(JButton[][] mapGrids, int x, int y) {
-        if (mapGrids[x][y].getBackground() == Color.GREEN) {
+        if (mapGrids[x][y].getBackground() == Color.WHITE) {
             mapGrids[x][y].setBackground(Color.RED);
         } else {
-            mapGrids[x][y].setBackground(Color.GREEN);
+            mapGrids[x][y].setBackground(Color.WHITE);
         }
     }
 
@@ -227,7 +227,7 @@ public class Controller {
         for (int x = 0; x < Arena.MAP_WIDTH; x++) {
             for (int y = 0; y < Arena.MAP_LENGTH; y++) {
                 if (mapGrids[x][y].getBackground() == Color.RED) {
-                    mapGrids[x][y].setBackground(Color.GREEN);
+                    mapGrids[x][y].setBackground(Color.WHITE);
                 }
             }
         }
@@ -252,7 +252,7 @@ public class Controller {
         } else {
             for (int i = x - 1; i <= x + 1; i++) {
                 for (int j = y - 1; j <= y + 1; j++) {
-                    mazeGrids[20 - j][i - 1].setBackground(Color.CYAN);
+                    mazeGrids[20 - j][i - 1].setBackground(Color.GREEN);
                 }
             }
 
@@ -260,16 +260,16 @@ public class Controller {
 
             switch (_robotOrientation) {
                 case NORTH:
-                    mazeGrids[19 - y][x - 1].setBackground(Color.PINK);
+                    mazeGrids[19 - y][x - 1].setBackground(Color.BLUE);
                     break;
                 case SOUTH:
-                    mazeGrids[21 - y][x - 1].setBackground(Color.PINK);
+                    mazeGrids[21 - y][x - 1].setBackground(Color.BLUE);
                     break;
                 case EAST:
-                    mazeGrids[20 - y][x].setBackground(Color.PINK);
+                    mazeGrids[20 - y][x].setBackground(Color.BLUE);
                     break;
                 case WEST:
-                    mazeGrids[20 - y][x - 2].setBackground(Color.PINK);
+                    mazeGrids[20 - y][x - 2].setBackground(Color.BLUE);
                     break;
             }
 
@@ -291,7 +291,7 @@ public class Controller {
             for (int y = 0; y < Arena.MAP_LENGTH; y++) {
                 mazeGrids[x][y].setBackground(Color.BLACK);
                 if ((x >= 0 & x <= 2 & y >= 12 & y <= 14) || (y >= 0 & y <= 2 & x >= 17 & x <= 19)) {
-                    mazeGrids[x][y].setBackground(Color.ORANGE);
+                    mazeGrids[x][y].setBackground(Color.PINK);
                 }
             }
         }
@@ -616,7 +616,7 @@ public class Controller {
                 for (Path.Step step : steps) {
                     int x = step.getX();
                     int y = step.getY();
-                    mazeGrids[19 - y][x].setBackground(Color.YELLOW);
+                    mazeGrids[19 - y][x].setBackground(Color.MAGENTA);
                 }
                 return null;
             }
@@ -654,9 +654,9 @@ public class Controller {
                 for (int i = 17 - _robotPosition[1]; i <= 19 - _robotPosition[1]; i++) {
                     for (int j = _robotPosition[0] - 1; j <= _robotPosition[0] + 1; j++) {
                         if (i == 17 - _robotPosition[1] && j == _robotPosition[0]) {
-                            mazeGrids[i][j].setBackground(Color.PINK);
+                            mazeGrids[i][j].setBackground(Color.BLUE);
                         } else {
-                            mazeGrids[i][j].setBackground(Color.CYAN);
+                            mazeGrids[i][j].setBackground(Color.GREEN);
                         }
                     }
                 }
@@ -666,9 +666,9 @@ public class Controller {
                 for (int i = 19 - _robotPosition[1]; i <= 21 - _robotPosition[1]; i++) {
                     for (int j = _robotPosition[0] - 1; j <= _robotPosition[0] + 1; j++) {
                         if (i == 21 - _robotPosition[1] && j == _robotPosition[0]) {
-                            mazeGrids[i][j].setBackground(Color.PINK);
+                            mazeGrids[i][j].setBackground(Color.BLUE);
                         } else {
-                            mazeGrids[i][j].setBackground(Color.CYAN);
+                            mazeGrids[i][j].setBackground(Color.GREEN);
                         }
                     }
                 }
@@ -678,9 +678,9 @@ public class Controller {
                 for (int i = 18 - _robotPosition[1]; i <= 20 - _robotPosition[1]; i++) {
                     for (int j = _robotPosition[0]; j <= _robotPosition[0] + 2; j++) {
                         if (i == 19 - _robotPosition[1] && j == _robotPosition[0] + 2) {
-                            mazeGrids[i][j].setBackground(Color.PINK);
+                            mazeGrids[i][j].setBackground(Color.BLUE);
                         } else {
-                            mazeGrids[i][j].setBackground(Color.CYAN);
+                            mazeGrids[i][j].setBackground(Color.GREEN);
                         }
                     }
                 }
@@ -690,9 +690,9 @@ public class Controller {
                 for (int i = 18 - _robotPosition[1]; i <= 20 - _robotPosition[1]; i++) {
                     for (int j = _robotPosition[0] - 2; j <= _robotPosition[0]; j++) {
                         if (i == 19 - _robotPosition[1] && j == _robotPosition[0] - 2) {
-                            mazeGrids[i][j].setBackground(Color.PINK);
+                            mazeGrids[i][j].setBackground(Color.BLUE);
                         } else {
-                            mazeGrids[i][j].setBackground(Color.CYAN);
+                            mazeGrids[i][j].setBackground(Color.GREEN);
                         }
                     }
                 }
@@ -706,23 +706,23 @@ public class Controller {
 
         switch (_robotOrientation) {
             case NORTH:
-                mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
-                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.PINK);
+                mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.GREEN);
+                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.BLUE);
                 _robotOrientation = Orientation.EAST;
                 break;
             case SOUTH:
-                mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
-                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.PINK);
+                mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.GREEN);
+                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.BLUE);
                 _robotOrientation = Orientation.WEST;
                 break;
             case EAST:
-                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.CYAN);
-                mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
+                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.GREEN);
+                mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.BLUE);
                 _robotOrientation = Orientation.SOUTH;
                 break;
             case WEST:
-                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.CYAN);
-                mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
+                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.GREEN);
+                mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.BLUE);
                 _robotOrientation = Orientation.NORTH;
         }
         updateMazeColor();
@@ -733,23 +733,23 @@ public class Controller {
 
         switch (_robotOrientation) {
             case NORTH:
-                mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
-                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.PINK);
+                mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.GREEN);
+                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.BLUE);
                 _robotOrientation = Orientation.WEST;
                 break;
             case SOUTH:
-                mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.CYAN);
-                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.PINK);
+                mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.GREEN);
+                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.BLUE);
                 _robotOrientation = Orientation.EAST;
                 break;
             case EAST:
-                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.CYAN);
-                mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
+                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] + 1].setBackground(Color.GREEN);
+                mazeGrids[18 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.BLUE);
                 _robotOrientation = Orientation.NORTH;
                 break;
             case WEST:
-                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.CYAN);
-                mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.PINK);
+                mazeGrids[19 - _robotPosition[1]][_robotPosition[0] - 1].setBackground(Color.GREEN);
+                mazeGrids[20 - _robotPosition[1]][_robotPosition[0]].setBackground(Color.BLUE);
                 _robotOrientation = Orientation.SOUTH;
         }
         updateMazeColor();
@@ -768,9 +768,9 @@ public class Controller {
                                 && j >= MazeExplorer.START[1] - 1 && j <= MazeExplorer.START[1] + 1)
                                 || (i >= MazeExplorer.GOAL[0] - 1 && i <= MazeExplorer.GOAL[0] + 1
                                 && j >= MazeExplorer.GOAL[1] - 1 && j <= MazeExplorer.GOAL[1] + 1)) {
-                            mazeGrids[19 - j][i].setBackground(Color.ORANGE);
+                            mazeGrids[19 - j][i].setBackground(Color.PINK);
                         } else {
-                            mazeGrids[19 - j][i].setBackground(Color.GREEN);
+                            mazeGrids[19 - j][i].setBackground(Color.WHITE);
                         }
                     }
                 } else if (mazeRef[i][j] == MazeExplorer.IS_OBSTACLE) {
