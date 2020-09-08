@@ -193,6 +193,7 @@ public class UI extends JFrame implements ActionListener {
         _exploreTextFields = new JTextField[4];
         _exploreBtn = new JButton("Explore");
         _stopExploreBtn = new JButton("Stop Exploration");
+        _stopExploreBtn.setVisible(false);
         _stopExploreBtn.setEnabled(false);
 
         if (RobotSystem.isRealRun()) {
@@ -209,8 +210,13 @@ public class UI extends JFrame implements ActionListener {
         exploreCtrlLabels[1] = new JLabel("Speed (steps/sec): ");
         exploreCtrlLabels[2] = new JLabel("Target coverage (%): ");
         exploreCtrlLabels[3] = new JLabel("Time limit (sec): ");
+        exploreCtrlLabels[0].setVisible(false);
+        exploreCtrlLabels[1].setVisible(false);
+        exploreCtrlLabels[2].setVisible(false);
+        exploreCtrlLabels[3].setVisible(false);
         for (int i = 0; i < 4; i++) {
             _exploreTextFields[i] = new JTextField(10);
+            _exploreTextFields[i].setVisible(false);
             if (RobotSystem.isRealRun()) {
                 _exploreTextFields[i].setEditable(false);
             }
@@ -278,8 +284,11 @@ public class UI extends JFrame implements ActionListener {
 
         ffpCtrlLabels[0] = new JLabel("Speed (steps/sec): ");
         ffpCtrlLabels[1] = new JLabel("Time limit (sec): ");
+        ffpCtrlLabels[0].setVisible(false);
+        ffpCtrlLabels[1].setVisible(false);
         for (int i = 0; i < 2; i++) {
             _ffpTextFields[i] = new JTextField(10);
+            _ffpTextFields[i].setVisible(false);
             if (RobotSystem.isRealRun()) {
                 _ffpTextFields[i].setEditable(false);
             }
@@ -337,6 +346,7 @@ public class UI extends JFrame implements ActionListener {
         statusPane.add(statusConsole, BorderLayout.CENTER);
         _ctrlPane.add(statusPane, BorderLayout.SOUTH);
         contentPane.add(_ctrlPane, BorderLayout.CENTER);
+        statusPane.setVisible(false);
 
         //==============================================================================================
         //Lastly the right panel.
