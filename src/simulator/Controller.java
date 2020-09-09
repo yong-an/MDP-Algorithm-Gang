@@ -514,8 +514,9 @@ public class Controller {
                         while (!msgFFP.equals(Message.START_FASTEST)) {
                             msgFFP = _pcClient.readMessage();
                         }
-                        _ui.setStatus("start finding fastest path");
-                        findFastestPath();
+                        _ui.setStatus("Start finding fastest path");
+                        findFastestPath(true);
+                        //findFastestPath(false);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -585,65 +586,74 @@ public class Controller {
         }
     }
 
-    public void findFastestPath() {
+    public void findFastestPath(boolean s) {
+    	
+    	 if (!RobotSystem.isRealRun()) {
+	            if (!_ui.isIntFFPInput()) {
+	                _ui.setStatus("invalid input for finding fastest path");
+	                _ui.setFfpBtnEnabled(true);
+	                return;
+	            }
 
-        if (!RobotSystem.isRealRun()) {
-            if (!_ui.isIntFFPInput()) {
-                _ui.setStatus("invalid input for finding fastest path");
-                _ui.setFfpBtnEnabled(true);
-                return;
-            }
+	            _ui.refreshFfpInput();
+	        }
+    	 
+    	if(s == true) {
 
-            _ui.refreshFfpInput();
-        }
+	        SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
+	            @Override
+	            protected Void doInBackground() throws Exception {
 
-        SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
-            @Override
-            protected Void doInBackground() throws Exception {
+	                MazeExplorer explorer = MazeExplorer.getInstance();
+	                AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 
-                MazeExplorer explorer = MazeExplorer.getInstance();
-                AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+	                if (!RobotSystem.isRealRun()) {
+	                    _fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1],
+	                            MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
+	                }
 
-                if (!RobotSystem.isRealRun()) {
-                    _fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1],
-                            MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
-                }
+	                pathFinder.moveRobotAlongFastestPath(_fastestPath, explorer.getRobotOrientation());
 
-                pathFinder.moveRobotAlongFastestPath(_fastestPath, explorer.getRobotOrientation());
+	                ArrayList<Path.Step> steps = _fastestPath.getSteps();
+	                JButton[][] mazeGrids = _ui.getMazeGrids();
+	                for (Path.Step step : steps) {
+	                    int x = step.getX();
+	                    int y = step.getY();
+	                    mazeGrids[19 - y][x].setBackground(Color.MAGENTA);
+	                }
+	                return null;
+	            }
 
-                ArrayList<Path.Step> steps = _fastestPath.getSteps();
-                JButton[][] mazeGrids = _ui.getMazeGrids();
-                for (Path.Step step : steps) {
-                    int x = step.getX();
-                    int y = step.getY();
-                    mazeGrids[19 - y][x].setBackground(Color.MAGENTA);
-                }
-                return null;
-            }
+	            @Override
+	            public void done() {
+	                _ui.setStatus("Fastest path found");
 
-            @Override
-            public void done() {
-                _ui.setStatus("fastest path found");
+	                if (!_ui.getTimerMessage().equals("Fastest path: time out")) {
+	                    _ui.setTimerMessage("Fastest path: within time limit");
+	                }
+	                if (_ffpTimer.isRunning()) {
+	                    _ffpTimer.stop();
+	                }
 
-                if (!_ui.getTimerMessage().equals("fastest path: time out")) {
-                    _ui.setTimerMessage("fastest path: within time limit");
-                }
-                if (_ffpTimer.isRunning()) {
-                    _ffpTimer.stop();
-                }
-
-            }
-        };
+	            }
+	        };
 
 
-        if (RobotSystem.isRealRun()) {
-            _ffpTimeLimit = FFP_TIME_LIMIT;
-        }
-        FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
-        _ffpTimer = new Timer(1000, timeActionListener);
-        _ffpTimer.start();
-        _ui.setStatus("robot finding fastest path");
-        findFastestPath.execute();
+	        if (RobotSystem.isRealRun()) {
+	            _ffpTimeLimit = FFP_TIME_LIMIT;
+	        }
+	        FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
+	        _ffpTimer = new Timer(1000, timeActionListener);
+	        _ffpTimer.start();
+	        _ui.setStatus("Robot finding fastest path");
+	        findFastestPath.execute();
+    	}
+    	else {
+    		System.out.println("FLOODFILLING");
+    		
+    		// sad pepe (T_T) LOGIC HERE
+    	}
+       
     }
 
     public void moveRobotForward() {

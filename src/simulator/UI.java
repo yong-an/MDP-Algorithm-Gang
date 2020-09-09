@@ -10,11 +10,13 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.DocumentEvent;
@@ -44,6 +46,8 @@ public class UI extends JFrame implements ActionListener {
     private Controller _controller;
     private JTextField[] _exploreTextFields, _ffpTextFields;
     private JButton _exploreBtn, _ffpBtn, _stopExploreBtn, _loadBtn;
+    private JRadioButton btnAStar, btnFloodFill;
+    private boolean selection = false;
 
     /**
      * Creation of the simulator UI.
@@ -266,6 +270,12 @@ public class UI extends JFrame implements ActionListener {
         //Controls for the Fastest Path
         JLabel[] ffpCtrlLabels = new JLabel[2];
         _ffpTextFields = new JTextField[2];
+        btnAStar = new JRadioButton("A * " , true);
+        btnFloodFill = new JRadioButton("Flood Fill");
+        ButtonGroup algorithmBtnGrp = new ButtonGroup();
+        algorithmBtnGrp.add(btnAStar);
+        algorithmBtnGrp.add(btnFloodFill);
+        
         _ffpBtn = new JButton("Navigate");
 
         if (RobotSystem.isRealRun()) {
@@ -285,11 +295,13 @@ public class UI extends JFrame implements ActionListener {
             }
         }
 
-        JPanel ffpInputPane = new JPanel(new GridLayout(2, 2));
+        JPanel ffpInputPane = new JPanel(new GridLayout(5, 5));
         ffpInputPane.add(ffpCtrlLabels[0]);
         ffpInputPane.add(_ffpTextFields[0]);
         ffpInputPane.add(ffpCtrlLabels[1]);
         ffpInputPane.add(_ffpTextFields[1]);
+        ffpInputPane.add(btnAStar);
+        ffpInputPane.add(btnFloodFill);
 
         if (!RobotSystem.isRealRun()) {
             ffpCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -408,7 +420,8 @@ public class UI extends JFrame implements ActionListener {
             _controller.exploreMaze();
         } else if (cmd.equals("FindFastestPath")) {
             _ffpBtn.setEnabled(false);
-            _controller.findFastestPath();
+            selection = btnAStar.isSelected();
+            _controller.findFastestPath(selection);
         } else if (cmd.equals("stopExplore")) {
             _stopExploreBtn.setEnabled(false);
             _controller.stopExploring();
