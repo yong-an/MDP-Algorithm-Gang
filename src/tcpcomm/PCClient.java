@@ -13,8 +13,8 @@ import datatypes.Message;
  */
 public class PCClient {
 
-    public static final String RPI_IP_ADDRESS = "192.168.101.1";
-    public static final int RPI_PORT = 4042;
+    public static final String RPI_IP_ADDRESS = "192.168.23.23";
+    public static final int RPI_PORT = 22;
     private static PCClient _instance;
     private Socket _clientSocket;
     private PrintWriter _toRPi;
@@ -94,7 +94,7 @@ public class PCClient {
     }
 
     /**
-     * This function will handle receiving message to RPI.
+     * This function will handle receiving message from RPI.
      *
      * @return
      * @throws IOException
