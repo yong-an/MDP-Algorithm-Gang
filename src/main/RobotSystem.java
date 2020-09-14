@@ -11,7 +11,7 @@ public class RobotSystem {
 	private static boolean _isRealRun = false;
 
 	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
+		EventQueue.invokeLater(new Runnable() { 
 			public void run() {
 				new RobotSystem();
 			}

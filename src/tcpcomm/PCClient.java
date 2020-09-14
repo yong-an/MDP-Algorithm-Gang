@@ -5,7 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
-
+import java.time.LocalTime;
 import datatypes.Message;
 
 /**
@@ -82,17 +82,44 @@ public class PCClient {
     }
 
     /**
-     * This function will handle sending message to RPI.
+     * This function will handle sending message to Arduino.
      *
      * @param msg
      * @throws IOException
      */
     public void sendMessage(String msg) throws IOException {
-        _toRPi.print(msg);
-        _toRPi.flush();
-        System.out.println("Message Sent: " + msg);
-    }
 
+		msg = "@s"+msg+"!";
+		_toRPi.print(msg);
+		_toRPi.flush();
+		
+		System.out.println("Message sent to Arduino: " + msg+" - "+LocalTime.now());
+	}
+    /**
+     * This function will handle sending message to Android.
+     *
+     * @param msg
+     */
+	public void sendMessageToAndroid(String msg) {
+		msg = "@b"+msg+"!";
+		_toRPi.print(msg);
+		_toRPi.flush();
+		
+		System.out.println("Message sent to Android: " + msg+" - "+LocalTime.now());
+	}
+	
+    /**
+     * This function will handle sending message to R-PI.
+     *
+     * @param msg
+     */
+	public void sendMsgToRPI(String msg){
+		msg = "@r"+msg+"!";
+		_toRPi.print(msg);
+		_toRPi.flush();
+		
+		System.out.println("Message sent to RPI: " + msg+" - "+LocalTime.now());
+	}
     /**
      * This function will handle receiving message from RPI.
      *

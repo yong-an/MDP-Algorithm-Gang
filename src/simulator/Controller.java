@@ -9,7 +9,9 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -26,28 +28,29 @@ import simulator.arena.Arena;
 import simulator.arena.FileReaderWriter;
 import simulator.robot.Robot;
 import tcpcomm.PCClient;
-
 /**
  * This Java file handles the simulator UI logic / real run logic -> depending on RPI whether is it connected or not.
  */
 public class Controller {
 
-    public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/Map-Descriptor-Output.txt";
-    private static final int THRESHOLD_BUFFER_TIME = 10;
-    private static final int EXPLORE_TIME_LIMIT = 360;
-    private static final int FFP_TIME_LIMIT = 120;
-    private static final int EXPLORE_REAL_RUN_SPEED = 1;
-
-    private static Controller _instance;
-    private UI _ui;
-    private Timer _exploreTimer, _ffpTimer;
-    private int[] _robotPosition = new int[2];
-    private Orientation _robotOrientation;
-    private int _speed, _exploreTimeLimit, _ffpTimeLimit;
-    private float _actualCoverage, _initialCoverage;
-    private boolean _hasReachedStart, _hasReachedTimeThreshold;
-    private PCClient _pcClient;
-    private Path _fastestPath;
+	public static final String ARENA_DESCRIPTOR_PATH = System.getProperty("user.dir") + "/map-descriptors/Map-Descriptor-Output.txt";
+	private static final int THRESHOLD_BUFFER_TIME = 10;
+	private static final int EXPLORE_TIME_LIMIT = 360;
+	private static final int FFP_TIME_LIMIT = 120;
+	private static final int EXPLORE_REAL_RUN_SPEED = 1;
+	private static final int EXPLORE_COVERAGE = 100;
+	
+	private static Controller _instance;
+	private UI _ui;
+	private Timer _exploreTimer, _ffpTimer;
+	private int[] _robotPosition = new int[2];
+	private int[] _waypointPosition = new int[2];
+	private Orientation _robotOrientation;
+	private int _speed,  _exploreTimeLimit, _ffpTimeLimit;
+	private float _actualCoverage, _initialCoverage;
+	private boolean _hasReachedStart, _hasReachedTimeThreshold;
+	private PCClient _pcClient;
+	private Path _fastestPath, _fastestPath2, _fastestBackPath;
 
     /**
      * This function will generate the UI.
@@ -66,69 +69,129 @@ public class Controller {
             _instance = new Controller();
         }
         return _instance;
+        
+    /**
+    * This function returns the robot orientation
+    *
+    * @return
+    */
     }
+	public Orientation getOrientation() {
+		return this._robotOrientation;
+	}
+	
+    /**
+    * This function returns robot position in array format
+    *
+    * @return
+    */
+	public int[] getPosition() {
+		return this._robotPosition;
+	}
+	
+    /**
+    * This function returns the fastest path
+    *
+    * @return
+    */
+	public Path getFastestPathBack() {
+		return _fastestBackPath;
+	}
 
     /**
      * This function handles the run logic.
      * It check if it's a real run or just a simulated run.
      * And display the UI accordingly.
      */
-    public void run() {
-        _ui.setVisible(true);
-
-        if (RobotSystem.isRealRun()) {
-
-            _pcClient = PCClient.getInstance();
-            SwingWorker<Void, Void> connectWithRPi = new SwingWorker<Void, Void>() {
-
-                @Override
-                protected Void doInBackground() throws Exception {
-
-                    try {
-                        //Connect to RPI.
-                        _ui.setStatus("waiting for connection...");
-                        _pcClient.setUpConnection(PCClient.RPI_IP_ADDRESS, PCClient.RPI_PORT);
-                        _ui.setStatus("connected with RPi");
-
-                        //Read initial robot position.
-                        String msgRobotPosition = _pcClient.readMessage();
-                        while (!msgRobotPosition.matches("[0-9]+,[0-9]+")) {
-                            msgRobotPosition = _pcClient.readMessage();
-                        }
-                        int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
-                        resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
-
-                        //Get the explore command.
-                        String msgExplore = _pcClient.readMessage();
-                        while (!msgExplore.equals(Message.START_EXPLORATION)) {
-                            msgExplore = _pcClient.readMessage();
-                        }
-                        _ui.setStatus("start exploring");
-                        exploreMaze();
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                }
-
-                private int[] getRobotPositionInput(String msgRobotPosition) {
-                    int[] posInput = new int[2];
-                    int index = msgRobotPosition.indexOf(",");
-                    posInput[0] = Integer.parseInt(msgRobotPosition.substring(0, index));
-                    posInput[1] = Integer.parseInt(msgRobotPosition.substring(index + 1));
-                    return posInput;
-                }
-
-            };
-
-            connectWithRPi.execute();
-
-        } else {
-            _ui.refreshExploreInput();
-        }
-    }
+	public void run() {
+		_ui.setVisible(true);
+		_robotOrientation = Orientation.NORTH;
+		if (RobotSystem.isRealRun()) {
+	
+			_pcClient = PCClient.getInstance();
+			
+			SwingWorker<Void, Void> connectWithRPi = new SwingWorker<Void, Void>() {
+			
+				@Override
+				protected Void doInBackground() throws Exception {
+					
+					try {
+						//Connect with RPi
+						_ui.setStatus("waiting for connection...");
+						_pcClient.setUpConnection(PCClient.RPI_IP_ADDRESS, PCClient.RPI_PORT);
+						_ui.setStatus("connected with RPi");
+						
+						//Read initial robot position
+						String msgRobotPosition = "";
+						String msgWayPoint = "";
+						boolean receivePosition = true;
+						boolean receiveWaypoint = true;
+						String messageReceive = "";
+						List<String> valueList;
+						
+						while(receivePosition || receiveWaypoint) {
+							messageReceive = _pcClient.readMessage();
+							valueList = Arrays.asList(messageReceive.split(":"));
+							
+							if(receivePosition && valueList.get(0).equals("START")) {
+								msgRobotPosition = valueList.get(1);
+								int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
+								resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
+								receivePosition = false;
+							}
+							if(receiveWaypoint && valueList.get(0).equals("WP")) {
+								msgWayPoint = valueList.get(1);
+								setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
+								receiveWaypoint = false;
+							}
+						}
+											
+						//Version 4
+						MazeExplorer me = MazeExplorer.getInstance();
+						me.init(_robotPosition, _robotOrientation);
+						Robot caliRobot = Robot.getInstance();
+						
+						_robotOrientation = caliRobot.calibrateAtStartZone(_robotOrientation);
+						me.setOrientation(_robotOrientation);
+						//End 
+						
+						//Get explore command
+						String msgExplore = _pcClient.readMessage();
+						//String msgExplore = Message.START_EXPLORATION;
+						while (!msgExplore.equals(Message.START_EXPLORATION)) {
+							msgExplore = _pcClient.readMessage();
+						}
+						_ui.setStatus("start exploring");
+						exploreMaze();
+				} catch (UnknownHostException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+					return null;
+				}
+				
+			};
+			
+			connectWithRPi.execute();
+	
+		} else {
+			_ui.refreshExploreInput();
+		}
+	}
+	
+    /**
+     * Function will return the robot position in descriptor format.
+     *
+     * @return
+     */
+	public int[] getRobotPositionInput (String msgRobotPosition) {
+		int[] posInput = new int[2];
+		int index = msgRobotPosition.indexOf(",");
+		posInput[0] = Integer.parseInt(msgRobotPosition.substring(0, index));
+		posInput[1] = Integer.parseInt(msgRobotPosition.substring(index + 1));
+		return posInput;
+	}
 
     /**
      * Function will return the UI.
@@ -154,6 +217,7 @@ public class Controller {
      * @return
      */
     public boolean hasReachedTimeThreshold() {
+    	System.out.println("Reach Time Threshold: "+_hasReachedTimeThreshold);
         return _hasReachedTimeThreshold;
     }
 
@@ -280,6 +344,39 @@ public class Controller {
             _ui.setStatus("robot initial position set");
         }
     }
+    
+    /**
+     * Function to set way point in maze.
+     *
+     * @param mazeGrids
+     * @param waypoint
+     */
+    public void setWayPointInMaze(JButton[][] mazeGrids, String waypoint) {
+		
+		if((_waypointPosition[1] != 0 && _waypointPosition[0] != 0) || waypoint.isEmpty())
+			mazeGrids[20-(_waypointPosition[1]+1)][(_waypointPosition[0]+1)-1].setText("");	
+		if(!waypoint.isEmpty()) {
+			int[] mazeWayPoint = getRobotPositionInput(waypoint);
+			int x = mazeWayPoint[0];
+			int y = mazeWayPoint[1];
+			
+			if(RobotSystem.isRealRun()) {
+				x+=1;
+				y+=1;
+			}
+			
+			if (x < 2 || x > 14 || y < 2 || y > 19) {
+				_ui.setStatus("warning: robot position out of range");
+				resetMaze(mazeGrids);
+			} else {
+				mazeGrids[20-y][x - 1].setText("WP");	
+				_waypointPosition[0] = x - 1;
+				_waypointPosition[1] = y - 1;
+				System.out.println("Waypoint set at "+_waypointPosition[0]+", "+_waypointPosition[1]);
+				_ui.setStatus("waypoint set at "+_waypointPosition[0]+", "+_waypointPosition[1]);
+			}
+		}
+	}
 
     /**
      * Function to reset the maze grids.
@@ -368,61 +465,62 @@ public class Controller {
      * This class handles exploration logic of the maze.
      */
     class ExploreTimeClass implements ActionListener {
-        int _counter;
-
-        public ExploreTimeClass(int timeLimit) {
-            _counter = timeLimit;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
-            _counter--;
-            _ui.setTimer(_counter);
-
-            if (_counter >= 0) {
-                SwingWorker<Void, Float> getThreshold = new SwingWorker<Void, Float>() {
-                    Path _backPath;
-
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        //float threshold;
-                        MazeExplorer explorer = MazeExplorer.getInstance();
-                        AStarPathFinder pathFinder = AStarPathFinder.getInstance();
-
-                        _backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1],
-                                MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
-
-                        //threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME; //If need buffer.
-                        publish((float) _counter);
-                        return null;
-                    }
-
-                    @Override
-                    protected void process(List<Float> chunks) {
-                        Float curThreshold = chunks.get(chunks.size() - 1);
-
-                        if (curThreshold == 0) {
-                            _hasReachedTimeThreshold = true;
-                        }
-
+		int _counter; 
+		
+		public ExploreTimeClass(int timeLimit) {
+			_counter = timeLimit;
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			
+			_counter--;
+			_ui.setTimer(_counter);
+			
+			if (_counter >= 0) {
+				SwingWorker<Void, Float> getThreshold = new SwingWorker<Void, Float>() {
+//					Path _backPath;
+					@Override
+					protected Void doInBackground() throws Exception {
+						//float threshold;
+						MazeExplorer explorer = MazeExplorer.getInstance();
+						AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+						
+//						_backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], 
+//								MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
+//						System.out.println("Find fastest path back every turn");
+//						_fastestBackPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], 
+//								MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
+						
+						//threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME; //If need buffer.
+						publish((float)_counter);
+						return null;
+					}
+					@Override
+					protected void process(List<Float> chunks) {
+						Float curThreshold = chunks.get(chunks.size() - 1);
+						
+						if (curThreshold == 0) {
+							_hasReachedTimeThreshold = true;
+						}
+						
 //						if (_counter <= curThreshold) {
 //							_hasReachedTimeThreshold = true;
 //						}
-                    }
-                };
-
-                if (_counter == 0) {
-                    _exploreTimer.stop();
-                    _ui.setTimerMessage("exploration: time out");
-                    Toolkit.getDefaultToolkit().beep();
-                }
-
-                getThreshold.execute();
-
-            }
-        }
-    }
+					}
+				};
+				
+				if (_counter == 0) {
+					_exploreTimer.stop();
+					_ui.setTimerMessage("exploration: time out");
+					Toolkit.getDefaultToolkit().beep();
+				}
+				
+				getThreshold.execute();
+			
+			} 
+		}
+	}
 
     /**
      * Function handles exploration of the maze.
@@ -541,8 +639,8 @@ public class Controller {
                     _actualCoverage = (float) (100 * numExplored) / (float) (Arena.MAP_LENGTH * Arena.MAP_WIDTH);
                     _ui.setCoverageUpdate(_actualCoverage);
 
-                    if (_initialCoverage <= _actualCoverage)
-                        stopExploring();
+                    //if (_initialCoverage <= _actualCoverage)
+                    //    stopExploring();
                 }
                 return null;
             }
@@ -598,9 +696,9 @@ public class Controller {
 	            _ui.refreshFfpInput();
 	        }
     	 
+    	 //A *
     	if(s == true) {
-
-	        SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
+    		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
 	            @Override
 	            protected Void doInBackground() throws Exception {
 
@@ -647,11 +745,63 @@ public class Controller {
 	        _ffpTimer.start();
 	        _ui.setStatus("Robot finding fastest path");
 	        findFastestPath.execute();
+    	
     	}
     	else {
-    		System.out.println("FLOODFILLING");
+    		// MANUALLY SET WAY POINTS
+    		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
+    			@Override
+    			protected Void doInBackground() throws Exception {
+    				MazeExplorer explorer = MazeExplorer.getInstance();
+    				AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+    	
+    				if(!RobotSystem.isRealRun()) {
+    					_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
+    							_waypointPosition[0], _waypointPosition[1], explorer.getMazeRef());
+    					_fastestPath2 = pathFinder.findFastestPath(_waypointPosition[0], _waypointPosition[1], 
+    							MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
+    	
+    					_fastestPath.combineSteps(_fastestPath2.getSteps());
+    				}
+    				System.out.println("Fastest Path: Start");
+    				pathFinder.moveRobotAlongFastestPath(_fastestPath, explorer.getRobotOrientation());
+    				System.out.println("Fastest Path: End");
+    				ArrayList<Path.Step> steps = _fastestPath.getSteps();
+    				JButton[][] mazeGrids = _ui.getMazeGrids();
+    				for (Path.Step step : steps) {
+    					int x = step.getX();
+    					int y = step.getY();
+    					mazeGrids[19-y][x].setBackground(Color.YELLOW);
+    				}
+    				
+    				return null;
+    			}
+    			@Override
+    			public void done() {
+    				Robot robot = Robot.getInstance();
+    				_robotOrientation = robot.calibrateAtEndZone(_robotOrientation);
+    				PCClient pcClient = PCClient.getInstance();
+    				if (RobotSystem.isRealRun()) {
+    					pcClient.sendMessageToAndroid(Message.EXPLORE_DONE);
+    				}
+    				_ui.setStatus("fastest path found");
+    				if (!_ui.getTimerMessage().equals("fastest path: time out")) {
+    					_ui.setTimerMessage("fastest path: within time limit");
+    				}
+    				if (_ffpTimer.isRunning()) {
+    					_ffpTimer.stop(); 
+    				}
+    			}
+    		};
     		
-    		// sad pepe (T_T) LOGIC HERE
+    		if (RobotSystem.isRealRun()) {
+    			_ffpTimeLimit = FFP_TIME_LIMIT;
+    		}
+    		FastestPathTimeClass timeActionListener = new FastestPathTimeClass(_ffpTimeLimit);
+    		_ffpTimer = new Timer(1000, timeActionListener);
+    		_ffpTimer.start();
+    		_ui.setStatus("robot finding fastest path");
+    		findFastestPath.execute();
     	}
        
     }

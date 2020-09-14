@@ -1,7 +1,11 @@
 package simulator.robot;
 
 import java.io.IOException;
+import java.time.LocalTime;
+
+import algorithms.MazeExplorer;
 import datatypes.Message;
+import datatypes.Movement;
 import datatypes.Orientation;
 import main.RobotSystem;
 import simulator.Controller;
@@ -16,12 +20,14 @@ public class Robot {
 	private static Robot _instance;
 	private int _speed;
 	private int _stepsSinceLastCalibration;
+	private int _stepsSinceLastSideCalibration;
 
 	/**
 	 * Constructor that will handle the calibration counter.
 	 */
 	private Robot() {
 		_stepsSinceLastCalibration = 0;
+		_stepsSinceLastSideCalibration = 0;
 	}
 
 	/**
@@ -52,10 +58,31 @@ public class Robot {
 	}
 
 	/**
-	 * This function will reset the calibration steps to 0.
+	 * This function will reset the calibration last steps to 0.
 	 */
 	public void resetStepsSinceLastCalibration(){
 		_stepsSinceLastCalibration = 0;
+	}
+	
+	/**
+	 * This function will return you the number of steps since last side calibration.
+	 */
+	public int getStepsSinceLastSideCalibration(){
+		return _stepsSinceLastCalibration;
+	}
+	
+	/**
+	 * This function will reset the calibration side steps to 0.
+	 */
+	public void resetStepsSinceLastSideCalibration(){
+		_stepsSinceLastCalibration = 0;
+	}
+	
+	/**
+	 * This function will increment the side calibration.
+	 */
+	public void incrementSideCalibration() {
+		_stepsSinceLastCalibration++;
 	}
 
 	/**
@@ -157,6 +184,36 @@ public class Robot {
 		}
 		return numOfClearGrids;
 	}
+	
+	/**
+	 * This function turn the robot 180 degrees
+	 */
+	public void turn180() {
+		Controller controller = Controller.getInstance();
+		PCClient pcClient = controller.getPCClient();
+		if (!RobotSystem.isRealRun()) {
+			int stepTime = 1000 / _speed;
+			try {
+				Thread.sleep(stepTime);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				pcClient.sendMessage(Message.oneEighty + Message.SEPARATOR);
+	
+				String feedback = pcClient.readMessage();
+				while (!feedback.equals(Message.DONE)) {
+					feedback = pcClient.readMessage();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		controller.turnRobotRight();
+		controller.turnRobotRight();
+		sendToAndroid();
+	}
 
 	/**
 	 * This function handles rotate right of the simulator robot.
@@ -164,6 +221,7 @@ public class Robot {
 	public void turnRight() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
+		MazeExplorer me = MazeExplorer.getInstance();
 		if (!RobotSystem.isRealRun()) {
 			int stepTime = 1000 / _speed;
 			try {
@@ -184,6 +242,9 @@ public class Robot {
 			}
 		}
 		controller.turnRobotRight();
+		me.setLeftCountdownBack();
+		me.setleftGotObstacle();
+		sendToAndroid();
 	}
 
 	/**
@@ -192,6 +253,8 @@ public class Robot {
 	public void turnLeft() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
+		MazeExplorer me = MazeExplorer.getInstance();
+		
 		if (!RobotSystem.isRealRun()) {
 			int stepTime = 1000 / _speed;
 			try {
@@ -210,8 +273,10 @@ public class Robot {
 				e.printStackTrace();
 			}
 		}
-
 		controller.turnRobotLeft();
+		me.setLeftCountdownBack();
+		me.setleftGotObstacle();
+		sendToAndroid();
 	}
 
 	/**
@@ -220,6 +285,8 @@ public class Robot {
 	public void moveForward() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
+		MazeExplorer mc = MazeExplorer.getInstance();
+		
 		if (!RobotSystem.isRealRun()) {
 			int stepTime = 1000 / _speed;
 			try {
@@ -237,9 +304,13 @@ public class Robot {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			_stepsSinceLastCalibration ++;
+			_stepsSinceLastCalibration++;
 		}
+		
 		controller.moveRobotForward();
+		if(mc.getleftGotObstacle())
+			mc.setLeftCoundown();
+		sendToAndroid();
 	}
 
 	/**
@@ -249,6 +320,8 @@ public class Robot {
 	public void moveForward(int count) {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
+		boolean moreThan = false;
+		
 		if (!RobotSystem.isRealRun()) {
 			int stepTime = 1000 / _speed;
 			for (int i = 0; i < count; i++) {
@@ -262,19 +335,60 @@ public class Robot {
 			}
 		} else {
 			try {
-				if (count >= 10) {
-					pcClient.sendMessage(Message.MOVE_FORWARD + count % 10 + count / 10 +  "|");
-				} else {
-					pcClient.sendMessage(Message.MOVE_FORWARD + count + Message.SEPARATOR);
+				String msg = "";
+				if(count == 10)
+					msg = "I";
+				else if (count == 11)
+					msg = "O";
+				else if (count == 12) 
+					msg = "P";
+				else if(count > 12) {
+					msg = Integer.toString(count-12);
+					moreThan = true;
 				}
-
-				String feedback = pcClient.readMessage();
-				for (int i = 0; i < count; i++) {
+				else
+					msg = Integer.toString(count);
+				if(moreThan) {
+					System.out.println("Robot: Moving robot straight via RPI: "+count+" "+LocalTime.now());
+					pcClient.sendMessage(msg+ Message.SEPARATOR);
+					
+					System.out.println("Robot: Moving robot straight: "+count+" "+LocalTime.now());
+					for (int i = 0; i < (count-12); i++) {
+						controller.moveRobotForward();
+					}
+					
+					String feedback = pcClient.readMessage();
 					while (!feedback.equals(Message.DONE)) {
 						feedback = pcClient.readMessage();
 					}
-					controller.moveRobotForward();
+					
+					pcClient.sendMessage("P"+ Message.SEPARATOR);
+					
+					System.out.println("Robot: Moving robot straight: "+count+" "+LocalTime.now());
+					for (int i = 0; i < 12; i++) {
+						controller.moveRobotForward();
+					}
+					
+					feedback = pcClient.readMessage();
+					while (!feedback.equals(Message.DONE)) {
+						feedback = pcClient.readMessage();
+					}
 				}
+				else {
+					System.out.println("Robot: Moving robot straight via RPI: "+count+" "+LocalTime.now());
+					pcClient.sendMessage(msg+ Message.SEPARATOR);
+					
+					System.out.println("Robot: Moving robot straight: "+count+" "+LocalTime.now());
+					for (int i = 0; i < count; i++) {
+						controller.moveRobotForward();
+					}
+					
+					String feedback = pcClient.readMessage();
+					while (!feedback.equals(Message.DONE)) {
+						feedback = pcClient.readMessage();
+					}
+				}
+				
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -286,16 +400,75 @@ public class Robot {
 	 * This function handles the robot position calibration.
 	 */
 	public void calibrateRobotPosition() {
+		if (RobotSystem.isRealRun()) {
+			Controller controller = Controller.getInstance();
+			PCClient pcClient = controller.getPCClient();
+			try {
+				pcClient.sendMessage(Message.CALIBRATE + Message.SEPARATOR);
+				String feedback = pcClient.readMessage();
+				while (!feedback.equals(Message.DONE)) {
+					feedback = pcClient.readMessage();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	/**
+	 * This function handles the robot position calibration overloaded function.
+	 * @param m
+	 */
+	public void calibrateRobotPosition(Movement m) {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
 		try {
-			pcClient.sendMessage(Message.CALIBRATE + Message.SEPARATOR);
+			if(m.name().equals("LR"))
+				pcClient.sendMessage(Message.CALIBRATE + Message.SEPARATOR);
+			else
+				pcClient.sendMessage(m.name() + Message.SEPARATOR);
 			String feedback = pcClient.readMessage();
 			while (!feedback.equals(Message.DONE)) {
 				feedback = pcClient.readMessage();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * This function handles the robot position calibration via front.
+	 * @param m
+	 */
+	public void calibrateRobotPositionViaFront() {
+		Controller controller = Controller.getInstance();
+		PCClient pcClient = controller.getPCClient();
+		try {
+			pcClient.sendMessage(Message.CALIBRATEFRONT + Message.SEPARATOR);
+			String feedback = pcClient.readMessage();
+			while (!feedback.equals(Message.DONE)) {
+				feedback = pcClient.readMessage();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	/**
+	 * This function handles the sending of map descriptor to android.
+	 */
+	public void sendToAndroid() {
+		Controller controller = Controller.getInstance();
+		MazeExplorer explorer = MazeExplorer.getInstance();
+		PCClient pcClient = controller.getPCClient();
+		String P1Descriptor, P2Descriptor;
+		String message = "";
+		P1Descriptor = explorer.getP1Descriptor();
+		P2Descriptor = explorer.getP2Descriptor();	
+		message = "DATA:"+P1Descriptor+","+P2Descriptor+","+controller.getPosition()[0]+","+controller.getPosition()[1]+","+controller.getOrientation();
+		if(RobotSystem.isRealRun()) {
+			pcClient.sendMessageToAndroid(message);
 		}
 	}
 
@@ -333,6 +506,28 @@ public class Robot {
 				calibrateRobotPosition();
 				turnRight();
 				turnRight();
+		}
+		return Orientation.NORTH;
+	}
+	
+	/**
+	 * This function handles the robot calibration at the end zone.
+	 * @param ori
+	 * @return
+	 */
+	public Orientation calibrateAtEndZone(Orientation ori) {	
+		switch (ori) {
+			case NORTH:
+				calibrateRobotPosition();
+				turnRight();
+				calibrateRobotPosition();
+				turnLeft();
+				break;
+			case EAST:
+				calibrateRobotPosition();
+				turnLeft();
+				calibrateRobotPosition();
+				break;
 		}
 		return Orientation.NORTH;
 	}
