@@ -212,7 +212,7 @@ public class Robot {
 		}
 		controller.turnRobotRight();
 		controller.turnRobotRight();
-		sendToAndroid();
+		//sendToAndroid();
 	}
 
 	/**
@@ -244,7 +244,7 @@ public class Robot {
 		controller.turnRobotRight();
 		me.setLeftCountdownBack();
 		me.setleftGotObstacle();
-		sendToAndroid();
+		//sendToAndroid();
 	}
 
 	/**
@@ -276,7 +276,7 @@ public class Robot {
 		controller.turnRobotLeft();
 		me.setLeftCountdownBack();
 		me.setleftGotObstacle();
-		sendToAndroid();
+		////sendToAndroid();
 	}
 
 	/**
@@ -310,7 +310,7 @@ public class Robot {
 		controller.moveRobotForward();
 		if(mc.getleftGotObstacle())
 			mc.setLeftCoundown();
-		sendToAndroid();
+		//sendToAndroid();
 	}
 
 	/**
@@ -406,8 +406,10 @@ public class Robot {
 			try {
 				pcClient.sendMessage(Message.CALIBRATE + Message.SEPARATOR);
 				String feedback = pcClient.readMessage();
+				System.out.println("HERE IS FEEDBACK" + feedback);
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
+					System.out.println("HERE IS FEEDBACK2" + feedback);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -481,11 +483,11 @@ public class Robot {
 		switch (ori) {
 			case NORTH:
 				turnLeft();
-				calibrateRobotPosition();
-				turnLeft();
-				calibrateRobotPosition();
-				turnRight();
-				turnRight();
+				//calibrateRobotPosition();
+				//turnLeft();
+				//calibrateRobotPosition();
+				//turnRight();
+				//turnRight();
 				break;
 			case SOUTH:
 				calibrateRobotPosition();

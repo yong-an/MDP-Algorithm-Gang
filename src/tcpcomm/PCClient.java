@@ -14,12 +14,12 @@ import datatypes.Message;
 public class PCClient {
 
     public static final String RPI_IP_ADDRESS = "192.168.23.23";
-    public static final int RPI_PORT = 22;
+    public static final int RPI_PORT = 5000;
     private static PCClient _instance;
     private Socket _clientSocket;
     private PrintWriter _toRPi;
     private Scanner _fromRPi;
-
+    
     private PCClient() {
 
     }
@@ -36,7 +36,7 @@ public class PCClient {
         }
         return _instance;
     }
-
+    
     /**
      * Main function that will setup connection to the RPI.
      * Once connected PC will send a message requesting for the sensor values.
@@ -49,12 +49,15 @@ public class PCClient {
         PCClient pcClient = PCClient.getInstance();
         pcClient.setUpConnection(RPI_IP_ADDRESS, RPI_PORT);
         System.out.println("RPI Connected Successfully");
-        while (true) {
+
+       while(true) {
+    	    System.out.println(Message.READ_SENSOR_VALUES);
             pcClient.sendMessage(Message.READ_SENSOR_VALUES);
             String msgReceived = pcClient.readMessage();
             System.out.println("Message Received: " + msgReceived);
         }
     }
+    
 
     /**
      * This function will handle the connection to RPI
@@ -88,11 +91,9 @@ public class PCClient {
      * @throws IOException
      */
     public void sendMessage(String msg) throws IOException {
-
 		msg = "@s"+msg+"!";
 		_toRPi.print(msg);
-		_toRPi.flush();
-		
+		_toRPi.flush(); 
 		System.out.println("Message sent to Arduino: " + msg+" - "+LocalTime.now());
 	}
     /**
@@ -104,21 +105,19 @@ public class PCClient {
 		msg = "@b"+msg+"!";
 		_toRPi.print(msg);
 		_toRPi.flush();
-		
 		System.out.println("Message sent to Android: " + msg+" - "+LocalTime.now());
 	}
 	
     /**
      * This function will handle sending message to R-PI.
      *
-     * @param msg
+     * @param msg 
      */
 	public void sendMsgToRPI(String msg){
 		msg = "@r"+msg+"!";
 		_toRPi.print(msg);
 		_toRPi.flush();
-		
-		System.out.println("Message sent to RPI: " + msg+" - "+LocalTime.now());
+		System.out.println("Message sent to RPI: " + msg+" - ");
 	}
     /**
      * This function will handle receiving message from RPI.
@@ -127,6 +126,7 @@ public class PCClient {
      * @throws IOException
      */
     public String readMessage() throws IOException {
+
         String messageReceived = _fromRPi.nextLine();
         System.out.println("Message Received: " + messageReceived);
         return messageReceived;

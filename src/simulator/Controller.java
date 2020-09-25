@@ -129,7 +129,7 @@ public class Controller {
 						String messageReceive = "";
 						List<String> valueList;
 						
-						while(receivePosition || receiveWaypoint) {
+						/*while(receivePosition || receiveWaypoint) {
 							messageReceive = _pcClient.readMessage();
 							valueList = Arrays.asList(messageReceive.split(":"));
 							
@@ -144,25 +144,34 @@ public class Controller {
 								setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
 								receiveWaypoint = false;
 							}
-						}
-											
-						//Version 4
+						}*/
+						
+						msgRobotPosition = "2,2";
+						//msgRobotPosition = valueList.get(1);
+						int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
+						resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
+
+						msgWayPoint = "6,18";
+						//String msgWayPoint = valueList.get(1);
+						setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
+						
+				
 						MazeExplorer me = MazeExplorer.getInstance();
 						me.init(_robotPosition, _robotOrientation);
 						Robot caliRobot = Robot.getInstance();
 						
 						_robotOrientation = caliRobot.calibrateAtStartZone(_robotOrientation);
 						me.setOrientation(_robotOrientation);
-						//End 
 						
-						//Get explore command
-						String msgExplore = _pcClient.readMessage();
+						//String msgExplore = _pcClient.readMessage();
 						//String msgExplore = Message.START_EXPLORATION;
-						while (!msgExplore.equals(Message.START_EXPLORATION)) {
-							msgExplore = _pcClient.readMessage();
-						}
+						//while (!msgExplore.equals(Message.START_EXPLORATION)) {
+							//msgExplore = _pcClient.readMessage();
+						//}
+
 						_ui.setStatus("start exploring");
 						exploreMaze();
+
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
 				} catch (IOException e) {
@@ -174,6 +183,7 @@ public class Controller {
 			};
 			
 			connectWithRPi.execute();
+
 	
 		} else {
 			_ui.refreshExploreInput();
@@ -310,40 +320,44 @@ public class Controller {
      * @param y
      */
     public void resetRobotInMaze(JButton[][] mazeGrids, int x, int y) {
-        if (x < 2 || x > 14 || y < 2 || y > 9) {
-            _ui.setStatus("warning: robot position out of range");
-            resetMaze(mazeGrids);
-        } else {
-            for (int i = x - 1; i <= x + 1; i++) {
-                for (int j = y - 1; j <= y + 1; j++) {
-                    mazeGrids[20 - j][i - 1].setBackground(Color.GREEN);
-                }
-            }
-
-            _robotOrientation = Orientation.NORTH;
-
-            switch (_robotOrientation) {
-                case NORTH:
-                    mazeGrids[19 - y][x - 1].setBackground(Color.BLUE);
-                    break;
-                case SOUTH:
-                    mazeGrids[21 - y][x - 1].setBackground(Color.BLUE);
-                    break;
-                case EAST:
-                    mazeGrids[20 - y][x].setBackground(Color.BLUE);
-                    break;
-                case WEST:
-                    mazeGrids[20 - y][x - 2].setBackground(Color.BLUE);
-                    break;
-            }
-
-            _robotPosition[0] = x - 1;
-            _robotPosition[1] = y - 1;
-
-
-            _ui.setStatus("robot initial position set");
-        }
-    }
+		//if(RobotSystem.isRealRun()) {
+			//x+=1;
+			//y+=1;
+		//}
+		if (x < 2 || x > 14 || y < 2 || y > 9) {
+			_ui.setStatus("warning: robot position out of range");
+			resetMaze(mazeGrids);
+		} else {
+			for (int i = x - 1; i <= x + 1; i++) {
+				for (int j = y - 1; j <= y + 1; j++) {
+					mazeGrids[20 - j][i - 1].setBackground(Color.GREEN);		
+				}
+			}
+			
+			//_robotOrientation = Orientation.NORTH;
+			
+			switch (_robotOrientation) {
+			case NORTH:
+				mazeGrids[19 - y][x - 1].setBackground(Color.BLUE);	
+				break;
+			case SOUTH:
+				mazeGrids[21 - y][x - 1].setBackground(Color.BLUE);	
+				break;
+			case EAST:
+				mazeGrids[20 - y][x].setBackground(Color.BLUE);	
+				break;
+			case WEST:
+				mazeGrids[20 - y][x - 2].setBackground(Color.BLUE);	
+				break;
+			}
+			
+			_robotPosition[0] = x - 1;
+			_robotPosition[1] = y - 1;
+		
+			System.out.println("Robot initial position set at "+_robotPosition[0]+","+_robotPosition[1]);
+			_ui.setStatus("robot initial position set");
+		}
+	}
     
     /**
      * Function to set way point in maze.
@@ -526,7 +540,7 @@ public class Controller {
      * Function handles exploration of the maze.
      */
     public void exploreMaze() {
-
+    	
         if (!RobotSystem.isRealRun()) {
             if (!_ui.isIntExploreInput()) {
                 _ui.setStatus("invalid input for exploration");
@@ -540,7 +554,7 @@ public class Controller {
                 return;
             }
         }
-
+        
         MazeExplorer explorer = MazeExplorer.getInstance();
         Robot robot = Robot.getInstance();
 
@@ -554,13 +568,15 @@ public class Controller {
         SwingWorker<Void, Void> exploreMaze = new SwingWorker<Void, Void>() {
             @Override
             protected Void doInBackground() throws Exception {
+
                 if (!RobotSystem.isRealRun()) {
                     robot.setSpeed(_speed);
                 }
                 _hasReachedStart = false;
 
                 explorer.explore(_robotPosition, _robotOrientation);
-
+                
+              	
                 //Compute the fastest path right after exploration for real run.
                 if (RobotSystem.isRealRun()) {
                     AStarPathFinder pathFinder = AStarPathFinder.getInstance();
@@ -749,6 +765,7 @@ public class Controller {
     	}
     	else {
     		// MANUALLY SET WAY POINTS
+    		
     		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
     			@Override
     			protected Void doInBackground() throws Exception {

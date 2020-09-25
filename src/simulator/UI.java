@@ -271,7 +271,7 @@ public class UI extends JFrame implements ActionListener {
         JLabel[] ffpCtrlLabels = new JLabel[2];
         _ffpTextFields = new JTextField[2];
         btnAStar = new JRadioButton("A * " , true);
-        btnFloodFill = new JRadioButton("Manual Way-Points");
+        btnFloodFill = new JRadioButton("Test");
         ButtonGroup algorithmBtnGrp = new ButtonGroup();
         algorithmBtnGrp.add(btnAStar);
         algorithmBtnGrp.add(btnFloodFill);
