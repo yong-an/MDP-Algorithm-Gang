@@ -296,7 +296,9 @@ public class MazeExplorer {
 						if (i == 0 || i == Arena.MAP_WIDTH-1)
 							break;
 						//found empty space south of obstacle, set it as coods to take picture from facing north
-						if (_mazeRef[i][j+offset] != IS_OBSTACLE && _mazeRef[i][j+offset-1] != IS_OBSTACLE && _mazeRef[i][j+offset-2] != IS_OBSTACLE)
+						if (_mazeRef[i][j+offset] != IS_OBSTACLE && _mazeRef[i][j+offset-1] != IS_OBSTACLE && _mazeRef[i][j+offset-2] != IS_OBSTACLE
+								&& _mazeRef[i-1][j+offset] != IS_OBSTACLE && _mazeRef[i-1][j+offset-1] != IS_OBSTACLE && _mazeRef[i-1][j+offset-2] != IS_OBSTACLE
+								&& _mazeRef[i+1][j+offset] != IS_OBSTACLE && _mazeRef[i+1][j+offset-1] != IS_OBSTACLE && _mazeRef[i+1][j+offset-2] != IS_OBSTACLE)
 						{
 							ImageRef imageRef = new ImageRef(i,j+offset-1,Orientation.NORTH);
 							//check if already exists
@@ -314,7 +316,9 @@ public class MazeExplorer {
 						if (j == 0 || j == Arena.MAP_LENGTH-1)
 							break;
 						//found sufficient empty space east of obstacle, set it as coods to take picture from facing north
-						if (_mazeRef[i+offset][j] != IS_OBSTACLE && _mazeRef[i+offset+1][j] != IS_OBSTACLE && _mazeRef[i+offset+2][j] != IS_OBSTACLE)
+						if (_mazeRef[i+offset][j] != IS_OBSTACLE && _mazeRef[i+offset+1][j] != IS_OBSTACLE && _mazeRef[i+offset+2][j] != IS_OBSTACLE
+								&& _mazeRef[i+offset][j-1] != IS_OBSTACLE && _mazeRef[i+offset+1][j-1] != IS_OBSTACLE && _mazeRef[i+offset+2][j-1] != IS_OBSTACLE
+								&& _mazeRef[i+offset][j+1] != IS_OBSTACLE && _mazeRef[i+offset+1][j+1] != IS_OBSTACLE && _mazeRef[i+offset+2][j+1] != IS_OBSTACLE)
 						{
 							ImageRef imageRef = new ImageRef(i+offset+1,j,Orientation.WEST);
 							//check if already exists
@@ -332,7 +336,9 @@ public class MazeExplorer {
 						if (i == 0 || i == Arena.MAP_WIDTH-1)
 							break;
 						//found empty space south of obstacle, set it as coods to take picture from facing north
-						if (_mazeRef[i][j+offset] != IS_OBSTACLE && _mazeRef[i][j+offset+1] != IS_OBSTACLE && _mazeRef[i][j+offset+2] != IS_OBSTACLE)
+						if (_mazeRef[i][j+offset] != IS_OBSTACLE && _mazeRef[i][j+offset+1] != IS_OBSTACLE && _mazeRef[i][j+offset+2] != IS_OBSTACLE
+								&& _mazeRef[i-1][j+offset] != IS_OBSTACLE && _mazeRef[i-1][j+offset+1] != IS_OBSTACLE && _mazeRef[i-1][j+offset+2] != IS_OBSTACLE
+								&& _mazeRef[i+1][j+offset] != IS_OBSTACLE && _mazeRef[i+1][j+offset+1] != IS_OBSTACLE && _mazeRef[i+1][j+offset+2] != IS_OBSTACLE)
 						{
 							ImageRef imageRef = new ImageRef(i,j+offset+1,Orientation.SOUTH);
 							//check if already exists
@@ -350,7 +356,9 @@ public class MazeExplorer {
 						if (j == 0 || j == Arena.MAP_LENGTH-1)
 							break;
 						//found sufficient empty space east of obstacle, set it as coods to take picture from facing north
-						if (_mazeRef[i+offset][j] != IS_OBSTACLE && _mazeRef[i+offset-1][j] != IS_OBSTACLE && _mazeRef[i+offset-2][j] != IS_OBSTACLE)
+						if (_mazeRef[i+offset][j] != IS_OBSTACLE && _mazeRef[i+offset-1][j] != IS_OBSTACLE && _mazeRef[i+offset-2][j] != IS_OBSTACLE
+								&& _mazeRef[i+offset][j-1] != IS_OBSTACLE && _mazeRef[i+offset-1][j-1] != IS_OBSTACLE && _mazeRef[i+offset-2][j-1] != IS_OBSTACLE
+								&& _mazeRef[i+offset][j+1] != IS_OBSTACLE && _mazeRef[i+offset-1][j+1] != IS_OBSTACLE && _mazeRef[i+offset-2][j+1] != IS_OBSTACLE)
 						{
 							ImageRef imageRef = new ImageRef(i+offset-1,j,Orientation.EAST);
 							//check if already exists
