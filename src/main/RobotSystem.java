@@ -25,7 +25,7 @@ public class RobotSystem {
 	public RobotSystem() {
 		Controller c = Controller.getInstance();
 		c.run();
-		System.out.println("We R Live.");
+		System.out.println("We R Live Now");
 	}
 	
 	public static boolean isRealRun() {

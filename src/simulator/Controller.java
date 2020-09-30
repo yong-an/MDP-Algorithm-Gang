@@ -105,7 +105,7 @@ public class Controller {
      */
 	public void run() {
 		_ui.setVisible(true);
-		_robotOrientation = Orientation.NORTH;
+		_robotOrientation = Orientation.EAST;
 		if (RobotSystem.isRealRun()) {
 	
 			_pcClient = PCClient.getInstance();
@@ -146,13 +146,13 @@ public class Controller {
 							}
 						}*/
 						
-						msgRobotPosition = "2,2";
-						//msgRobotPosition = valueList.get(1);
+						msgRobotPosition = "1,1";
+						//   msgRobotPosition = valueList.get(1);
 						int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
 						resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
 
 						msgWayPoint = "6,18";
-						//String msgWayPoint = valueList.get(1);
+						//   String msgWayPoint = valueList.get(1);
 						setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
 						
 				
@@ -163,17 +163,18 @@ public class Controller {
 						_robotOrientation = caliRobot.calibrateAtStartZone(_robotOrientation);
 						me.setOrientation(_robotOrientation);
 						
-						//String msgExplore = _pcClient.readMessage();
+						String msgExplore = _pcClient.readMessage();
 						//String msgExplore = Message.START_EXPLORATION;
-						//while (!msgExplore.equals(Message.START_EXPLORATION)) {
-							//msgExplore = _pcClient.readMessage();
-						//}
+						while (!msgExplore.equals(Message.START_EXPLORATION)) {
+							msgExplore = _pcClient.readMessage();
+						}
 
 						_ui.setStatus("start exploring");
 						exploreMaze();
 
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
+					System.out.println(e.toString());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -320,10 +321,10 @@ public class Controller {
      * @param y
      */
     public void resetRobotInMaze(JButton[][] mazeGrids, int x, int y) {
-		//if(RobotSystem.isRealRun()) {
-			//x+=1;
-			//y+=1;
-		//}
+		if(RobotSystem.isRealRun()) {
+			x+=1;
+			y+=1;
+		}
 		if (x < 2 || x > 14 || y < 2 || y > 9) {
 			_ui.setStatus("warning: robot position out of range");
 			resetMaze(mazeGrids);
@@ -573,10 +574,10 @@ public class Controller {
                     robot.setSpeed(_speed);
                 }
                 _hasReachedStart = false;
-
+                
                 explorer.explore(_robotPosition, _robotOrientation);
                 
-              	
+              
                 //Compute the fastest path right after exploration for real run.
                 if (RobotSystem.isRealRun()) {
                     AStarPathFinder pathFinder = AStarPathFinder.getInstance();

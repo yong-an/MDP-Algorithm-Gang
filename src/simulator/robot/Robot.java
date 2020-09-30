@@ -2,11 +2,11 @@ package simulator.robot;
 
 import java.io.IOException;
 import java.time.LocalTime;
-
 import algorithms.MazeExplorer;
 import datatypes.Message;
 import datatypes.Movement;
 import datatypes.Orientation;
+import org.json.*;
 import main.RobotSystem;
 import simulator.Controller;
 import simulator.arena.Arena;
@@ -22,6 +22,7 @@ public class Robot {
 	private int _stepsSinceLastCalibration;
 	private int _stepsSinceLastSideCalibration;
 
+ 
 	/**
 	 * Constructor that will handle the calibration counter.
 	 */
@@ -212,7 +213,8 @@ public class Robot {
 		}
 		controller.turnRobotRight();
 		controller.turnRobotRight();
-		//sendToAndroid();
+		
+		sendToAndroid();
 	}
 
 	/**
@@ -242,9 +244,11 @@ public class Robot {
 			}
 		}
 		controller.turnRobotRight();
+		
 		me.setLeftCountdownBack();
 		me.setleftGotObstacle();
-		//sendToAndroid();
+		
+		sendToAndroid();
 	}
 
 	/**
@@ -274,9 +278,11 @@ public class Robot {
 			}
 		}
 		controller.turnRobotLeft();
+		
 		me.setLeftCountdownBack();
 		me.setleftGotObstacle();
-		////sendToAndroid();
+		
+		sendToAndroid();
 	}
 
 	/**
@@ -308,16 +314,18 @@ public class Robot {
 		}
 		
 		controller.moveRobotForward();
+		
 		if(mc.getleftGotObstacle())
 			mc.setLeftCoundown();
-		//sendToAndroid();
+		
+		sendToAndroid();
 	}
 
 	/**
 	 * This function overloads the previous function by allowing you to select the amount of grids to move forward.
 	 * @param count
 	 */
-	public void moveForward(int count) {
+	 public void moveForward(int count) {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
 		boolean moreThan = false;
@@ -394,7 +402,44 @@ public class Robot {
 				e.printStackTrace();
 			}
 		}
-	}
+	} 
+	
+	/*public void moveForward(int count) {
+		
+		Controller controller = Controller.getInstance();
+		PCClient pcClient = controller.getPCClient();
+		if (!RobotSystem.isRealRun()) {
+			int stepTime = 1000 / _speed;
+			for (int i = 0; i < count; i++) {
+				try {
+					Thread.sleep(stepTime);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+		
+				controller.moveRobotForward();
+			}
+		} else {
+			try {
+				System.out.println("Robot: Moving robot straight: "+count+" "+LocalTime.now());
+				for (int i = 0; i < count; i++) {
+					controller.moveRobotForward();
+				}
+				System.out.println("Robot: Moving robot straight via RPI: "+count+" "+LocalTime.now());
+				pcClient.sendMessage(Integer.toString(count));
+				
+				String feedback = pcClient.readMessage();	
+				while (!feedback.equals(Message.DONE)) {
+					System.out.println("Waiting: "+LocalTime.now());
+					feedback = pcClient.readMessage();
+				}
+	
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}*/
 
 	/**
 	 * This function handles the robot position calibration.
@@ -406,10 +451,8 @@ public class Robot {
 			try {
 				pcClient.sendMessage(Message.CALIBRATE + Message.SEPARATOR);
 				String feedback = pcClient.readMessage();
-				System.out.println("HERE IS FEEDBACK" + feedback);
 				while (!feedback.equals(Message.DONE)) {
 					feedback = pcClient.readMessage();
-					System.out.println("HERE IS FEEDBACK2" + feedback);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -468,10 +511,32 @@ public class Robot {
 		String message = "";
 		P1Descriptor = explorer.getP1Descriptor();
 		P2Descriptor = explorer.getP2Descriptor();	
+		
+		/*JSONObject JSON = new JSONObject();
+		JSONObject JSON1 = new JSONObject();
+		try {
+			JSON.put("explored",P1Descriptor);
+			JSON.put("length","300");
+			JSON.put("obstacle",P2Descriptor);
+			
+			JSON1.put("x",controller.getPosition()[0]);
+			JSON1.put("y",controller.getPosition()[1]);
+			JSON1.put("ori",controller.getOrientation());
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}*/
+
 		message = "DATA:"+P1Descriptor+","+P2Descriptor+","+controller.getPosition()[0]+","+controller.getPosition()[1]+","+controller.getOrientation();
+		
 		if(RobotSystem.isRealRun()) {
 			pcClient.sendMessageToAndroid(message);
+			//pcClient.sendJsonToAndroid(JSON);
+			//DELAY 500ms
+			//pcClient.sendJsonToAndroid(JSON1);
 		}
+
 	}
 
 	/**
@@ -483,11 +548,11 @@ public class Robot {
 		switch (ori) {
 			case NORTH:
 				turnLeft();
-				//calibrateRobotPosition();
-				//turnLeft();
-				//calibrateRobotPosition();
-				//turnRight();
-				//turnRight();
+				calibrateRobotPosition();
+				turnLeft();
+				calibrateRobotPosition();
+				turnRight();
+				turnRight();
 				break;
 			case SOUTH:
 				calibrateRobotPosition();
@@ -496,11 +561,11 @@ public class Robot {
 				turnRight();			
 				break;
 			case EAST:
-				turnRight();
-				calibrateRobotPosition();
-				turnRight();
-				calibrateRobotPosition();
-				turnRight();
+				//turnRight();
+				calibrateRobotPositionViaFront();
+				//turnRight();
+				//calibrateRobotPosition();
+				//turnRight();
 				break;
 			case WEST:
 				calibrateRobotPosition();
@@ -509,7 +574,7 @@ public class Robot {
 				turnRight();
 				turnRight();
 		}
-		return Orientation.NORTH;
+		return Orientation.EAST;
 	}
 	
 	/**
@@ -531,6 +596,6 @@ public class Robot {
 				calibrateRobotPosition();
 				break;
 		}
-		return Orientation.NORTH;
+		return Orientation.EAST;
 	}
 }
