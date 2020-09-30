@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -388,10 +389,45 @@ public class MazeExplorer {
 //		}
 //		return null;
 //	}
+	
+	private void sortImageRef()
+	{
+		ArrayList<ImageRef> sortedArrayListOfImageRefs = new ArrayList<ImageRef>();
+		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
+		Path newPath;
+		ImageRef currNode  = new ImageRef(1,1,Orientation.NORTH);
+		Path fastestPath = null;
+		int fastestNodeElement = 0;
+		while (!arrayListOfImageRefs.isEmpty())
+		{
+			for (int i = 0; i < arrayListOfImageRefs.size(); ++i)
+			{
+				newPath = pathFinder.findFastestPath(currNode.getX(), currNode.getY(), arrayListOfImageRefs.get(i).getX(), arrayListOfImageRefs.get(i).getY(), _mazeRef);
+				if (fastestPath == null)
+				{
+					fastestPath = newPath;
+					fastestNodeElement = 0;
+				}
+				else if (newPath.getNumOfSteps() < fastestPath.getNumOfSteps())
+				{
+					fastestPath = newPath;
+					fastestNodeElement = i;
+				}
+			}
+			sortedArrayListOfImageRefs.add(new ImageRef(arrayListOfImageRefs.get(fastestNodeElement)));
+			currNode  = sortedArrayListOfImageRefs.get(sortedArrayListOfImageRefs.size()-1);
+			System.out.println(arrayListOfImageRefs.size());
+			arrayListOfImageRefs.remove(fastestNodeElement);
+			fastestPath = null;
+		}
+		arrayListOfImageRefs = new ArrayList<ImageRef>(sortedArrayListOfImageRefs);
+	}
 
 	public void findImage() {
 
 		setImageRef();
+		Collections.sort(arrayListOfImageRefs);
+		sortImageRef();
 		while(!arrayListOfImageRefs.isEmpty()) {
 			System.out.println(arrayListOfImageRefs.get(0).getX()+","+arrayListOfImageRefs.get(0).getY());
 			VirtualMap virtualMap = VirtualMap.getInstance();

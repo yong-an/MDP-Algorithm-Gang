@@ -1,8 +1,9 @@
 package datatypes;
 
+import java.util.Comparator;
 import simulator.arena.Arena;
 
-public class ImageRef {
+public class ImageRef implements Comparable<ImageRef> {
 	private int x, y;
 	private Orientation orientation;
 
@@ -10,6 +11,12 @@ public class ImageRef {
 		x = 0;
 		y = 0;
 		orientation = orientation.NORTH;
+	}
+	
+	public ImageRef(ImageRef _imageRef) {
+		x = _imageRef.getX();
+		y = _imageRef.getY();
+		orientation = _imageRef.getOrientation();
 	}
 
 	public ImageRef(int _x, int _y, Orientation _orientation) {
@@ -40,6 +47,11 @@ public class ImageRef {
 		return hash;
 	}
 
+	public int compareTo(ImageRef _that) {
+
+        return Integer.compare(x + y*Arena.MAP_WIDTH-1, _that.x + _that.y*Arena.MAP_WIDTH-1);
+    }
+	
 	public int getX() {
 		return x;
 	}
