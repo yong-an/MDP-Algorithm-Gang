@@ -2,12 +2,14 @@ package algorithms;
 
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import java.util.HashMap;
 
+import datatypes.ImageRef;
 import datatypes.Message;
 import datatypes.Movement;
 import datatypes.Orientation;
@@ -42,7 +44,7 @@ public class MazeExplorer {
 	private static final int RIGHT_CALIBRATION_THRESHOLD = 2;
 	private static MazeExplorer _instance;
 	private Boolean[][] _isExplored;
-	private int[][] _mazeRef, rightWallRef, imageRef, weightageRef;
+	private int[][] _mazeRef, rightWallRef, weightageRef;
 	private Robot _robot;
 	private int[] _robotPosition;
 	private Orientation _robotOrientation;
@@ -54,6 +56,7 @@ public class MazeExplorer {
 	private int leftCountdown = 2;
 	private int[] lastCalibrate = new int[2];
 	private boolean leftGotObstacle = false;
+	private ArrayList<ImageRef> arrayListOfImageRefs = new ArrayList<ImageRef>();
 
 	private MazeExplorer() {
 
@@ -200,7 +203,6 @@ public class MazeExplorer {
 				_isExplored[i][j] = true;
 				_mazeRef[i][j] = IS_EMPTY;
 				rightWallRef[i][j] = IS_EMPTY;
-				imageRef[i][j] = IS_EMPTY;
 				weightageRef[i][j] = IS_EMPTY;
 			}
 		}
@@ -278,78 +280,133 @@ public class MazeExplorer {
 		}
 	}
 
-	public void updateImageRef() {
+	// set coods for robot in arrayListOfImageRef to capture images from these coods and orientation
+	// check in order of south east north west
+	// TODO updated this function please check dependancy on correct usage of function
+	public void setImageRef() {
 		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
 			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
 //				if (_mazeRef[i][j] == IS_OBSTACLE && rightWallRef[i][j] != RIGHT_CHECK){ // TODO remove its wrong
-				if (_mazeRef[i][j] == IS_OBSTACLE){
-					imageRef[i][j] = IS_OBSTACLE;
-					System.out.println("Image Ref: "+i+","+j);
+				if (_mazeRef[i][j] == IS_OBSTACLE)
+				{
+					//check south
+					// exit condition based on minimum space for robot
+					for (int offset = 0; j+offset-1 > 0; --offset)
+					{
+						if (i == 0 || i == Arena.MAP_WIDTH-1)
+							break;
+						//found empty space south of obstacle, set it as coods to take picture from facing north
+						if (_mazeRef[i][j+offset] != IS_OBSTACLE && _mazeRef[i][j+offset-1] != IS_OBSTACLE && _mazeRef[i][j+offset-2] != IS_OBSTACLE)
+						{
+							ImageRef imageRef = new ImageRef(i,j+offset-1,Orientation.NORTH);
+							//check if already exists
+							if (arrayListOfImageRefs.contains(imageRef))
+								break;
+							arrayListOfImageRefs.add(imageRef);
+							System.out.println("Image Ref: "+imageRef.getX()+","+imageRef.getY()+","+imageRef.getOrientation());
+							break;
+						}
+					}
+					//check east
+					// exit condition based on minimum space for robot
+					for (int offset = 0; i+offset+1 < Arena.MAP_LENGTH-1; ++offset)
+					{
+						if (j == 0 || j == Arena.MAP_LENGTH-1)
+							break;
+						//found sufficient empty space east of obstacle, set it as coods to take picture from facing north
+						if (_mazeRef[i+offset][j] != IS_OBSTACLE && _mazeRef[i+offset+1][j] != IS_OBSTACLE && _mazeRef[i+offset+2][j] != IS_OBSTACLE)
+						{
+							ImageRef imageRef = new ImageRef(i+offset+1,j,Orientation.WEST);
+							//check if already exists
+							if (arrayListOfImageRefs.contains(imageRef))
+								break;
+							arrayListOfImageRefs.add(imageRef);
+							System.out.println("Image Ref: "+imageRef.getX()+","+imageRef.getY()+","+imageRef.getOrientation());
+							break;
+						}
+					}
+					//check north
+					// exit condition based on minimum space for robot
+					for (int offset = 0; j+offset+1 < Arena.MAP_WIDTH-1; ++offset)
+					{
+						if (i == 0 || i == Arena.MAP_WIDTH-1)
+							break;
+						//found empty space south of obstacle, set it as coods to take picture from facing north
+						if (_mazeRef[i][j+offset] != IS_OBSTACLE && _mazeRef[i][j+offset+1] != IS_OBSTACLE && _mazeRef[i][j+offset+2] != IS_OBSTACLE)
+						{
+							ImageRef imageRef = new ImageRef(i,j+offset+1,Orientation.SOUTH);
+							//check if already exists
+							if (arrayListOfImageRefs.contains(imageRef))
+								break;
+							arrayListOfImageRefs.add(imageRef);
+							System.out.println("Image Ref: "+imageRef.getX()+","+imageRef.getY()+","+imageRef.getOrientation());
+							break;
+						}
+					}
+					//check west
+					// exit condition based on minimum space for robot
+					for (int offset = 0; i+offset-1 > 0; --offset)
+					{
+						if (j == 0 || j == Arena.MAP_LENGTH-1)
+							break;
+						//found sufficient empty space east of obstacle, set it as coods to take picture from facing north
+						if (_mazeRef[i+offset][j] != IS_OBSTACLE && _mazeRef[i+offset-1][j] != IS_OBSTACLE && _mazeRef[i+offset-2][j] != IS_OBSTACLE)
+						{
+							ImageRef imageRef = new ImageRef(i+offset-1,j,Orientation.EAST);
+							//check if already exists
+							if (arrayListOfImageRefs.contains(imageRef))
+								break;
+							arrayListOfImageRefs.add(imageRef);
+							System.out.println("Image Ref: "+imageRef.getX()+","+imageRef.getY()+","+imageRef.getOrientation());
+							break;
+						}
+					}
 				}
 			}
 		}
 	}
 
-	private int[] getPos() {
-		int[] obsPos = new int[2];
-
-		for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
-			for (int obsY = 0; obsY < Arena.MAP_WIDTH; obsY++) {
-				if(imageRef[obsX][obsY] == IS_OBSTACLE) {
-					obsPos[0] = obsX;
-					obsPos[1] = obsY;
-					return obsPos;
-				}
-			}
-		}
-		return null;
-	}
+//	private int[] getPos() {
+//		int[] obsPos = new int[2];
+//
+//		for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
+//			for (int obsY = 0; obsY < Arena.MAP_WIDTH; obsY++) {
+//				if(imageRef[obsX][obsY] == IS_OBSTACLE) {
+//					obsPos[0] = obsX;
+//					obsPos[1] = obsY;
+//					return obsPos;
+//				}
+//			}
+//		}
+//		return null;
+//	}
 
 	public void findImage() {
 
-		updateImageRef();
-
-		while(getPos()!=null) {
+		setImageRef();
+		while(!arrayListOfImageRefs.isEmpty()) {
+			System.out.println(arrayListOfImageRefs.get(0).getX()+","+arrayListOfImageRefs.get(0).getY());
 			VirtualMap virtualMap = VirtualMap.getInstance();
 			AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 			Path fastestPath;
 			Controller controller = Controller.getInstance();
-			int[] nextRobotPosition = null, obsPos;
 			virtualMap.updateVirtualMap(_mazeRef);
 
-			obsPos = getPos();
-			int obsX = obsPos[0];
-			int obsY = obsPos[1];
+			int obsX = arrayListOfImageRefs.get(0).getX();
+			int obsY = arrayListOfImageRefs.get(0).getY();
+			
 			System.out.println("Next Point: "+obsX+","+obsY);
 			System.out.println("Time Reach?: "+controller.hasReachedTimeThreshold());
 			if (controller.hasReachedTimeThreshold()) {
 				System.out.println("Find Image: TIME OUT!");
 				break;
 			}
-//			if (imageRef[obsX][obsY] == IS_OBSTACLE){ // TODO remove if() cos this if() is useless
-				nextRobotPosition = getNearestRobotPositionTo(obsX, obsY, virtualMap, false);
-
-				fastestPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], nextRobotPosition[0], nextRobotPosition[1], _mazeRef);
+				fastestPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], obsX, obsY, _mazeRef);
 
 				_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true, true, true);
 				virtualMap.updateVirtualMap(_mazeRef);
-
-				if (_robotPosition[0] > obsX) {
-					adjustOrientationTo(Orientation.WEST);
-				} else if (_robotPosition[0] < obsX) {
-					adjustOrientationTo(Orientation.EAST);
-				} else if  (_robotPosition[1] > obsY) {
-					adjustOrientationTo(Orientation.SOUTH);
-				} else if  (_robotPosition[1] < obsY) {
-					adjustOrientationTo(Orientation.NORTH);
-				}
-				int[] pos = new int[2];
-				pos[0] = -1;
-				pos[1] = -1;
-				findImageAlongWall(pos, nextRobotPosition);
-				//updateImageRef(); // TODO remove, definitely useless
-				//currentRobotPosition = nextRobotPosition;
-//			}
+				adjustOrientationTo(arrayListOfImageRefs.get(0).getOrientation());
+				arrayListOfImageRefs.remove(0);
 		}
 	}
 
@@ -1400,7 +1457,7 @@ public class MazeExplorer {
 			_isExplored = new Boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 			_mazeRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 			rightWallRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
-			imageRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
+			//imageRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 			weightageRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 
 			for (int i = 0; i < Arena.MAP_LENGTH; i++) {
@@ -1412,7 +1469,7 @@ public class MazeExplorer {
 				for (int j = 0; j < Arena.MAP_WIDTH; j++) {
 					_mazeRef[i][j] = UNEXPLORED;
 					rightWallRef[i][j] = UNEXPLORED;
-					imageRef[i][j] = UNEXPLORED;
+					//imageRef[i][j] = UNEXPLORED;
 					weightageRef[i][j] = 0;
 				}
 			}
@@ -1898,25 +1955,25 @@ public class MazeExplorer {
 	      switch (ori) {
 		      case NORTH:
 		    	  if((curPos[0]+2) != 15 && _mazeRef[curPos[0]+2][curPos[1]+i] == IS_OBSTACLE) {
-		    		  imageRef[curPos[0]+2][curPos[1]+i] = IS_EMPTY;
+		    		  //imageRef[curPos[0]+2][curPos[1]+i] = IS_EMPTY;
 		    		  hasObs = true;
 		    	  }
 		    	  break;
 		      case SOUTH:
 		    	  if((curPos[0]-2) != -1 && _mazeRef[curPos[0]-2][curPos[1]+i] == IS_OBSTACLE) {
-		    		  imageRef[curPos[0]-2][curPos[1]+i] = IS_EMPTY;
+		    		  //imageRef[curPos[0]-2][curPos[1]+i] = IS_EMPTY;
 		    		  hasObs = true;
 		    	  }
 		    	  break;
 		      case EAST:
 		    	  if((curPos[1]-2) != -1 && _mazeRef[curPos[0]+i][curPos[1]-2] == IS_OBSTACLE) {
-		    		  imageRef[curPos[0]+i][curPos[1]-2] = IS_EMPTY;
+		    		  //imageRef[curPos[0]+i][curPos[1]-2] = IS_EMPTY;
 		    		  hasObs = true;
 		    	  }
 		    	  break;
 		      case WEST:
 		    	  if((curPos[1]+2) != 20 && _mazeRef[curPos[0]+i][curPos[1]+2] == IS_OBSTACLE) {
-		    		  imageRef[curPos[0]+i][curPos[1]+2] = IS_EMPTY;
+		    		  //imageRef[curPos[0]+i][curPos[1]+2] = IS_EMPTY;
 		    		  hasObs = true;
 		    	  }
 		    	  break;
