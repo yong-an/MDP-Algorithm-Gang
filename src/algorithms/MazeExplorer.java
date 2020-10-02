@@ -442,31 +442,48 @@ public class MazeExplorer {
             _robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true, true, true);
             virtualMap.updateVirtualMap(_mazeRef);
             adjustOrientationTo(arrayListOfImageRefs.get(0).getOrientation());
-
+            sendPicToRPI(arrayListOfImageRefs.get(0));
             arrayListOfImageRefs.remove(0);
 
-            // TODO add talk to RPI somewhere here
-            sendPicToRPI(_robotPosition, _robotOrientation);
         } // end of while (!arrayListOfImageRefs.isEmpty())
     }
 
-    private void sendPicToRPI(int[] robotPosition, Orientation ori) {
-        String msg = "";
+    private Boolean sendPicToRPI(ImageRef _imageRef) {
+    	if (_imageRef == null)
+    	{
+    		 System.out.println("null error");
+    		 return false;
+    	}
+    	ImageRef obstacleToSend = new ImageRef(_imageRef);
+    	switch (obstacleToSend.getOrientation()) {
+		case NORTH:
+			obstacleToSend.setY(obstacleToSend.getY()+2);
+			obstacleToSend.setOrientation(Orientation.SOUTH);
+			break;
+		case SOUTH:
+			obstacleToSend.setY(obstacleToSend.getY()-2);
+			obstacleToSend.setOrientation(Orientation.NORTH);
+			break;
+		case EAST:
+			obstacleToSend.setX(obstacleToSend.getX()+2);
+			obstacleToSend.setOrientation(Orientation.WEST);
+			break;
+		case WEST:
+			obstacleToSend.setX(obstacleToSend.getX()-2);
+			obstacleToSend.setOrientation(Orientation.EAST);
+			break;
+		default:
+			break;
+		}
+    	if (obstacleToSend.getX() >= Arena.MAP_WIDTH || obstacleToSend.getX() < 0 || obstacleToSend.getY() >= Arena.MAP_LENGTH || obstacleToSend.getY() < 0)
+    	{
+    		System.out.println("Error: Obstacle out of bounds");
+    		return false;
+    	}
+        String msg = obstacleToSend.getX() + "_" + obstacleToSend.getY() + "_" + obstacleToSend.getOrientation();
 
         Controller controller = Controller.getInstance();
         PCClient pcClient = controller.getPCClient();
-
-        if (ori == Orientation.NORTH && (robotPosition[0] + 2) != 15)
-            msg = (robotPosition[0] + 2) + "_" + robotPosition[1] + "_" + ori;
-
-        else if (ori == Orientation.SOUTH && (robotPosition[0] - 2) != -1)
-            msg = (robotPosition[0] - 2) + "_" + robotPosition[1] + "_" + ori;
-
-        else if (ori == Orientation.EAST && (robotPosition[1] - 2) != -1)
-            msg = (robotPosition[0]) + "_" + (robotPosition[1] - 2) + "_" + ori;
-
-        else if (ori == Orientation.WEST && (robotPosition[1] + 2) != 20)
-            msg = (robotPosition[0]) + "_" + (robotPosition[1] + 2) + "_" + ori;
 
         System.out.println("Send to RPI: " + msg);
         if (RobotSystem.isRealRun()) {
@@ -485,14 +502,18 @@ public class MazeExplorer {
                     System.out.println("Picture Taking Command Timing: " + numSeconds);
                     if (((numSeconds % 2) == 0) && numSeconds < 10) {
                         pcClient.sendMsgToRPI(msg);
-                    } else if (numSeconds >= 10)
-                        break;
+                    } else if (numSeconds >= 10) {
+                    	System.out.println("Response timeout");
+                    	return false;
+                    }
+                    	
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
         System.out.println("Picture Command Completed");
+        return true;
     }
 
     public void sendObsPosLeft(int[] robotPosition, Orientation ori, int x, int y, int blockAway) {
