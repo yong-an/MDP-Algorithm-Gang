@@ -446,8 +446,53 @@ public class MazeExplorer {
             arrayListOfImageRefs.remove(0);
 
             // TODO add talk to RPI somewhere here
+            sendPicToRPI(_robotPosition, _robotOrientation);
+        } // end of while (!arrayListOfImageRefs.isEmpty())
+    }
 
+    private void sendPicToRPI(int[] robotPosition, Orientation ori) {
+        String msg = "";
+
+        Controller controller = Controller.getInstance();
+        PCClient pcClient = controller.getPCClient();
+
+        if (ori == Orientation.NORTH && (robotPosition[0] + 2) != 15)
+            msg = (robotPosition[0] + 2) + "_" + robotPosition[1] + "_" + ori;
+
+        else if (ori == Orientation.SOUTH && (robotPosition[0] - 2) != -1)
+            msg = (robotPosition[0] - 2) + "_" + robotPosition[1] + "_" + ori;
+
+        else if (ori == Orientation.EAST && (robotPosition[1] - 2) != -1)
+            msg = (robotPosition[0]) + "_" + (robotPosition[1] - 2) + "_" + ori;
+
+        else if (ori == Orientation.WEST && (robotPosition[1] + 2) != 20)
+            msg = (robotPosition[0]) + "_" + (robotPosition[1] + 2) + "_" + ori;
+
+        System.out.println("Send to RPI: " + msg);
+        if (RobotSystem.isRealRun()) {
+            try {
+                Date startDate = new Date();
+                Date endDate = null;
+                int numSeconds = 0;
+                pcClient.sendMsgToRPI(msg);
+                System.out.println("Sent Take Picture Command");
+                String feedback = pcClient.readMessage();
+                while (!feedback.equals(Message.DONE)) {
+                    feedback = pcClient.readMessage();
+                    System.out.println("Reading Picture Taking Command");
+                    endDate = new Date();
+                    numSeconds = (int) ((endDate.getTime() - startDate.getTime()) / 1000);
+                    System.out.println("Picture Taking Command Timing: " + numSeconds);
+                    if (((numSeconds % 2) == 0) && numSeconds < 10) {
+                        pcClient.sendMsgToRPI(msg);
+                    } else if (numSeconds >= 10)
+                        break;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        System.out.println("Picture Command Completed");
     }
 
     public void sendObsPosLeft(int[] robotPosition, Orientation ori, int x, int y, int blockAway) {
@@ -497,65 +542,65 @@ public class MazeExplorer {
 
     }
 
-    /**
-     * send RPI the robots current position and orientation
-     * and send RPI msg to take picture
-     * and receive feedback from RPI
-     * timeout after 10 seconds
-     * also prints out time taken for RPI to reply
-     *
-     * @param robotPosition
-     * @param ori
-     * @throws IOException
-     */
-    public void sendObstaclePos(int[] robotPosition, Orientation ori) throws IOException {
-        String msg = "";
-
-        if (ori == Orientation.NORTH && (robotPosition[0] + 2) != 15)
-            msg = (robotPosition[0] + 2) + "_" + robotPosition[1] + "_" + ori;
-
-        else if (ori == Orientation.SOUTH && (robotPosition[0] - 2) != -1)
-            msg = (robotPosition[0] - 2) + "_" + robotPosition[1] + "_" + ori;
-
-        else if (ori == Orientation.EAST && (robotPosition[1] - 2) != -1)
-            msg = (robotPosition[0]) + "_" + (robotPosition[1] - 2) + "_" + ori;
-
-        else if (ori == Orientation.WEST && (robotPosition[1] + 2) != 20)
-            msg = (robotPosition[0]) + "_" + (robotPosition[1] + 2) + "_" + ori;
-
-        // TODO update from 2nd oct, due to code from 30th sep, following code for RPI msg is outdated D:
-        System.out.println("Send to RPI: " + msg);
-        if (RobotSystem.isRealRun()) {
-            Controller controller = Controller.getInstance();
-            PCClient pcClient = controller.getPCClient();
-            //pcClient.sendMsgToRPI(msg);
-
-            try {
-                Date startDate = new Date();
-                Date endDate = new Date();
-                int numSeconds = 0;
-                pcClient.sendMsgToRPI(msg);
-                System.out.println("Sent Take Picture Command");
-                String feedback = pcClient.readMessage();
-                while (!feedback.equals(Message.DONE)) {
-                    feedback = pcClient.readMessage();
-                    System.out.println("Reading Picture Taking Command");
-                    endDate = new Date();
-                    numSeconds = (int) ((endDate.getTime() - startDate.getTime()) / 1000);
-                    System.out.println("Picture Taking Command Timing: " + numSeconds);
-                    if (((numSeconds % 2) == 0) && numSeconds < 10) {
-                        pcClient.sendMsgToRPI(msg);
-                    } else if (numSeconds >= 10)
-                        break;
-
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            System.out.println("Picture Command Completed");
-        }
-
-    }
+//    /**
+//     * send RPI the robots current position and orientation
+//     * and send RPI msg to take picture
+//     * and receive feedback from RPI
+//     * timeout after 10 seconds
+//     * also prints out time taken for RPI to reply
+//     *
+//     * @param robotPosition
+//     * @param ori
+//     * @throws IOException
+//     */
+//    public void sendObstaclePos(int[] robotPosition, Orientation ori) throws IOException { // TODO seems outdated
+//        String msg = "";
+//
+//        if (ori == Orientation.NORTH && (robotPosition[0] + 2) != 15)
+//            msg = (robotPosition[0] + 2) + "_" + robotPosition[1] + "_" + ori;
+//
+//        else if (ori == Orientation.SOUTH && (robotPosition[0] - 2) != -1)
+//            msg = (robotPosition[0] - 2) + "_" + robotPosition[1] + "_" + ori;
+//
+//        else if (ori == Orientation.EAST && (robotPosition[1] - 2) != -1)
+//            msg = (robotPosition[0]) + "_" + (robotPosition[1] - 2) + "_" + ori;
+//
+//        else if (ori == Orientation.WEST && (robotPosition[1] + 2) != 20)
+//            msg = (robotPosition[0]) + "_" + (robotPosition[1] + 2) + "_" + ori;
+//
+//        // TODO update from 2nd oct, due to code from 30th sep, following code for RPI msg is outdated D:
+//        System.out.println("Send to RPI: " + msg);
+//        if (RobotSystem.isRealRun()) {
+//            Controller controller = Controller.getInstance();
+//            PCClient pcClient = controller.getPCClient();
+//            //pcClient.sendMsgToRPI(msg);
+//
+//            try {
+//                Date startDate = new Date();
+//                Date endDate = new Date();
+//                int numSeconds = 0;
+//                pcClient.sendMsgToRPI(msg);
+//                System.out.println("Sent Take Picture Command");
+//                String feedback = pcClient.readMessage();
+//                while (!feedback.equals(Message.DONE)) {
+//                    feedback = pcClient.readMessage();
+//                    System.out.println("Reading Picture Taking Command");
+//                    endDate = new Date();
+//                    numSeconds = (int) ((endDate.getTime() - startDate.getTime()) / 1000);
+//                    System.out.println("Picture Taking Command Timing: " + numSeconds);
+//                    if (((numSeconds % 2) == 0) && numSeconds < 10) {
+//                        pcClient.sendMsgToRPI(msg);
+//                    } else if (numSeconds >= 10)
+//                        break;
+//
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            System.out.println("Picture Command Completed");
+//        }
+//
+//    }
 
     //Start Exploring
     public void setIsExplored(int[] robotPosition, Orientation ori, boolean hasCalibration) {
@@ -1967,13 +2012,13 @@ public class MazeExplorer {
             }
         }
 
-        if (hasObs) {
-            try {
-                sendObstaclePos(curPos, ori);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        }
+//        if (hasObs) {
+//            try {
+//                sendObstaclePos(curPos, ori); // TODO remove, is outdated
+//            } catch (IOException e1) {
+//                e1.printStackTrace();
+//            }
+//        }
     }
 
 //    /**

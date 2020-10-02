@@ -63,7 +63,7 @@ public class VirtualMap {
 		
 	}
 	
-	// TODO testing - check result of exploration
+	// testing - check result of exploration
 	/*	
 	System.out.println("=========Explore Result===========");
 	for (int a = Arena.MAP_WIDTH - 1; a >= 0; a--) {
