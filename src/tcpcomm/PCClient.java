@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
-import org.json.JSONObject;
+//import org.json.JSONObject;
 
 import java.time.LocalTime;
 import datatypes.Message;
@@ -111,13 +111,13 @@ public class PCClient {
 		System.out.println("Message sent to Android: " + msg+" - "+LocalTime.now());
 	}
 	
-	public void sendJsonToAndroid(JSONObject msg) {
+	/*public void sendJsonToAndroid(JSONObject msg) {
 		String payLoad;
 		payLoad = "@b"+msg+"!";
 		_toRPi.print(msg);
 		_toRPi.flush();
 		System.out.println("JSON sent to Android: " + payLoad+" - "+LocalTime.now());
-	}
+	} */
 	
     /**
      * This function will handle sending message to R-PI.

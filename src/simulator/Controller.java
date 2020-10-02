@@ -106,6 +106,7 @@ public class Controller {
 	public void run() {
 		_ui.setVisible(true);
 		_robotOrientation = Orientation.EAST;
+		
 		if (RobotSystem.isRealRun()) {
 	
 			_pcClient = PCClient.getInstance();
@@ -129,32 +130,49 @@ public class Controller {
 						String messageReceive = "";
 						List<String> valueList;
 						
-						/*while(receivePosition || receiveWaypoint) {
-							messageReceive = _pcClient.readMessage();
-							valueList = Arrays.asList(messageReceive.split(":"));
-							
-							if(receivePosition && valueList.get(0).equals("START")) {
+						/*if(receivePosition && valueList.get(0).equals("START")) {
 								msgRobotPosition = valueList.get(1);
+								
+								System.out.println(msgRobotPosition);
+								
 								int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
 								resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
 								receivePosition = false;
-							}
-							if(receiveWaypoint && valueList.get(0).equals("WP")) {
+						}*/
+						 
+						while(receivePosition || receiveWaypoint) {
+							System.out.println("Waiting for Way point");
+							
+							messageReceive = _pcClient.readMessage();
+							//messageReceive = "WP:10,10";
+							
+							valueList = Arrays.asList(messageReceive.split(":"));
+							
+							//System.out.println(messageReceive);
+							//System.out.println(valueList.get(0).toString());
+
+							 if(receiveWaypoint && valueList.get(0).equals("WP")) {
 								msgWayPoint = valueList.get(1);
+							
+								//System.out.println(msgWayPoint);
+								
 								setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
 								receiveWaypoint = false;
 							}
-						}*/
+						}
+						
 						
 						msgRobotPosition = "1,1";
 						//   msgRobotPosition = valueList.get(1);
 						int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
 						resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
-
+						
+						
+						/*
 						msgWayPoint = "6,18";
 						//   String msgWayPoint = valueList.get(1);
 						setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
-						
+						*/
 				
 						MazeExplorer me = MazeExplorer.getInstance();
 						me.init(_robotPosition, _robotOrientation);
@@ -212,6 +230,7 @@ public class Controller {
     public UI getUI() {
         return _ui;
     }
+    
 
     /**
      * Function will return the PC client.
@@ -623,7 +642,9 @@ public class Controller {
                 //Waiting for fastest path command for real run.
                 if (!RobotSystem.isRealRun()) {
                     _ui.setExploreBtnEnabled(true);
-                } else {
+                } 
+                else 
+                {
                     try {
                         String msgFFP = _pcClient.readMessage();
                         while (!msgFFP.equals(Message.START_FASTEST)) {

@@ -6,7 +6,7 @@ import algorithms.MazeExplorer;
 import datatypes.Message;
 import datatypes.Movement;
 import datatypes.Orientation;
-import org.json.*;
+//import org.json.*;
 import main.RobotSystem;
 import simulator.Controller;
 import simulator.arena.Arena;
@@ -485,6 +485,21 @@ public class Robot {
 	 * This function handles the robot position calibration via front.
 	 * @param m
 	 */
+	public void calibrateRobotPositionViaStart() {
+		Controller controller = Controller.getInstance();
+		PCClient pcClient = controller.getPCClient();
+		try {
+			pcClient.sendMessage(Message.CALIBRATESTART + Message.SEPARATOR);
+			String feedback = pcClient.readMessage();
+			while (!feedback.equals(Message.DONE)) {
+				feedback = pcClient.readMessage();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	public void calibrateRobotPositionViaFront() {
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
@@ -499,6 +514,8 @@ public class Robot {
 		}
 		
 	}
+	
+
 	
 	/**
 	 * This function handles the sending of map descriptor to android.
@@ -562,7 +579,7 @@ public class Robot {
 				break;
 			case EAST:
 				//turnRight();
-				calibrateRobotPositionViaFront();
+				calibrateRobotPositionViaStart();
 				//turnRight();
 				//calibrateRobotPosition();
 				//turnRight();
