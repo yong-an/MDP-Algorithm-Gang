@@ -281,13 +281,15 @@ public class MazeExplorer {
 		}
 	}
 
-	// set coods for robot in arrayListOfImageRef to capture images from these coods and orientation
-	// check in order of south east north west
-	// TODO updated this function please check dependancy on correct usage of function
-	public void setImageRef() {
+
+
+	/**
+	 * set coods for robot in arrayListOfImageRef to capture images from these coods and orientation
+	 * check in order of south east north west
+	 */
+	public void setImageRef() { // TODO updated this function please check dependancy on correct usage of function
 		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
 			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
-//				if (_mazeRef[i][j] == IS_OBSTACLE && rightWallRef[i][j] != RIGHT_CHECK){ // TODO remove its wrong
 				if (_mazeRef[i][j] == IS_OBSTACLE)
 				{
 					//check south
@@ -375,7 +377,7 @@ public class MazeExplorer {
 		}
 	}
 
-//	private int[] getPos() {
+//	private int[] getPos() { // TODO remove if no longer needed
 //		int[] obsPos = new int[2];
 //
 //		for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
@@ -423,8 +425,12 @@ public class MazeExplorer {
 		arrayListOfImageRefs = new ArrayList<ImageRef>(sortedArrayListOfImageRefs);
 	}
 
+	/**
+	 * after map exploration,
+	 * if(startImageRun), explore again to find pictures
+	 * and send to RPI
+	 */
 	public void findImage() {
-
 		setImageRef();
 		Collections.sort(arrayListOfImageRefs);
 		sortImageRef();
@@ -1647,32 +1653,31 @@ public class MazeExplorer {
 								if (cleared[x][y]) {
 									if ((Math.abs(obsX + obsY - x - y) == radius) && (x == obsX || y == obsY)) {
 										isClearedAhead = true;
-										// TODO questionable area, investigate further soon :tm:
-//										if (x > obsX) {
-//											for(int i = obsX + 1; i < x; i++) {
-//													if (_mazeRef[i][y] != IS_EMPTY) {
-//														isClearedAhead = false;
-//												}
-//											}
-//										} else if (x < obsX) {
-//											for(int i = x + 1; i < obsX; i++) {
-//												if (_mazeRef[i][y] != IS_EMPTY) {
-//													isClearedAhead = false;
-//												}
-//											}
-//										} else if (y > obsY) {
-//											for(int j = obsY + 1; j < y; j++) {
-//												if (_mazeRef[x][j] != IS_EMPTY) {
-//													isClearedAhead = false;
-//												}
-//											}
-//										} else if (y < obsY) {
-//											for(int j = y + 1; j < obsY; j++) {
-//												if (_mazeRef[x][j] != IS_EMPTY) {
-//													isClearedAhead = false;
-//												}
-//											}
-//										}
+										if (x > obsX) {
+											for(int i = obsX + 1; i < x; i++) {
+													if (_mazeRef[i][y] != IS_EMPTY) {
+														isClearedAhead = false;
+												}
+											}
+										} else if (x < obsX) {
+											for(int i = x + 1; i < obsX; i++) {
+												if (_mazeRef[i][y] != IS_EMPTY) {
+													isClearedAhead = false;
+												}
+											}
+										} else if (y > obsY) {
+											for(int j = obsY + 1; j < y; j++) {
+												if (_mazeRef[x][j] != IS_EMPTY) {
+													isClearedAhead = false;
+												}
+											}
+										} else if (y < obsY) {
+											for(int j = y + 1; j < obsY; j++) {
+												if (_mazeRef[x][j] != IS_EMPTY) {
+													isClearedAhead = false;
+												}
+											}
+										}
 										if (isClearedAhead) {
 											nearestPosition[0] = x;
 											nearestPosition[1] = y;
@@ -1867,78 +1872,78 @@ public class MazeExplorer {
 			}
 		}
 
-	/**]
-	 * find image(s) around obstacle
-	 *
-	 * @param goalPos
-	 * @param initial
-	 */
-		private void findImageAlongWall (int[] goalPos, int[] initial) {
-			int move = 0;
-			Controller controller = Controller.getInstance();
-			PCClient pc = PCClient.getInstance();
-
-			_robot.turnLeft();
-			updateRobotOrientation(Movement.TURN_LEFT);
-
-			while (!isGoalPos(_robotPosition, goalPos) && !controller.hasReachedTimeThreshold()) {
-				int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
-				//System.out.println("Initial:"+initial[0]+","+initial[1]);
-
-                // set current imageRef = IS_EMPTY
-				boolean hasObs = eraseWall(_robotPosition, _robotOrientation);
-
-                // tell RPI to take pic and process feedback from RPI
-                if(hasObs && startImageRun) {
-                    try {
-                        sendObstaclePos(_robotPosition, _robotOrientation);
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
-                }
-
-				if (rightStatus != RIGHT_NO_ACCESS) {
-					if (rightStatus == RIGHT_UNSURE_ACCESS) {
-						_robot.turnRight();
-						updateRobotOrientation(Movement.TURN_RIGHT);
-
-						if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
-							_robot.moveForward();
-							updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-							move++;
-							if(Arrays.equals(initial, _robotPosition) && move > 7) {
-								return;
-							}
-
-						} else {
-							_robot.turnLeft();
-							updateRobotOrientation(Movement.TURN_LEFT);
-						}
-					} else { //rightStatus == RIGHT_CAN_ACCESS
-						_robot.turnRight();
-						updateRobotOrientation(Movement.TURN_RIGHT);
-
-						_robot.moveForward();
-						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-						move++;
-						if(Arrays.equals(initial, _robotPosition) && move > 7) {
-							return;
-						}
-					}
-
-				} else if (hasAccessibleFront(_robotPosition, _robotOrientation)){
-					_robot.moveForward();
-					updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-					move++;
-					if(Arrays.equals(initial, _robotPosition) && move > 7) {
-						return;
-					}
-				} else {
-					_robot.turnLeft();
-					updateRobotOrientation(Movement.TURN_LEFT);
-				}
-			}
-		}
+//	/**
+//	 * find image(s) around obstacle
+//	 *
+//	 * @param goalPos
+//	 * @param initial
+//	 */
+//		private void findImageAlongWall (int[] goalPos, int[] initial) { // TODO remove if not used
+//			int move = 0;
+//			Controller controller = Controller.getInstance();
+//			PCClient pc = PCClient.getInstance();
+//
+//			_robot.turnLeft();
+//			updateRobotOrientation(Movement.TURN_LEFT);
+//
+//			while (!isGoalPos(_robotPosition, goalPos) && !controller.hasReachedTimeThreshold()) {
+//				int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
+//				//System.out.println("Initial:"+initial[0]+","+initial[1]);
+//
+//                // set current imageRef = IS_EMPTY
+//				boolean hasObs = eraseWall(_robotPosition, _robotOrientation);
+//
+//                // tell RPI to take pic and process feedback from RPI
+//                if(hasObs && startImageRun) {
+//                    try {
+//                        sendObstaclePos(_robotPosition, _robotOrientation);
+//                    } catch (IOException e1) {
+//                        e1.printStackTrace();
+//                    }
+//                }
+//
+//				if (rightStatus != RIGHT_NO_ACCESS) {
+//					if (rightStatus == RIGHT_UNSURE_ACCESS) {
+//						_robot.turnRight();
+//						updateRobotOrientation(Movement.TURN_RIGHT);
+//
+//						if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
+//							_robot.moveForward();
+//							updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+//							move++;
+//							if(Arrays.equals(initial, _robotPosition) && move > 7) {
+//								return;
+//							}
+//
+//						} else {
+//							_robot.turnLeft();
+//							updateRobotOrientation(Movement.TURN_LEFT);
+//						}
+//					} else { //rightStatus == RIGHT_CAN_ACCESS
+//						_robot.turnRight();
+//						updateRobotOrientation(Movement.TURN_RIGHT);
+//
+//						_robot.moveForward();
+//						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+//						move++;
+//						if(Arrays.equals(initial, _robotPosition) && move > 7) {
+//							return;
+//						}
+//					}
+//
+//				} else if (hasAccessibleFront(_robotPosition, _robotOrientation)){
+//					_robot.moveForward();
+//					updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+//					move++;
+//					if(Arrays.equals(initial, _robotPosition) && move > 7) {
+//						return;
+//					}
+//				} else {
+//					_robot.turnLeft();
+//					updateRobotOrientation(Movement.TURN_LEFT);
+//				}
+//			}
+//		}
 
 		//tells me if my curPos is equal to my goalPos
 		private boolean isGoalPos (int[] curPos, int[] goalPos) {
@@ -1988,54 +1993,44 @@ public class MazeExplorer {
 		      }
 		  }
 
-    /**
-     * remove found imageRef position form imageRef
-     * @param curPos
-     * @param ori
-     */
-	private boolean eraseWall(int[] curPos, Orientation ori) {
-		boolean hasObs = false;
-	    for (int i=-1; i<2; i++) {
-	      switch (ori) {
-		      case NORTH:
-		    	  if((curPos[0]+2) != 15 && _mazeRef[curPos[0]+2][curPos[1]+i] == IS_OBSTACLE) {
-		    		  //imageRef[curPos[0]+2][curPos[1]+i] = IS_EMPTY;
-		    		  hasObs = true;
-		    	  }
-		    	  break;
-		      case SOUTH:
-		    	  if((curPos[0]-2) != -1 && _mazeRef[curPos[0]-2][curPos[1]+i] == IS_OBSTACLE) {
-		    		  //imageRef[curPos[0]-2][curPos[1]+i] = IS_EMPTY;
-		    		  hasObs = true;
-		    	  }
-		    	  break;
-		      case EAST:
-		    	  if((curPos[1]-2) != -1 && _mazeRef[curPos[0]+i][curPos[1]-2] == IS_OBSTACLE) {
-		    		  //imageRef[curPos[0]+i][curPos[1]-2] = IS_EMPTY;
-		    		  hasObs = true;
-		    	  }
-		    	  break;
-		      case WEST:
-		    	  if((curPos[1]+2) != 20 && _mazeRef[curPos[0]+i][curPos[1]+2] == IS_OBSTACLE) {
-		    		  //imageRef[curPos[0]+i][curPos[1]+2] = IS_EMPTY;
-		    		  hasObs = true;
-		    	  }
-		    	  break;
-	      }
-		}
-	    // TODO changed function from void() to boolean()
-	    return hasObs;
-
-	    // TODO remove why u put here????
-//	    if(hasObs && startImageRun) {
-//		      try {
-//					sendObstaclePos(curPos, ori);
-//				} catch (IOException e1) {
-//					e1.printStackTrace();
-//				}
-//		      }
-
-	  }
+//    /**
+//     * remove found imageRef position form imageRef
+//     * @param curPos
+//     * @param ori
+//     */
+//	private boolean eraseWall(int[] curPos, Orientation ori) { // TODO remove if not used anymore
+//		boolean hasObs = false;
+//	    for (int i=-1; i<2; i++) {
+//	      switch (ori) {
+//		      case NORTH:
+//		    	  if((curPos[0]+2) != 15 && _mazeRef[curPos[0]+2][curPos[1]+i] == IS_OBSTACLE) {
+//		    		  //imageRef[curPos[0]+2][curPos[1]+i] = IS_EMPTY;
+//		    		  hasObs = true;
+//		    	  }
+//		    	  break;
+//		      case SOUTH:
+//		    	  if((curPos[0]-2) != -1 && _mazeRef[curPos[0]-2][curPos[1]+i] == IS_OBSTACLE) {
+//		    		  //imageRef[curPos[0]-2][curPos[1]+i] = IS_EMPTY;
+//		    		  hasObs = true;
+//		    	  }
+//		    	  break;
+//		      case EAST:
+//		    	  if((curPos[1]-2) != -1 && _mazeRef[curPos[0]+i][curPos[1]-2] == IS_OBSTACLE) {
+//		    		  //imageRef[curPos[0]+i][curPos[1]-2] = IS_EMPTY;
+//		    		  hasObs = true;
+//		    	  }
+//		    	  break;
+//		      case WEST:
+//		    	  if((curPos[1]+2) != 20 && _mazeRef[curPos[0]+i][curPos[1]+2] == IS_OBSTACLE) {
+//		    		  //imageRef[curPos[0]+i][curPos[1]+2] = IS_EMPTY;
+//		    		  hasObs = true;
+//		    	  }
+//		    	  break;
+//	      }
+//		}
+//
+//	    return hasObs;
+//	  }
 
 		private int checkRightSide (int[] curPos, Orientation ori) {
 			int[] rightPos = new int[2];
