@@ -4,7 +4,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.WatchEvent;
+import java.nio.file.WatchKey;
+import java.nio.file.WatchService;
 import java.util.Scanner;
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 
 //import org.json.JSONObject;
 
@@ -141,6 +148,20 @@ public class PCClient {
         String messageReceived = _fromRPi.nextLine();
         System.out.println("Message Received: " + messageReceived);
         return messageReceived;
+    }
+    
+    public void poolDirectory () throws IOException, InterruptedException {
+    	WatchService watcher = FileSystems.getDefault().newWatchService();
+		Path dir = Paths.get("D:\\Sample");
+		WatchKey key = dir.register(watcher,ENTRY_CREATE);
+		
+	    while( (key = watcher.take()) != null) {
+	    	for(WatchEvent<?> event:key.pollEvents()) {
+	    		System.out.println("New File: " + event.kind() + " - " + event.context());
+	    	}
+	    	
+	    key.reset();
+	    }
     }
 
 }
