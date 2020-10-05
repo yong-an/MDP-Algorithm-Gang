@@ -215,15 +215,16 @@ public class MazeExplorer {
 			_hasExploredTillGoal = false; //Timeout before reaching goal
 		}
 		
-		hasNextRun();
+		//hasNextRun();
 		
-		if(startImageRun)
-			findImage();
+		//if(startImageRun)
+			//findImage();
 	
 		//Current robot position is not at start point, find fastest path back to start point
 		System.out.println("After end");
-		fastestPathBackToStart(); 
+		//fastestPathBackToStart(); 
 		
+		/*
 		if (RobotSystem.isRealRun()) {
 			//Send Arduino the signal that exploration is done
 			//_robotOrientation = _robot.calibrateAtStartZone(_robotOrientation);
@@ -234,9 +235,10 @@ public class MazeExplorer {
 				while (!msgExDone.equals(Message.DONE)) {
 					msgExDone = pcClient.readMessage();
 				}
-				
+				System.out.println("DONEDONEDONE");
 				pcClient.sendMessageToAndroid(Message.EXPLORE_DONE);
 				pcClient.sendMsgToRPI(Message.RPI_DONE);
+				System.out.println("DONEDONEDONE2");
 				
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -244,6 +246,7 @@ public class MazeExplorer {
 		} else {
 			adjustOrientationTo(Orientation.NORTH);
 		}
+		*/
 	}
 	
 	private void fastestPathBackToStart() {
@@ -1612,7 +1615,7 @@ public class MazeExplorer {
 					
 					
 						_robot.turnRight();
-						_robotOrientation = Orientation.SOUTH;
+						_robotOrientation = Orientation.WEST;
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
 					}
@@ -1992,7 +1995,6 @@ public class MazeExplorer {
 				else 
 				{
 					_robot.turnLeft();
-					//_robot.calibrateRobotPositionViaFront();
 					updateRobotOrientation(Movement.TURN_LEFT);
 					setIsExplored(_robotPosition, _robotOrientation, true);
 				}
@@ -2033,7 +2035,7 @@ public class MazeExplorer {
 						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
-						 /* if(checkGhostWall(_robotPosition, _robotOrientation)) {				
+						  if(checkGhostWall(_robotPosition, _robotOrientation)) {				
 							AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 							Path backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], lastCalibrate[0], lastCalibrate[1], _mazeRef);
 							_robotOrientation = pathFinder.moveRobotAlongFastestPath(backPath, _robotOrientation, false, false, false);
@@ -2055,7 +2057,7 @@ public class MazeExplorer {
 									_robotOrientation = Orientation.EAST;
 									break;
 							}
-						} 	*/
+						} 	
 					} 
 			
 				} else if (hasAccessibleFront(_robotPosition, _robotOrientation)){ 

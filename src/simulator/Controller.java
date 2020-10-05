@@ -130,7 +130,42 @@ public class Controller {
 						String messageReceive = "";
 						List<String> valueList;
 						
-						/*if(receivePosition && valueList.get(0).equals("START")) {
+						
+						/*
+						 
+						
+						//THIS PORTION IS THE WAY POINT CODE
+						//IT WILL WHILE LOOP UNTIL IT RECEIVE A VALID WP
+						//messageReceive = "WP:10,10"; 
+						//messageReceive = "START:1,1"
+						//SAMPLE VALUES ^ HOW ITS SUPPOSE TO LOOK LIKE
+						 
+						System.out.println("Waiting for Way point");
+						
+						while(receivePosition || receiveWaypoint) {
+						
+							messageReceive = _pcClient.readMessage();
+							System.out.println(messageReceive);
+				
+							valueList = Arrays.asList(messageReceive.split(":"));
+								
+							//System.out.println(messageReceive);
+							//System.out.println(valueList.get(0).toString());
+
+							if(receiveWaypoint && valueList.get(0).equals("WP")) {
+								msgWayPoint = valueList.get(1);
+								
+								//System.out.println(msgWayPoint);
+									
+								setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
+								receiveWaypoint = false;
+								}
+						
+						
+							//USE THIS PORTION IF YOU WANT ANDROID TO SET START POINT TOO
+							//ELSE JUST USE THE BTM PORTION 1,1
+							
+							if(receivePosition && valueList.get(0).equals("START")) {
 								msgRobotPosition = valueList.get(1);
 								
 								System.out.println(msgRobotPosition);
@@ -138,41 +173,25 @@ public class Controller {
 								int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
 								resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
 								receivePosition = false;
-						}*/
-						 
-						while(receivePosition || receiveWaypoint) {
-							System.out.println("Waiting for Way point");
-							
-							messageReceive = _pcClient.readMessage();
-							//messageReceive = "WP:10,10";
-							
-							valueList = Arrays.asList(messageReceive.split(":"));
-							
-							//System.out.println(messageReceive);
-							//System.out.println(valueList.get(0).toString());
-
-							 if(receiveWaypoint && valueList.get(0).equals("WP")) {
-								msgWayPoint = valueList.get(1);
-							
-								//System.out.println(msgWayPoint);
-								
-								setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
-								receiveWaypoint = false;
 							}
+						
 						}
 						
 						
+						*/
+											
+						//=======================HARD CODED WP -> COMMENT AWAY THIS ======================
 						msgRobotPosition = "1,1";
 						//   msgRobotPosition = valueList.get(1);
 						int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
 						resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
 						
 						
-						/*
-						msgWayPoint = "6,18";
-						//   String msgWayPoint = valueList.get(1);
+						msgWayPoint = "6,10";
+						//String msgWayPoint = valueList.get(1);
 						setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
-						*/
+						
+						//===============================================================================
 				
 						MazeExplorer me = MazeExplorer.getInstance();
 						me.init(_robotPosition, _robotOrientation);
@@ -595,7 +614,6 @@ public class Controller {
                 _hasReachedStart = false;
                 
                 explorer.explore(_robotPosition, _robotOrientation);
-                
               
                 //Compute the fastest path right after exploration for real run.
                 if (RobotSystem.isRealRun()) {
@@ -618,6 +636,7 @@ public class Controller {
                 String P1Descriptor, P2Descriptor;
                 P1Descriptor = explorer.getP1Descriptor();
                 P2Descriptor = explorer.getP2Descriptor();
+
                 System.out.println("P1 descriptor: " + P1Descriptor);
                 System.out.println("P2 descriptor: " + P2Descriptor);
 
@@ -786,7 +805,7 @@ public class Controller {
     	
     	}
     	else {
-    		// MANUALLY SET WAY POINTS
+    		// Test
     		
     		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
     			@Override
