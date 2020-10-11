@@ -702,33 +702,9 @@ public class MazeExplorer {
     		 System.out.println("null error");
     		 return false;
     	}
-    	ImageRef obstacleToSend = new ImageRef(_imageRef);
-    	switch (obstacleToSend.getOrientation()) {
-		case NORTH:
-			obstacleToSend.setY(obstacleToSend.getY()+2);
-			obstacleToSend.setOrientation(Orientation.SOUTH);
-			break;
-		case SOUTH:
-			obstacleToSend.setY(obstacleToSend.getY()-2);
-			obstacleToSend.setOrientation(Orientation.NORTH);
-			break;
-		case EAST:
-			obstacleToSend.setX(obstacleToSend.getX()+2);
-			obstacleToSend.setOrientation(Orientation.WEST);
-			break;
-		case WEST:
-			obstacleToSend.setX(obstacleToSend.getX()-2);
-			obstacleToSend.setOrientation(Orientation.EAST);
-			break;
-		default:
-			break;
-		}
-    	if (obstacleToSend.getX() >= Arena.MAP_WIDTH || obstacleToSend.getX() < 0 || obstacleToSend.getY() >= Arena.MAP_LENGTH || obstacleToSend.getY() < 0)
-    	{
-    		System.out.println("Error: Obstacle out of bounds");
-    		return false;
-    	}
-        String msg = obstacleToSend.getX() + "_" + obstacleToSend.getY() + "_" + obstacleToSend.getOrientation();
+
+        String msg = "H:" + _imageRef.getX() + ":" + _imageRef.getY() + ":" + _imageRef.getOrientation() + ":"
+        				+ _imageRef.getTargetX() + ":" + _imageRef.getTargetY() + ":" + _imageRef.getTargetOrientation();
 
         Controller controller = Controller.getInstance();
         PCClient pcClient = controller.getPCClient();
