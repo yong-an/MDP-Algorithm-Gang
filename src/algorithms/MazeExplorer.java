@@ -294,14 +294,34 @@ public class MazeExplorer {
                     //check south
                     // exit condition based on minimum space for robot
                     for (int offset = 0; j + offset - 1 > 0; --offset) {
-                        if (i == 0 || i == Arena.MAP_WIDTH - 1)
-                            break;
+                    	int offsetWall = 0;
+                    	boolean alongWestWall = false;
+                    	boolean alongEastWall = false;
+                        // obstacle is along west wall
+                        if (i == 0)
+                        {
+                        	++offsetWall;
+                        	alongWestWall = true;
+                        }
+                        else if (i == Arena.MAP_LENGTH-1)
+                        {
+                        	--offsetWall;
+                        	alongEastWall = true;
+                        }
                         //found empty space south of obstacle, set it as coods to take picture from facing north
-                        if (_mazeRef[i][j + offset] != IS_OBSTACLE && _mazeRef[i][j + offset - 1] != IS_OBSTACLE && _mazeRef[i][j + offset - 2] != IS_OBSTACLE
-                                && _mazeRef[i - 1][j + offset] != IS_OBSTACLE && _mazeRef[i - 1][j + offset - 1] != IS_OBSTACLE && _mazeRef[i - 1][j + offset - 2] != IS_OBSTACLE
-                                && _mazeRef[i + 1][j + offset] != IS_OBSTACLE && _mazeRef[i + 1][j + offset - 1] != IS_OBSTACLE && _mazeRef[i + 1][j + offset - 2] != IS_OBSTACLE) {
-                            ImageRef imageRef = new ImageRef(i, j + offset - 1, Orientation.NORTH);
-                            //check if already exists
+                        if (_mazeRef[i + offsetWall][j + offset] != IS_OBSTACLE && _mazeRef[i + offsetWall][j + offset - 1] != IS_OBSTACLE && _mazeRef[i + offsetWall][j + offset - 2] != IS_OBSTACLE
+                                && _mazeRef[i + offsetWall - 1][j + offset] != IS_OBSTACLE && _mazeRef[i + offsetWall - 1][j + offset - 1] != IS_OBSTACLE && _mazeRef[i + offsetWall - 1][j + offset - 2] != IS_OBSTACLE
+                                && _mazeRef[i + offsetWall + 1][j + offset] != IS_OBSTACLE && _mazeRef[i + offsetWall + 1][j + offset - 1] != IS_OBSTACLE && _mazeRef[i + offsetWall + 1][j + offset - 2] != IS_OBSTACLE) {
+                        	ImageRef imageRef = new ImageRef();
+                        	//check for extra 1 space, required if obstacle is along wall
+                        	if (j + offset - 3 >= 0 && _mazeRef[i + offsetWall - 1][j + offset - 3] != IS_OBSTACLE && _mazeRef[i + offsetWall][j + offset - 3] != IS_OBSTACLE && _mazeRef[i + offsetWall + 1][j + offset - 3] != IS_OBSTACLE)
+                        		imageRef = new ImageRef(i + offsetWall, j + offset - 2, Orientation.NORTH, i + offsetWall, j, Orientation.SOUTH);
+                        	else if (alongWestWall == false && alongEastWall == false)
+                        		imageRef = new ImageRef(i, j + offset - 1, Orientation.NORTH, i, j, Orientation.SOUTH);
+                        	else
+                        		break;
+
+                        	//check if already exists
                             if (arrayListOfImageRefs.contains(imageRef))
                                 break;
                             arrayListOfImageRefs.add(imageRef);
@@ -312,14 +332,34 @@ public class MazeExplorer {
                     //check east
                     // exit condition based on minimum space for robot
                     for (int offset = 0; i + offset + 1 < Arena.MAP_LENGTH - 1; ++offset) {
-                        if (j == 0 || j == Arena.MAP_LENGTH - 1)
-                            break;
+                    	int offsetWall = 0;
+                    	boolean alongNorthWall = false;
+                    	boolean alongSouthWall = false;
+                        // obstacle is along south wall
+                        if (j == 0)
+                        {
+                        	++offsetWall;
+                        	alongSouthWall = true;
+                        }
+                        else if (j == Arena.MAP_WIDTH-1)
+                        {
+                        	--offsetWall;
+                        	alongNorthWall = true;
+                        }
                         //found sufficient empty space east of obstacle, set it as coods to take picture from facing north
-                        if (_mazeRef[i + offset][j] != IS_OBSTACLE && _mazeRef[i + offset + 1][j] != IS_OBSTACLE && _mazeRef[i + offset + 2][j] != IS_OBSTACLE
-                                && _mazeRef[i + offset][j - 1] != IS_OBSTACLE && _mazeRef[i + offset + 1][j - 1] != IS_OBSTACLE && _mazeRef[i + offset + 2][j - 1] != IS_OBSTACLE
-                                && _mazeRef[i + offset][j + 1] != IS_OBSTACLE && _mazeRef[i + offset + 1][j + 1] != IS_OBSTACLE && _mazeRef[i + offset + 2][j + 1] != IS_OBSTACLE) {
-                            ImageRef imageRef = new ImageRef(i + offset + 1, j, Orientation.WEST);
-                            //check if already exists
+                        if (_mazeRef[i + offset][j + offsetWall] != IS_OBSTACLE && _mazeRef[i + offset + 1][j + offsetWall] != IS_OBSTACLE && _mazeRef[i + offset + 2][j + offsetWall] != IS_OBSTACLE
+                                && _mazeRef[i + offset][j + offsetWall - 1] != IS_OBSTACLE && _mazeRef[i + offset + 1][j + offsetWall - 1] != IS_OBSTACLE && _mazeRef[i + offset + 2][j + offsetWall - 1] != IS_OBSTACLE
+                                && _mazeRef[i + offset][j + offsetWall + 1] != IS_OBSTACLE && _mazeRef[i + offset + 1][j + offsetWall + 1] != IS_OBSTACLE && _mazeRef[i + offset + 2][j + offsetWall + 1] != IS_OBSTACLE) {
+                        	ImageRef imageRef;
+                        	//check for extra 1 space 
+                        	if (i + 3 < Arena.MAP_LENGTH && _mazeRef[i + offset + 3][j + offsetWall - 1] != IS_OBSTACLE && _mazeRef[i + offset + 3][j + offsetWall] != IS_OBSTACLE && _mazeRef[i + offset + 3][j + offsetWall + 1] != IS_OBSTACLE)
+                        		imageRef = new ImageRef(i + offset + 2, j + offsetWall, Orientation.WEST, i, j + offsetWall, Orientation.EAST);
+                        	else if (alongSouthWall == false && alongNorthWall == false)
+                        		imageRef = new ImageRef(i + offset + 1, j, Orientation.WEST, i, j, Orientation.EAST);
+                        	else
+                        		break;
+
+                        	//check if already exists
                             if (arrayListOfImageRefs.contains(imageRef))
                                 break;
                             arrayListOfImageRefs.add(imageRef);
@@ -330,14 +370,34 @@ public class MazeExplorer {
                     //check north
                     // exit condition based on minimum space for robot
                     for (int offset = 0; j + offset + 1 < Arena.MAP_WIDTH - 1; ++offset) {
-                        if (i == 0 || i == Arena.MAP_WIDTH - 1)
-                            break;
-                        //found empty space south of obstacle, set it as coods to take picture from facing north
-                        if (_mazeRef[i][j + offset] != IS_OBSTACLE && _mazeRef[i][j + offset + 1] != IS_OBSTACLE && _mazeRef[i][j + offset + 2] != IS_OBSTACLE
-                                && _mazeRef[i - 1][j + offset] != IS_OBSTACLE && _mazeRef[i - 1][j + offset + 1] != IS_OBSTACLE && _mazeRef[i - 1][j + offset + 2] != IS_OBSTACLE
-                                && _mazeRef[i + 1][j + offset] != IS_OBSTACLE && _mazeRef[i + 1][j + offset + 1] != IS_OBSTACLE && _mazeRef[i + 1][j + offset + 2] != IS_OBSTACLE) {
-                            ImageRef imageRef = new ImageRef(i, j + offset + 1, Orientation.SOUTH);
-                            //check if already exists
+                    	int offsetWall = 0;
+                    	boolean alongWestWall = false;
+                    	boolean alongEastWall = false;
+                        // obstacle is along west wall
+                        if (i == 0)
+                        {
+                        	++offsetWall;
+                        	alongWestWall = true;
+                        }
+                        else if (i == Arena.MAP_LENGTH-1)
+                        {
+                        	--offsetWall;
+                        	alongEastWall = true;
+                        }
+                        //found empty space north of obstacle, set it as coods to take picture from facing north
+                        if (_mazeRef[i + offsetWall][j + offset] != IS_OBSTACLE && _mazeRef[i + offsetWall][j + offset + 1] != IS_OBSTACLE && _mazeRef[i + offsetWall][j + offset + 2] != IS_OBSTACLE
+                                && _mazeRef[i + offsetWall - 1][j + offset] != IS_OBSTACLE && _mazeRef[i + offsetWall - 1][j + offset + 1] != IS_OBSTACLE && _mazeRef[i + offsetWall - 1][j + offset + 2] != IS_OBSTACLE
+                                && _mazeRef[i + offsetWall + 1][j + offset] != IS_OBSTACLE && _mazeRef[i + offsetWall + 1][j + offset + 1] != IS_OBSTACLE && _mazeRef[i + offsetWall + 1][j + offset + 2] != IS_OBSTACLE) {
+                        	ImageRef imageRef;
+                        	//check for extra 1 space
+                        	if (j + 3 < Arena.MAP_WIDTH && _mazeRef[i + offsetWall - 1][j + offset + 3] != IS_OBSTACLE && _mazeRef[i + offsetWall][j + offset + 3] != IS_OBSTACLE && _mazeRef[i + offsetWall + 1][j + offset + 3] != IS_OBSTACLE)
+                        		imageRef = new ImageRef(i + offsetWall, j + offset + 2, Orientation.SOUTH, i + offsetWall, j, Orientation.NORTH);
+                        	else if (alongWestWall == false && alongEastWall == false)
+                        		imageRef = new ImageRef(i, j + offset + 1, Orientation.SOUTH, i, j, Orientation.NORTH);
+                        	else
+                        		break;
+
+                        	//check if already exists
                             if (arrayListOfImageRefs.contains(imageRef))
                                 break;
                             arrayListOfImageRefs.add(imageRef);
@@ -348,14 +408,34 @@ public class MazeExplorer {
                     //check west
                     // exit condition based on minimum space for robot
                     for (int offset = 0; i + offset - 1 > 0; --offset) {
-                        if (j == 0 || j == Arena.MAP_LENGTH - 1)
-                            break;
+                    	int offsetWall = 0;
+                    	boolean alongNorthWall = false;
+                    	boolean alongSouthWall = false;
+                        // obstacle is along south wall
+                        if (j == 0)
+                        {
+                        	++offsetWall;
+                        	alongSouthWall = true;
+                        }
+                        else if (j == Arena.MAP_WIDTH-1)
+                        {
+                        	--offsetWall;
+                        	alongNorthWall = true;
+                        }
                         //found sufficient empty space east of obstacle, set it as coods to take picture from facing north
-                        if (_mazeRef[i + offset][j] != IS_OBSTACLE && _mazeRef[i + offset - 1][j] != IS_OBSTACLE && _mazeRef[i + offset - 2][j] != IS_OBSTACLE
-                                && _mazeRef[i + offset][j - 1] != IS_OBSTACLE && _mazeRef[i + offset - 1][j - 1] != IS_OBSTACLE && _mazeRef[i + offset - 2][j - 1] != IS_OBSTACLE
-                                && _mazeRef[i + offset][j + 1] != IS_OBSTACLE && _mazeRef[i + offset - 1][j + 1] != IS_OBSTACLE && _mazeRef[i + offset - 2][j + 1] != IS_OBSTACLE) {
-                            ImageRef imageRef = new ImageRef(i + offset - 1, j, Orientation.EAST);
-                            //check if already exists
+                        if (_mazeRef[i + offset][j + offsetWall] != IS_OBSTACLE && _mazeRef[i + offset - 1][j + offsetWall] != IS_OBSTACLE && _mazeRef[i + offset - 2][j + offsetWall] != IS_OBSTACLE
+                                && _mazeRef[i + offset][j + offsetWall - 1] != IS_OBSTACLE && _mazeRef[i + offset - 1][j + offsetWall - 1] != IS_OBSTACLE && _mazeRef[i + offset - 2][j + offsetWall - 1] != IS_OBSTACLE
+                                && _mazeRef[i + offset][j + offsetWall + 1] != IS_OBSTACLE && _mazeRef[i + offset - 1][j + offsetWall + 1] != IS_OBSTACLE && _mazeRef[i + offset - 2][j + offsetWall + 1] != IS_OBSTACLE) {
+                        	ImageRef imageRef;
+                        	//check for extra 1 space
+                        	if (i - 3 >= 0 && _mazeRef[i + offset - 3][j + offsetWall - 1] != IS_OBSTACLE && _mazeRef[i + offset - 3][j + offsetWall] != IS_OBSTACLE && _mazeRef[i + offset - 3][j + offsetWall + 1] != IS_OBSTACLE)
+                        		imageRef = new ImageRef(i + offset - 2, j + offsetWall, Orientation.EAST, i, j + offsetWall, Orientation.WEST);
+                        	else if (alongSouthWall == false && alongNorthWall == false)
+                        		imageRef = new ImageRef(i + offset - 1, j, Orientation.EAST, i, j, Orientation.WEST);
+                        	else
+                        		break;
+
+                        	//check if already exists
                             if (arrayListOfImageRefs.contains(imageRef))
                                 break;
                             arrayListOfImageRefs.add(imageRef);
@@ -409,6 +489,172 @@ public class MazeExplorer {
         }
         arrayListOfImageRefs = new ArrayList<ImageRef>(sortedArrayListOfImageRefs);
     }
+    
+    private boolean isThereAdjacentObstacleEastAndWest(int _x, int _y)
+    {		
+    	//out of bounds guard
+		if (_x+1 >= Arena.MAP_LENGTH || _x-1 < 0 || _y >= Arena.MAP_WIDTH || _y < 0)
+			return false;
+    	if (_mazeRef[_x+1][_y] == IS_OBSTACLE && _mazeRef[_x-1][_y] == IS_OBSTACLE)
+    		return true;
+    	return false;
+    }
+    
+    private boolean isThereAdjacentObstacleEastOrWest(int _x, int _y)
+    {		
+    	//out of bounds guard
+		if (_y >= Arena.MAP_WIDTH || _y < 0)
+			return false;
+    	if (_x+1 < Arena.MAP_LENGTH && _mazeRef[_x+1][_y] == IS_OBSTACLE)
+    		return true;
+    	if (_x-1 >= 0 && _mazeRef[_x-1][_y] == IS_OBSTACLE)
+    		return true;
+    	return false;
+    }
+    
+    private boolean isThereAdjacentObstacleNorthAndSouth(int _x, int _y)
+    {
+    	//out of bounds guard
+		if (_x >= Arena.MAP_LENGTH || _x < 0 || _y+1 >= Arena.MAP_WIDTH || _y-1 < 0)
+			return false;
+    	if (_mazeRef[_x][_y+1] == IS_OBSTACLE && _mazeRef[_x][_y-1] == IS_OBSTACLE)
+    		return true;
+    	return false;
+    }
+    
+    private boolean isThereAdjacentObstacleNorthOrSouth(int _x, int _y)
+    {
+    	//out of bounds guard
+		if (_x >= Arena.MAP_LENGTH || _x < 0)
+			return false;
+    	if (_y+1 < Arena.MAP_WIDTH && _mazeRef[_x][_y+1] == IS_OBSTACLE)
+    		return true;
+    	if (_y-1 >= 0 && _mazeRef[_x][_y-1] == IS_OBSTACLE)
+    		return true;
+    	return false;
+    }
+    
+    /**
+     * remove unncessary imageRefs of groupings of 3
+     */
+    private void removeUnnecessaryImageRef3()
+    {
+    	 int i = 0;
+    	 while (!arrayListOfImageRefs.isEmpty()) 
+         {
+    		 ImageRef imageRefToCheck = arrayListOfImageRefs.get(i);
+    		 //check and remove groups of 3 horizontal imageRef
+			 if (isThereAdjacentObstacleEastAndWest(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
+			 {
+				 for (int j = 0; j < arrayListOfImageRefs.size(); ++j)
+				 {
+					 ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
+					 if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst))
+						 continue; 
+					 if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.EAST))
+					 {
+						 arrayListOfImageRefs.remove(j);
+						 --j;
+					 }
+					 else if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.WEST))
+					 {
+						 arrayListOfImageRefs.remove(j);
+						 --j;
+					 }
+					 // exceed arraylist bounds when removing last element
+					 if (j >= arrayListOfImageRefs.size())
+						 break;
+				 }
+			 }
+			//check and remove groups of 3 vertical imageRef
+			 if (isThereAdjacentObstacleNorthAndSouth(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
+			 {
+				 for (int j = 0; j < arrayListOfImageRefs.size(); ++j)
+				 {
+					 ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
+					 if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst))
+						 continue; 
+					 if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.NORTH))
+					 {
+						 arrayListOfImageRefs.remove(j);
+						 --j;
+					 }
+					 else if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.SOUTH))
+					 {
+						 arrayListOfImageRefs.remove(j);
+						 --j;
+					 }
+					 // exceed arraylist bounds when removing last element
+					 if (j >= arrayListOfImageRefs.size())
+						 break;
+				 }
+			 }
+    		 ++i;
+    		 if (i >= arrayListOfImageRefs.size())
+    			 return;
+         }
+    }
+    
+    /**
+     * remove unncessary imageRefs of groupings of 2
+     */
+    private void removeUnnecessaryImageRef2()
+    {
+    	 int i = 0;
+    	 while (!arrayListOfImageRefs.isEmpty()) 
+         {
+    		 ImageRef imageRefToCheck = arrayListOfImageRefs.get(i);
+    		 //check and remove groups of 2 horizontal imageRef
+			 if (isThereAdjacentObstacleEastOrWest(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
+			 {
+				 for (int j = 0; j < arrayListOfImageRefs.size(); ++j)
+				 {
+					 ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
+					 if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst))
+						 continue; 
+					 if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.EAST))
+					 {
+						 arrayListOfImageRefs.remove(j);
+						 --j;
+					 }
+					 else if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.WEST))
+					 {
+						 arrayListOfImageRefs.remove(j);
+						 --j;
+					 }
+					 // exceed arraylist bounds when removing last element
+					 if (j >= arrayListOfImageRefs.size())
+						 break;
+				 }
+			 }
+			//check and remove groups of 2 vertical imageRef
+			 if (isThereAdjacentObstacleNorthOrSouth(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
+			 {
+				 for (int j = 0; j < arrayListOfImageRefs.size(); ++j)
+				 {
+					 ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
+					 if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst))
+						 continue; 
+					 if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.NORTH))
+					 {
+						 arrayListOfImageRefs.remove(j);
+						 --j;
+					 }
+					 else if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.SOUTH))
+					 {
+						 arrayListOfImageRefs.remove(j);
+						 --j;
+					 }
+					 // exceed arraylist bounds when removing last element
+					 if (j >= arrayListOfImageRefs.size())
+						 break;
+				 }
+			 }
+    		 ++i;
+    		 if (i >= arrayListOfImageRefs.size())
+    			 return;
+         }
+    }
 
     /**
      * after map exploration,
@@ -419,7 +665,10 @@ public class MazeExplorer {
         System.out.println("*** Start findImage()");
         setImageRef();
         Collections.sort(arrayListOfImageRefs);
+        removeUnnecessaryImageRef3();
+        removeUnnecessaryImageRef2();
         sortImageRef();
+        
         while (!arrayListOfImageRefs.isEmpty()) {
             System.out.println(arrayListOfImageRefs.get(0).getX() + "," + arrayListOfImageRefs.get(0).getY());
             VirtualMap virtualMap = VirtualMap.getInstance();
@@ -1536,7 +1785,7 @@ public class MazeExplorer {
 
 
                     _robot.turnRight();
-                    _robotOrientation = Orientation.SOUTH;
+                    _robotOrientation = Orientation.WEST;
                     setIsExplored(_robotPosition, _robotOrientation, true);
 
                 }
