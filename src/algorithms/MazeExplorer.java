@@ -544,7 +544,7 @@ public class MazeExplorer {
          {
     		 ImageRef imageRefToCheck = arrayListOfImageRefs.get(i);
     		 //check and remove groups of 3 horizontal imageRef
-			 if (isThereAdjacentObstacleEastAndWest(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
+			 if (imageRefToCheck.distanceFromTarget() == 1 && isThereAdjacentObstacleEastAndWest(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
 			 {
 				 for (int j = 0; j < arrayListOfImageRefs.size(); ++j)
 				 {
@@ -567,7 +567,7 @@ public class MazeExplorer {
 				 }
 			 }
 			//check and remove groups of 3 vertical imageRef
-			 if (isThereAdjacentObstacleNorthAndSouth(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
+			 if (imageRefToCheck.distanceFromTarget() == 1 && isThereAdjacentObstacleNorthAndSouth(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
 			 {
 				 for (int j = 0; j < arrayListOfImageRefs.size(); ++j)
 				 {
@@ -605,12 +605,12 @@ public class MazeExplorer {
          {
     		 ImageRef imageRefToCheck = arrayListOfImageRefs.get(i);
     		 //check and remove groups of 2 horizontal imageRef
-			 if (isThereAdjacentObstacleEastOrWest(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
+			 if (imageRefToCheck.distanceFromTarget() == 1 && isThereAdjacentObstacleEastOrWest(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
 			 {
 				 for (int j = 0; j < arrayListOfImageRefs.size(); ++j)
 				 {
 					 ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
-					 if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst))
+					 if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst) || imageRefToCheck.getTargetY() != imageRefToCheckAgainst.getTargetY())
 						 continue; 
 					 if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.EAST))
 					 {
@@ -628,12 +628,12 @@ public class MazeExplorer {
 				 }
 			 }
 			//check and remove groups of 2 vertical imageRef
-			 if (isThereAdjacentObstacleNorthOrSouth(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
+			 if (imageRefToCheck.distanceFromTarget() == 1 && isThereAdjacentObstacleNorthOrSouth(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY()))
 			 {
 				 for (int j = 0; j < arrayListOfImageRefs.size(); ++j)
 				 {
 					 ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
-					 if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst))
+					 if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst) || imageRefToCheck.getTargetX() != imageRefToCheckAgainst.getTargetX())
 						 continue; 
 					 if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(), imageRefToCheckAgainst.getY(), Orientation.NORTH))
 					 {
@@ -668,7 +668,6 @@ public class MazeExplorer {
         removeUnnecessaryImageRef3();
         removeUnnecessaryImageRef2();
         sortImageRef();
-        
         while (!arrayListOfImageRefs.isEmpty()) {
             System.out.println(arrayListOfImageRefs.get(0).getX() + "," + arrayListOfImageRefs.get(0).getY());
             VirtualMap virtualMap = VirtualMap.getInstance();

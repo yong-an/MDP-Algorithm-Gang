@@ -45,6 +45,13 @@ public class ImageRef implements Comparable<ImageRef> {
 		targetOrientation = orientation.NORTH;
 	}
 	
+	public int distanceFromTarget()
+	{
+		if (Math.abs(x - targetX) == 2 || Math.abs(y - targetY) == 2) 
+			return 0;
+		return 1;
+	}
+	
 	public boolean isThereAdjacentImageRef(int _x, int _y, Orientation _adjacentDirection)
 	{
 		//out of bounds guard
