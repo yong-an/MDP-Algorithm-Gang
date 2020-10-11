@@ -565,31 +565,42 @@ public class Robot {
 		switch (ori) {
 			case NORTH:
 				turnLeft();
-				calibrateRobotPosition();
-				turnLeft();
-				calibrateRobotPosition();
-				turnRight();
-				turnRight();
+				calibrateRobotPositionViaStart();
 				break;
 			case SOUTH:
-				calibrateRobotPosition();
 				turnRight();
-				calibrateRobotPosition();
-				turnRight();			
+				calibrateRobotPositionViaStart();
+				turnLeft();
 				break;
 			case EAST:
-				//turnRight();
 				calibrateRobotPositionViaStart();
-				//turnRight();
-				//calibrateRobotPosition();
-				//turnRight();
 				break;
 			case WEST:
-				calibrateRobotPosition();
+				calibrateRobotPositionViaStart();
+		}
+		return Orientation.EAST;
+	}
+	
+	/**
+	 * This function handles the robot calibration after exploration.
+	 * @param ori
+	 * @return
+	 */
+	public Orientation calibrateAfterExploration(Orientation ori) {	
+		switch (ori) {
+			case NORTH:
 				turnLeft();
-				calibrateRobotPosition();
+				calibrateRobotPositionViaStart();
+				break;
+			case SOUTH:
 				turnRight();
-				turnRight();
+				calibrateRobotPositionViaStart();
+				break;
+			case EAST:
+				calibrateRobotPositionViaStart();
+				break;
+			case WEST:
+				calibrateRobotPositionViaStart();
 		}
 		return Orientation.EAST;
 	}

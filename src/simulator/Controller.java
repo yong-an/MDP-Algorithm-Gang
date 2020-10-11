@@ -129,57 +129,59 @@ public class Controller {
 						boolean receiveWaypoint = true;
 						String messageReceive = "";
 						List<String> valueList;
-						
-						
-						/*
-						 
+				
 						
 						//THIS PORTION IS THE WAY POINT CODE
-						//IT WILL WHILE LOOP UNTIL IT RECEIVE A VALID WP
 						//messageReceive = "WP:10,10"; 
 						//messageReceive = "START:1,1"
 						//SAMPLE VALUES ^ HOW ITS SUPPOSE TO LOOK LIKE
-						 
+						
+						
 						System.out.println("Waiting for Way point");
 						
-						while(receivePosition || receiveWaypoint) {
+						while(receiveWaypoint) {
 						
 							messageReceive = _pcClient.readMessage();
-							System.out.println(messageReceive);
-				
 							valueList = Arrays.asList(messageReceive.split(":"));
 								
-							//System.out.println(messageReceive);
-							//System.out.println(valueList.get(0).toString());
+							System.out.println(messageReceive);
+							System.out.println(valueList.get(0).toString());
 
 							if(receiveWaypoint && valueList.get(0).equals("WP")) {
 								msgWayPoint = valueList.get(1);
-								
-								//System.out.println(msgWayPoint);
-									
+								System.out.println(msgWayPoint);
 								setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
 								receiveWaypoint = false;
 								}
+						}
 						
 						
-							//USE THIS PORTION IF YOU WANT ANDROID TO SET START POINT TOO
-							//ELSE JUST USE THE BTM PORTION 1,1
+						/* 
+						 
+						 
+						System.out.println("Waiting for Start point");
+						
+						while(receivePosition) {
 							
+							messageReceive = _pcClient.readMessage();
+							valueList = Arrays.asList(messageReceive.split(":"));
+								
+							System.out.println(messageReceive);
+							System.out.println(valueList.get(0).toString());
+
 							if(receivePosition && valueList.get(0).equals("START")) {
 								msgRobotPosition = valueList.get(1);
-								
 								System.out.println(msgRobotPosition);
-								
 								int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
 								resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
 								receivePosition = false;
 							}
-						
 						}
 						
-						
 						*/
-											
+						
+						
+						
 						//=======================HARD CODED WP -> COMMENT AWAY THIS ======================
 						msgRobotPosition = "1,1";
 						//   msgRobotPosition = valueList.get(1);
@@ -187,27 +189,36 @@ public class Controller {
 						resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
 						
 						
-						msgWayPoint = "6,10";
+						//msgWayPoint = "7,17";
 						//String msgWayPoint = valueList.get(1);
-						setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
+						//setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
 						
 						//===============================================================================
-				
-						MazeExplorer me = MazeExplorer.getInstance();
-						me.init(_robotPosition, _robotOrientation);
-						Robot caliRobot = Robot.getInstance();
 						
-						_robotOrientation = caliRobot.calibrateAtStartZone(_robotOrientation);
-						me.setOrientation(_robotOrientation);
-						
-						String msgExplore = _pcClient.readMessage();
-						//String msgExplore = Message.START_EXPLORATION;
-						while (!msgExplore.equals(Message.START_EXPLORATION)) {
-							msgExplore = _pcClient.readMessage();
-						}
+						if(receiveWaypoint == false) {
+							
+							MazeExplorer me = MazeExplorer.getInstance();
+							me.init(_robotPosition, _robotOrientation);
+							Robot caliRobot = Robot.getInstance();
+							
+							_robotOrientation = caliRobot.calibrateAtStartZone(_robotOrientation);
+							me.setOrientation(_robotOrientation);
+							
+							String msgExplore = _pcClient.readMessage();
+							//String msgExplore = Message.START_EXPLORATION;
+							while (!msgExplore.equals(Message.START_EXPLORATION)) {
+								msgExplore = _pcClient.readMessage();
+							}
 
-						_ui.setStatus("start exploring");
-						exploreMaze();
+							_ui.setStatus("Start Exploring");
+							exploreMaze();
+							
+						}
+						else
+						{
+							System.out.println("Way Point -> " + receiveWaypoint);
+							System.out.println("Start Point -> " + receiveWaypoint);
+						}
 
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
@@ -621,6 +632,9 @@ public class Controller {
                     _fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1],
                             MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
                     Orientation bestOri = pathFinder.getBestInitialOrientation(_fastestPath);
+                    System.out.println("Best Ori" + bestOri);
+                    _robotOrientation = robot.calibrateAfterExploration(_robotOrientation);
+                    System.out.println(_robotOrientation + "BLAHBLAH");
                     explorer.adjustOrientationTo(bestOri);
                 }
 
@@ -664,17 +678,22 @@ public class Controller {
                 } 
                 else 
                 {
+                	//_robotOrientation = robot.calibrateAtStartZone(_robotOrientation);
+
                     try {
+                    	//_robotOrientation = robot.calibrateAfterExploration(_robotOrientation);
+                    	System.out.println(_robotOrientation + "before fastest path");
                         String msgFFP = _pcClient.readMessage();
                         while (!msgFFP.equals(Message.START_FASTEST)) {
                             msgFFP = _pcClient.readMessage();
                         }
                         _ui.setStatus("Start finding fastest path");
-                        findFastestPath(true);
-                        //findFastestPath(false);
+                        //findFastestPath(true);
+                        findFastestPath(false);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    
                 }
             }
         };
@@ -813,14 +832,15 @@ public class Controller {
     				MazeExplorer explorer = MazeExplorer.getInstance();
     				AStarPathFinder pathFinder = AStarPathFinder.getInstance();
     	
-    				if(!RobotSystem.isRealRun()) {
+    				if(RobotSystem.isRealRun()) {
     					_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
     							_waypointPosition[0], _waypointPosition[1], explorer.getMazeRef());
     					_fastestPath2 = pathFinder.findFastestPath(_waypointPosition[0], _waypointPosition[1], 
     							MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
-    	
+    	                System.out.println("combining steps");
     					_fastestPath.combineSteps(_fastestPath2.getSteps());
     				}
+                    System.out.println("fastest path:" + _fastestPath);
     				System.out.println("Fastest Path: Start");
     				pathFinder.moveRobotAlongFastestPath(_fastestPath, explorer.getRobotOrientation());
     				System.out.println("Fastest Path: End");

@@ -1525,6 +1525,9 @@ public class MazeExplorer {
 		}
 
 		public void adjustOrientationTo(Orientation ori) {
+			System.out.println("bestori:" + ori);
+			_robotOrientation = Orientation.EAST;
+			System.out.println("robotori:" + _robotOrientation);
 			switch (ori) {
 				case NORTH:
 					if (_robotOrientation == Orientation.SOUTH) {
@@ -1535,11 +1538,13 @@ public class MazeExplorer {
 						
 						_robot.turnRight();
 						_robotOrientation = Orientation.NORTH;
+						System.out.println("you should NOT see me" + _robotOrientation + "north");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 		
 					} else if (_robotOrientation == Orientation.EAST) {
-						
+						System.out.println("you should see me 1");
 						_robot.turnLeft();
+						System.out.println("you should see me");
 						_robotOrientation = Orientation.NORTH;
 						setIsExplored(_robotPosition, _robotOrientation, true);
 		
@@ -1547,6 +1552,7 @@ public class MazeExplorer {
 						
 						_robot.turnRight();
 						_robotOrientation = Orientation.NORTH;
+						System.out.println("you should NOT see me" + _robotOrientation + "north");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
 					}
@@ -1556,21 +1562,25 @@ public class MazeExplorer {
 						
 						_robot.turnRight();
 						_robotOrientation = Orientation.EAST;
+						System.out.println("you should NOT see me" + _robotOrientation + "south");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
 						_robot.turnRight();
 						_robotOrientation = Orientation.SOUTH;
+						System.out.println("you should NOT see me" + _robotOrientation + "south");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
 					} else if (_robotOrientation == Orientation.EAST) {
 						
 						_robot.turnRight();
 						_robotOrientation = Orientation.SOUTH;
+						System.out.println("you should NOT see me" + _robotOrientation + "south");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
 					} else if (_robotOrientation == Orientation.WEST) {
 						_robot.turnLeft();
 						_robotOrientation = Orientation.SOUTH;
+						System.out.println("you should NOT see me" + _robotOrientation + "south");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 					}
 					break;
@@ -1578,22 +1588,26 @@ public class MazeExplorer {
 					if (_robotOrientation == Orientation.NORTH) {
 						_robot.turnRight();
 						_robotOrientation = Orientation.EAST;
+						System.out.println("you should NOT see me" + _robotOrientation + "east");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
 					} else if (_robotOrientation == Orientation.SOUTH) {
 						
 						_robot.turnLeft();
 						_robotOrientation = Orientation.EAST;
+						System.out.println("you should NOT see me" + _robotOrientation + "east");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
 					} else if (_robotOrientation == Orientation.WEST) {
 			
 						_robot.turnRight();
 						_robotOrientation = Orientation.NORTH;
+						System.out.println("you should NOT see me" + _robotOrientation + "east");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
 						_robot.turnRight();
 						_robotOrientation = Orientation.EAST;
+						System.out.println("you should NOT see me" + _robotOrientation + "east");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 					}
 					break;
@@ -1601,21 +1615,25 @@ public class MazeExplorer {
 					if (_robotOrientation == Orientation.NORTH) {
 						_robot.turnLeft();
 						_robotOrientation = Orientation.WEST;
+						System.out.println("you should NOT see me" + _robotOrientation + "west");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 					} else if (_robotOrientation == Orientation.SOUTH) {
 				
 						_robot.turnRight();
 						_robotOrientation = Orientation.WEST;
+						System.out.println("you should NOT see me" + _robotOrientation + "west");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 					} else if (_robotOrientation == Orientation.EAST) {
 						
 						_robot.turnRight();
 						_robotOrientation = Orientation.SOUTH;
+						System.out.println("you should NOT see me" + _robotOrientation + "west");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 					
 					
 						_robot.turnRight();
 						_robotOrientation = Orientation.WEST;
+						System.out.println("you should NOT see me" + _robotOrientation + "west");
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
 					}
@@ -1937,7 +1955,6 @@ public class MazeExplorer {
 					{
 						System.out.println("ENTER RIGHT CAN ACCESS + UNSURE ACCESS" + rightStatus);
 						_robot.turnRight();
-						
 						updateRobotOrientation(Movement.TURN_RIGHT);
 						setIsExplored(_robotPosition, _robotOrientation, true);
 
@@ -1960,6 +1977,7 @@ public class MazeExplorer {
 						System.out.println("ENTER RIGHT CANNOT ACCESS" + rightStatus);
 						
 						_robot.turnRight();
+						
 						updateRobotOrientation(Movement.TURN_RIGHT);
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						
@@ -1999,6 +2017,8 @@ public class MazeExplorer {
 					setIsExplored(_robotPosition, _robotOrientation, true);
 				}
 			}
+			
+			
 		}
 		
 		private void exploreAlongWall (int[] goalPos) {
@@ -2071,11 +2091,7 @@ public class MazeExplorer {
 					updateRobotOrientation(Movement.TURN_LEFT);
 					setIsExplored(_robotPosition, _robotOrientation, true);
 				}				
-				System.out.println("Explored all?: "+areAllExplored());
-				if(areAllExplored() && isFastestPathBack) {
-					_fastestPathBack = controller.getFastestPathBack();
-					fastestPathBackToStart(); 
-				}
+
 			}
 		}
 		
