@@ -315,9 +315,9 @@ public class MazeExplorer {
                         	ImageRef imageRef = new ImageRef();
                         	//check for extra 1 space, required if obstacle is along wall
                         	if (j + offset - 3 >= 0 && _mazeRef[i + offsetWall - 1][j + offset - 3] != IS_OBSTACLE && _mazeRef[i + offsetWall][j + offset - 3] != IS_OBSTACLE && _mazeRef[i + offsetWall + 1][j + offset - 3] != IS_OBSTACLE)
-                        		imageRef = new ImageRef(i + offsetWall, j + offset - 2, Orientation.NORTH, i + offsetWall, j, Orientation.SOUTH);
+                        		imageRef = new ImageRef(i + offsetWall, j + offset - 2, Orientation.NORTH, i + offsetWall, j + offset + 1, Orientation.SOUTH);
                         	else if (alongWestWall == false && alongEastWall == false)
-                        		imageRef = new ImageRef(i, j + offset - 1, Orientation.NORTH, i, j, Orientation.SOUTH);
+                        		imageRef = new ImageRef(i, j + offset - 1, Orientation.NORTH, i, j + offset, Orientation.SOUTH);
                         	else
                         		break;
 
@@ -353,9 +353,9 @@ public class MazeExplorer {
                         	ImageRef imageRef;
                         	//check for extra 1 space 
                         	if (i + 3 < Arena.MAP_LENGTH && _mazeRef[i + offset + 3][j + offsetWall - 1] != IS_OBSTACLE && _mazeRef[i + offset + 3][j + offsetWall] != IS_OBSTACLE && _mazeRef[i + offset + 3][j + offsetWall + 1] != IS_OBSTACLE)
-                        		imageRef = new ImageRef(i + offset + 2, j + offsetWall, Orientation.WEST, i, j + offsetWall, Orientation.EAST);
+                        		imageRef = new ImageRef(i + offset + 2, j + offsetWall, Orientation.WEST, i + offset - 1, j + offsetWall, Orientation.EAST);
                         	else if (alongSouthWall == false && alongNorthWall == false)
-                        		imageRef = new ImageRef(i + offset + 1, j, Orientation.WEST, i, j, Orientation.EAST);
+                        		imageRef = new ImageRef(i + offset + 1, j, Orientation.WEST, i + offset, j, Orientation.EAST);
                         	else
                         		break;
 
@@ -391,9 +391,9 @@ public class MazeExplorer {
                         	ImageRef imageRef;
                         	//check for extra 1 space
                         	if (j + 3 < Arena.MAP_WIDTH && _mazeRef[i + offsetWall - 1][j + offset + 3] != IS_OBSTACLE && _mazeRef[i + offsetWall][j + offset + 3] != IS_OBSTACLE && _mazeRef[i + offsetWall + 1][j + offset + 3] != IS_OBSTACLE)
-                        		imageRef = new ImageRef(i + offsetWall, j + offset + 2, Orientation.SOUTH, i + offsetWall, j, Orientation.NORTH);
+                        		imageRef = new ImageRef(i + offsetWall, j + offset + 2, Orientation.SOUTH, i + offsetWall, j + offset - 1, Orientation.NORTH);
                         	else if (alongWestWall == false && alongEastWall == false)
-                        		imageRef = new ImageRef(i, j + offset + 1, Orientation.SOUTH, i, j, Orientation.NORTH);
+                        		imageRef = new ImageRef(i, j + offset + 1, Orientation.SOUTH, i, j + offset, Orientation.NORTH);
                         	else
                         		break;
 
@@ -429,9 +429,9 @@ public class MazeExplorer {
                         	ImageRef imageRef;
                         	//check for extra 1 space
                         	if (i - 3 >= 0 && _mazeRef[i + offset - 3][j + offsetWall - 1] != IS_OBSTACLE && _mazeRef[i + offset - 3][j + offsetWall] != IS_OBSTACLE && _mazeRef[i + offset - 3][j + offsetWall + 1] != IS_OBSTACLE)
-                        		imageRef = new ImageRef(i + offset - 2, j + offsetWall, Orientation.EAST, i, j + offsetWall, Orientation.WEST);
+                        		imageRef = new ImageRef(i + offset - 2, j + offsetWall, Orientation.EAST, i + offset + 1, j + offsetWall, Orientation.WEST);
                         	else if (alongSouthWall == false && alongNorthWall == false)
-                        		imageRef = new ImageRef(i + offset - 1, j, Orientation.EAST, i, j, Orientation.WEST);
+                        		imageRef = new ImageRef(i + offset - 1, j, Orientation.EAST, i + offset, j, Orientation.WEST);
                         	else
                         		break;
 
@@ -678,7 +678,7 @@ public class MazeExplorer {
             sendPicToRPI(arrayListOfImageRefs.get(0));
             arrayListOfImageRefs.remove(0);
 
-        } // end of while (!arrayListOfImageRefs.isEmpty())
+        }
     }
 
     private Boolean sendPicToRPI(ImageRef _imageRef) {
@@ -688,8 +688,8 @@ public class MazeExplorer {
     		 return false;
     	}
 
-        String msg = "H:" + _imageRef.getX() + ":" + _imageRef.getY() + ":" + _imageRef.getOrientation() + ":"
-        				+ _imageRef.getTargetX() + ":" + _imageRef.getTargetY() + ":" + _imageRef.getTargetOrientation();
+        String msg = "@r," + _imageRef.getX() + "," + _imageRef.getY() + "," + _imageRef.getOrientation() + ","
+        				+ _imageRef.getTargetX() + "," + _imageRef.getTargetY() + "," + _imageRef.getTargetOrientation();
 
         Controller controller = Controller.getInstance();
         PCClient pcClient = controller.getPCClient();
