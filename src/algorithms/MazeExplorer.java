@@ -448,21 +448,6 @@ public class MazeExplorer {
         }
     }
 
-//	private int[] getPos() { // TODO remove if no longer needed
-//		int[] obsPos = new int[2];
-//
-//		for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
-//			for (int obsY = 0; obsY < Arena.MAP_WIDTH; obsY++) {
-//				if(imageRef[obsX][obsY] == IS_OBSTACLE) {
-//					obsPos[0] = obsX;
-//					obsPos[1] = obsY;
-//					return obsPos;
-//				}
-//			}
-//		}
-//		return null;
-//	}
-
     private void sortImageRef() {
         ArrayList<ImageRef> sortedArrayListOfImageRefs = new ArrayList<ImageRef>();
         AStarPathFinder pathFinder = AStarPathFinder.getInstance();
@@ -786,66 +771,6 @@ public class MazeExplorer {
         }
 
     }
-
-//    /**
-//     * send RPI the robots current position and orientation
-//     * and send RPI msg to take picture
-//     * and receive feedback from RPI
-//     * timeout after 10 seconds
-//     * also prints out time taken for RPI to reply
-//     *
-//     * @param robotPosition
-//     * @param ori
-//     * @throws IOException
-//     */
-//    public void sendObstaclePos(int[] robotPosition, Orientation ori) throws IOException { // TODO seems outdated
-//        String msg = "";
-//
-//        if (ori == Orientation.NORTH && (robotPosition[0] + 2) != 15)
-//            msg = (robotPosition[0] + 2) + "_" + robotPosition[1] + "_" + ori;
-//
-//        else if (ori == Orientation.SOUTH && (robotPosition[0] - 2) != -1)
-//            msg = (robotPosition[0] - 2) + "_" + robotPosition[1] + "_" + ori;
-//
-//        else if (ori == Orientation.EAST && (robotPosition[1] - 2) != -1)
-//            msg = (robotPosition[0]) + "_" + (robotPosition[1] - 2) + "_" + ori;
-//
-//        else if (ori == Orientation.WEST && (robotPosition[1] + 2) != 20)
-//            msg = (robotPosition[0]) + "_" + (robotPosition[1] + 2) + "_" + ori;
-//
-//        // TODO update from 2nd oct, due to code from 30th sep, following code for RPI msg is outdated D:
-//        System.out.println("Send to RPI: " + msg);
-//        if (RobotSystem.isRealRun()) {
-//            Controller controller = Controller.getInstance();
-//            PCClient pcClient = controller.getPCClient();
-//            //pcClient.sendMsgToRPI(msg);
-//
-//            try {
-//                Date startDate = new Date();
-//                Date endDate = new Date();
-//                int numSeconds = 0;
-//                pcClient.sendMsgToRPI(msg);
-//                System.out.println("Sent Take Picture Command");
-//                String feedback = pcClient.readMessage();
-//                while (!feedback.equals(Message.DONE)) {
-//                    feedback = pcClient.readMessage();
-//                    System.out.println("Reading Picture Taking Command");
-//                    endDate = new Date();
-//                    numSeconds = (int) ((endDate.getTime() - startDate.getTime()) / 1000);
-//                    System.out.println("Picture Taking Command Timing: " + numSeconds);
-//                    if (((numSeconds % 2) == 0) && numSeconds < 10) {
-//                        pcClient.sendMsgToRPI(msg);
-//                    } else if (numSeconds >= 10)
-//                        break;
-//
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            System.out.println("Picture Command Completed");
-//        }
-//
-//    }
 
     //Start Exploring
     public void setIsExplored(int[] robotPosition, Orientation ori, boolean hasCalibration) {
@@ -2145,79 +2070,6 @@ public class MazeExplorer {
         }
     }
 
-//	/**
-//	 * find image(s) around obstacle
-//	 *
-//	 * @param goalPos
-//	 * @param initial
-//	 */
-//		private void findImageAlongWall (int[] goalPos, int[] initial) { // TODO remove if not used
-//			int move = 0;
-//			Controller controller = Controller.getInstance();
-//			PCClient pc = PCClient.getInstance();
-//
-//			_robot.turnLeft();
-//			updateRobotOrientation(Movement.TURN_LEFT);
-//
-//			while (!isGoalPos(_robotPosition, goalPos) && !controller.hasReachedTimeThreshold()) {
-//				int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
-//				//System.out.println("Initial:"+initial[0]+","+initial[1]);
-//
-//                // set current imageRef = IS_EMPTY
-//				boolean hasObs = eraseWall(_robotPosition, _robotOrientation);
-//
-//                // tell RPI to take pic and process feedback from RPI
-//                if(hasObs && startImageRun) {
-//                    try {
-//                        sendObstaclePos(_robotPosition, _robotOrientation);
-//                    } catch (IOException e1) {
-//                        e1.printStackTrace();
-//                    }
-//                }
-//
-//				if (rightStatus != RIGHT_NO_ACCESS) {
-//					if (rightStatus == RIGHT_UNSURE_ACCESS) {
-//						_robot.turnRight();
-//						updateRobotOrientation(Movement.TURN_RIGHT);
-//
-//						if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
-//							_robot.moveForward();
-//							updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-//							move++;
-//							if(Arrays.equals(initial, _robotPosition) && move > 7) {
-//								return;
-//							}
-//
-//						} else {
-//							_robot.turnLeft();
-//							updateRobotOrientation(Movement.TURN_LEFT);
-//						}
-//					} else { //rightStatus == RIGHT_CAN_ACCESS
-//						_robot.turnRight();
-//						updateRobotOrientation(Movement.TURN_RIGHT);
-//
-//						_robot.moveForward();
-//						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-//						move++;
-//						if(Arrays.equals(initial, _robotPosition) && move > 7) {
-//							return;
-//						}
-//					}
-//
-//				} else if (hasAccessibleFront(_robotPosition, _robotOrientation)){
-//					_robot.moveForward();
-//					updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
-//					move++;
-//					if(Arrays.equals(initial, _robotPosition) && move > 7) {
-//						return;
-//					}
-//				} else {
-//					_robot.turnLeft();
-//					updateRobotOrientation(Movement.TURN_LEFT);
-//				}
-//			}
-//		}
-
     //tells me if my curPos is equal to my goalPos
     private boolean isGoalPos(int[] curPos, int[] goalPos) {
         if (curPos[0] == goalPos[0] && curPos[1] == goalPos[1]) {
@@ -2257,53 +2109,7 @@ public class MazeExplorer {
             }
         }
 
-//        if (hasObs) {
-//            try {
-//                sendObstaclePos(curPos, ori); // TODO remove, is outdated
-//            } catch (IOException e1) {
-//                e1.printStackTrace();
-//            }
-//        }
     }
-
-//    /**
-//     * remove found imageRef position form imageRef
-//     * @param curPos
-//     * @param ori
-//     */
-//	private boolean eraseWall(int[] curPos, Orientation ori) { // TODO remove if not used anymore
-//		boolean hasObs = false;
-//	    for (int i=-1; i<2; i++) {
-//	      switch (ori) {
-//		      case NORTH:
-//		    	  if((curPos[0]+2) != 15 && _mazeRef[curPos[0]+2][curPos[1]+i] == IS_OBSTACLE) {
-//		    		  //imageRef[curPos[0]+2][curPos[1]+i] = IS_EMPTY;
-//		    		  hasObs = true;
-//		    	  }
-//		    	  break;
-//		      case SOUTH:
-//		    	  if((curPos[0]-2) != -1 && _mazeRef[curPos[0]-2][curPos[1]+i] == IS_OBSTACLE) {
-//		    		  //imageRef[curPos[0]-2][curPos[1]+i] = IS_EMPTY;
-//		    		  hasObs = true;
-//		    	  }
-//		    	  break;
-//		      case EAST:
-//		    	  if((curPos[1]-2) != -1 && _mazeRef[curPos[0]+i][curPos[1]-2] == IS_OBSTACLE) {
-//		    		  //imageRef[curPos[0]+i][curPos[1]-2] = IS_EMPTY;
-//		    		  hasObs = true;
-//		    	  }
-//		    	  break;
-//		      case WEST:
-//		    	  if((curPos[1]+2) != 20 && _mazeRef[curPos[0]+i][curPos[1]+2] == IS_OBSTACLE) {
-//		    		  //imageRef[curPos[0]+i][curPos[1]+2] = IS_EMPTY;
-//		    		  hasObs = true;
-//		    	  }
-//		    	  break;
-//	      }
-//		}
-//
-//	    return hasObs;
-//	  }
 
     private int checkRightSide(int[] curPos, Orientation ori) {
         int[] rightPos = new int[2];
