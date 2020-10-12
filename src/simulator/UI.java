@@ -39,14 +39,17 @@ public class UI extends JFrame implements ActionListener {
 
     private static final String EXPLORE_PANEL = "Explore Arena";
     private static final String FFP_PANEL = "Fastest Path";
+    private static final String IMAGE_PANEL = "Add/Remove Image";
     private static final long serialVersionUID = 1L;
     private JPanel _contentPane, _mapPane, _ctrlPane, _mazePane;
     private JLabel _status, _timer, _coverageUpdate;
     private JButton[][] _mapGrids, _mazeGrids;
     private Controller _controller;
     private JTextField[] _exploreTextFields, _ffpTextFields;
-    private JButton _exploreBtn, _ffpBtn, _stopExploreBtn, _loadBtn;
+    private JButton _exploreBtn, _ffpBtn, _stopExploreBtn, _loadBtn, _addImage, _removeImage;
     private JRadioButton btnAStar, btnFloodFill;
+    private JComboBox _imageIdsComboBox, _imageFunctionComboBox;
+    private ButtonGroup _imageBtnGrp;
     private boolean selection = false;
 
     /**
@@ -184,7 +187,7 @@ public class UI extends JFrame implements ActionListener {
         //Combo box drop down list [Exploration / Fastest Path].
         _ctrlPane = new JPanel(new BorderLayout());
         _ctrlPane.setBorder(new EmptyBorder(50, 20, 50, 20));
-        String comboBoxItems[] = {EXPLORE_PANEL, FFP_PANEL};
+        String comboBoxItems[] = {EXPLORE_PANEL, FFP_PANEL, IMAGE_PANEL};
         JComboBox cbCtrlSwitch = new JComboBox(comboBoxItems);
         cbCtrlSwitch.setFont(new Font("Tahoma", Font.BOLD, 16));
         cbCtrlSwitch.setEditable(false);
@@ -270,12 +273,12 @@ public class UI extends JFrame implements ActionListener {
         //Controls for the Fastest Path
         JLabel[] ffpCtrlLabels = new JLabel[2];
         _ffpTextFields = new JTextField[2];
-        btnAStar = new JRadioButton("A * " , true);
+        btnAStar = new JRadioButton("A * ", true);
         btnFloodFill = new JRadioButton("Test");
         ButtonGroup algorithmBtnGrp = new ButtonGroup();
         algorithmBtnGrp.add(btnAStar);
         algorithmBtnGrp.add(btnFloodFill);
-        
+
         _ffpBtn = new JButton("Navigate");
 
         if (RobotSystem.isRealRun()) {
@@ -322,11 +325,57 @@ public class UI extends JFrame implements ActionListener {
         ffpCtrlPane.add(ffpInputPane);
         ffpCtrlPane.add(ffpBtnPane);
         ffpCtrlPane.setBorder(new EmptyBorder(20, 20, 20, 20));
+        
+        // controls for add or remove IMAGES
+        JLabel[] imageCtrlLabels = new JLabel[3];
+        imageCtrlLabels[0] = new JLabel("Image Id: ");
+        imageCtrlLabels[1] = new JLabel("Image Orientation: ");
+        imageCtrlLabels[2] = new JLabel("Select Image Function");
+
+        // IMAGE: drop down menu for image id 1 to 15
+        String[] imageIds = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15"};
+        _imageIdsComboBox = new JComboBox(imageIds);
+        _imageIdsComboBox.addActionListener(this);
+
+        // IMAGE: radio buttons for orientation of image on the block
+        JRadioButton rBtnImgNORTH = new JRadioButton("N", true);
+        JRadioButton rBtnImgSOUTH = new JRadioButton("S");
+        JRadioButton rBtnImgEAST = new JRadioButton("E");
+        JRadioButton rBtnImgWEST = new JRadioButton("W");
+        rBtnImgNORTH.setActionCommand("N");
+        rBtnImgSOUTH.setActionCommand("S");
+        rBtnImgEAST.setActionCommand("E");
+        rBtnImgWEST.setActionCommand("W");
+        _imageBtnGrp = new ButtonGroup();
+        _imageBtnGrp.add(rBtnImgNORTH);
+        _imageBtnGrp.add(rBtnImgSOUTH);
+        _imageBtnGrp.add(rBtnImgEAST);
+        _imageBtnGrp.add(rBtnImgWEST);
+
+        // IMAGE: drop down menu to select what function to do when toggle at box
+        String[] imageFunctions = {"None", "Add Image Info", "Remove Image Info"};
+        _imageFunctionComboBox = new JComboBox(imageFunctions);
+
+        JPanel imageInputPane = new JPanel(new GridLayout(10, 2));
+        imageInputPane.add(imageCtrlLabels[0]);
+        imageInputPane.add(_imageIdsComboBox);
+        imageInputPane.add(imageCtrlLabels[1]);
+        imageInputPane.add(rBtnImgNORTH);
+        imageInputPane.add(rBtnImgSOUTH);
+        imageInputPane.add(rBtnImgEAST);
+        imageInputPane.add(rBtnImgWEST);
+        imageInputPane.add(imageCtrlLabels[2]);
+        imageInputPane.add(_imageFunctionComboBox);
+
+        JPanel imageCtrlPane = new JPanel();
+        imageCtrlPane.add(imageInputPane);
+        imageCtrlPane.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         //A card panel to swap the controls panels based on what u select on the combo box.
         JPanel cardPane = new JPanel(new CardLayout());
         cardPane.add(exploreCtrlPane, EXPLORE_PANEL);
         cardPane.add(ffpCtrlPane, FFP_PANEL);
+        cardPane.add(imageCtrlPane, IMAGE_PANEL);
         cardPane.setPreferredSize(new Dimension(280, 300));
         _ctrlPane.add(cardPane, BorderLayout.CENTER);
 
@@ -400,10 +449,27 @@ public class UI extends JFrame implements ActionListener {
             int index = cmd.indexOf(",");
             int x = Integer.parseInt(cmd.substring(17, index));
             int y = Integer.parseInt(cmd.substring(index + 1));
-            _controller.toggleObstacle(_mapGrids, x, y);
-            // enable load map button when map layout change
-            _loadBtn.setEnabled(true);
-            System.out.println("Toggle at " + x + ", " + y);
+            /**
+             * toggleFunction
+             * 0, do nothing related to image, the usual toggle tile happens
+             * 1, add image when click on tile
+             * 2, remove image click on tile
+             */
+            int toggleFunction = _imageFunctionComboBox.getSelectedIndex();
+            switch (toggleFunction) {
+                case 1: // add image when click on tile
+                    // image id +1 as image ids = [1,15] while ComboxBox index = [0,14]
+                    _controller.addImage(_mapGrids, x, y, _imageIdsComboBox.getSelectedIndex() + 1, _imageBtnGrp.getSelection().getActionCommand());
+                    break;
+                case 2: // remove image click on tile
+                    _controller.removeImage(_mapGrids, x, y);
+                    break;
+                default:
+                    _controller.toggleObstacle(_mapGrids, x, y);
+                    // enable load map button when map layout change
+                    _loadBtn.setEnabled(true);
+                    System.out.println("Toggle at " + x + ", " + y);
+            }
         } else if (cmd.equals("SwitchCtrl")) {
             JComboBox cb = (JComboBox) e.getSource();
             JPanel cardPanel = (JPanel) _ctrlPane.getComponent(1);
@@ -425,7 +491,6 @@ public class UI extends JFrame implements ActionListener {
         } else if (cmd.equals("stopExplore")) {
             _stopExploreBtn.setEnabled(false);
             _controller.stopExploring();
-
         }
     }
 
@@ -627,6 +692,7 @@ public class UI extends JFrame implements ActionListener {
 
     /**
      * This function will verify if the exploration input is valid.
+     *
      * @return
      */
     public boolean isIntExploreInput() {
@@ -665,6 +731,7 @@ public class UI extends JFrame implements ActionListener {
 
     /**
      * This function will verify if the fastest path input is valid.
+     *
      * @return
      */
     public boolean isIntFFPInput() {

@@ -299,6 +299,28 @@ public class Controller {
     }
 
     /**
+     * Function to add text to the grid/tile, where text = image id + orientation
+      * @param mapGrids
+     * @param x
+     * @param y
+     * @param imageId
+     * @param orientation
+     */
+    public void addImage(JButton[][] mapGrids, int x, int y, int imageId, String orientation){
+        mapGrids[x][y].setText(imageId + orientation);
+    }
+
+    /**
+     * Function to remove (image info) text from grid/tile
+     * @param mapGrids
+     * @param x
+     * @param y
+     */
+    public void removeImage(JButton[][] mapGrids, int x, int y){
+        mapGrids[x][y].setText("");
+    }
+
+    /**
      * Function to handle the logic behind switching of 2 different layout for the middle panel.
      *
      * @param cb
