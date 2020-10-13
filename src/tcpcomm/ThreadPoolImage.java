@@ -2,6 +2,7 @@ package tcpcomm;
 
 import datatypes.ImageMsg;
 import datatypes.Orientation;
+import simulator.Controller;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -11,9 +12,16 @@ import java.util.regex.Pattern;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 
+/**
+ * thread class to pool image files from a folder
+ * read image file name to obtain image info
+ * update algo stimulator with the image info
+ * and send image info to Android
+ */
 public class ThreadPoolImage implements Runnable {
     private static ArrayList<ImageMsg> imageMsgList;
     private static PCClient pcClient;
+    private static Controller controller;
 
     @Override
     public void run() {
@@ -21,6 +29,7 @@ public class ThreadPoolImage implements Runnable {
 
         imageMsgList = new ArrayList<ImageMsg>();
         pcClient = PCClient.getInstance();
+        controller = Controller.getInstance();
 
         try {
             poolDirectory();
@@ -37,7 +46,7 @@ public class ThreadPoolImage implements Runnable {
      * @throws IOException
      * @throws InterruptedException
      */
-    private void poolDirectory() throws IOException, InterruptedException { // todo watch folder
+    private void poolDirectory() throws IOException, InterruptedException {
         WatchService watcher = FileSystems.getDefault().newWatchService();
 //		Path dir = Paths.get("D:\\Sample"); // todo update pooling folder path
         Path dir = Paths.get("F:\\Sample");
@@ -49,10 +58,12 @@ public class ThreadPoolImage implements Runnable {
 
                 // consider file only at ENTRY_CREATE
                 if (event.kind() == ENTRY_CREATE) {
-                    imageMsgList.add(fileNameToImageMsg(event.context().toString()));
+                    ImageMsg image = fileNameToImageMsg(event.context().toString());
+                    imageMsgList.add(image);
 
-                    // update algo stimulator todo
-
+                    // update algo stimulator, show image info on stimulator
+                    controller.foundImage(image.getX(), image.getY(), image.getImageId(),
+                            Orientation.getOrientationLetter(image.getOrientation()));
 
                     // send msg to android
                     String msgToAndroid = imageMsgListToString(imageMsgList);
@@ -88,11 +99,10 @@ public class ThreadPoolImage implements Runnable {
             image.setImageId(Integer.parseInt(digits[0])); // image id
             image.setX(Integer.parseInt(digits[1])); // x-coord
             image.setY(Integer.parseInt(digits[2])); // y-coord
-
         }
 
         return image;
-    } //todo confirm image filename
+    } //todo RPI pls confirm image filename
 
     /**
      * convert all found images info, into a string of format [imageID,x-coord,y-coord]

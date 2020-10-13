@@ -6,6 +6,11 @@ package datatypes;
 public enum Orientation {
 	EAST, WEST, SOUTH, NORTH;
 
+	/**
+	 * convert input string of orientation into Orientation
+	 * @param s expected input string = NORTH | SOUTH | WEST | EAST
+	 * @return Orientation object
+	 */
 	public static Orientation getOrientationFromStr(String s){
 		s = s.toUpperCase();
 		switch(s)
@@ -20,5 +25,25 @@ public enum Orientation {
 				return EAST;
 		}
 		return null;
+	}
+
+	/**
+	 * convert input Orientation into its corresponding letter
+	 * @param o
+	 * @return a string of length 1: N | S | W | E
+	 */
+	public static String getOrientationLetter(Orientation o){
+		switch(o)
+		{
+			case NORTH:
+				return "N";
+			case SOUTH:
+				return "S";
+			case WEST:
+				return "W";
+			case EAST:
+				return "E";
+		}
+		return "";
 	}
 }

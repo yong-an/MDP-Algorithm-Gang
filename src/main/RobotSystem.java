@@ -26,7 +26,7 @@ public class RobotSystem {
         System.out.println("We R Live Now");
 
         Thread t1 = new Thread(new ThreadPoolImage());
-        t1.start(); // todo test thread, to be remove
+        t1.start(); // todo test thread, maybe move to findImage() instead
     }
 
     public static boolean isRealRun() {
