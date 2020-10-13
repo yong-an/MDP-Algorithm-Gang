@@ -39,7 +39,7 @@ public class Controller {
 	private static final int FFP_TIME_LIMIT = 120;
 	private static final int EXPLORE_REAL_RUN_SPEED = 1;
 	private static final int EXPLORE_COVERAGE = 100;
-	
+
 	private static Controller _instance;
 	private UI _ui;
 	private Timer _exploreTimer, _ffpTimer;
@@ -69,7 +69,7 @@ public class Controller {
             _instance = new Controller();
         }
         return _instance;
-        
+
     /**
     * This function returns the robot orientation
     *
@@ -79,7 +79,7 @@ public class Controller {
 	public Orientation getOrientation() {
 		return this._robotOrientation;
 	}
-	
+
     /**
     * This function returns robot position in array format
     *
@@ -88,7 +88,7 @@ public class Controller {
 	public int[] getPosition() {
 		return this._robotPosition;
 	}
-	
+
     /**
     * This function returns the fastest path
     *
@@ -106,22 +106,22 @@ public class Controller {
 	public void run() {
 		_ui.setVisible(true);
 		_robotOrientation = Orientation.EAST;
-		
+
 		if (RobotSystem.isRealRun()) {
-	
+
 			_pcClient = PCClient.getInstance();
-			
+
 			SwingWorker<Void, Void> connectWithRPi = new SwingWorker<Void, Void>() {
-			
+
 				@Override
 				protected Void doInBackground() throws Exception {
-					
+
 					try {
 						//Connect with RPi
 						_ui.setStatus("waiting for connection...");
 						_pcClient.setUpConnection(PCClient.RPI_IP_ADDRESS, PCClient.RPI_PORT);
 						_ui.setStatus("connected with RPi");
-						
+
 						//Read initial robot position
 						String msgRobotPosition = "";
 						String msgWayPoint = "";
@@ -129,21 +129,21 @@ public class Controller {
 						boolean receiveWaypoint = true;
 						String messageReceive = "";
 						List<String> valueList;
-				
-						
+
+
 						//THIS PORTION IS THE WAY POINT CODE
-						//messageReceive = "WP:10,10"; 
+						//messageReceive = "WP:10,10";
 						//messageReceive = "START:1,1"
 						//SAMPLE VALUES ^ HOW ITS SUPPOSE TO LOOK LIKE
-						
-						
+
+
 						System.out.println("Waiting for Way point");
-						
+
 						while(receiveWaypoint) {
-						
+
 							messageReceive = _pcClient.readMessage();
 							valueList = Arrays.asList(messageReceive.split(":"));
-								
+
 							System.out.println(messageReceive);
 							System.out.println(valueList.get(0).toString());
 
@@ -179,31 +179,31 @@ public class Controller {
 						}
 						
 						*/
-						
-						
-						
+
+
+
 						//=======================HARD CODED WP -> COMMENT AWAY THIS ======================
 						msgRobotPosition = "1,1";
 						//   msgRobotPosition = valueList.get(1);
 						int[] robotPosInput = getRobotPositionInput(msgRobotPosition);
 						resetRobotInMaze(_ui.getMazeGrids(), robotPosInput[0], robotPosInput[1]);
-						
-						
+
+
 						//msgWayPoint = "7,17";
 						//String msgWayPoint = valueList.get(1);
 						//setWayPointInMaze(_ui.getMazeGrids(), msgWayPoint);
-						
+
 						//===============================================================================
-						
+
 						if(receiveWaypoint == false) {
-							
+
 							MazeExplorer me = MazeExplorer.getInstance();
 							me.init(_robotPosition, _robotOrientation);
 							Robot caliRobot = Robot.getInstance();
-							
+
 							_robotOrientation = caliRobot.calibrateAtStartZone(_robotOrientation);
 							me.setOrientation(_robotOrientation);
-							
+
 							String msgExplore = _pcClient.readMessage();
 							//String msgExplore = Message.START_EXPLORATION;
 							while (!msgExplore.equals(Message.START_EXPLORATION)) {
@@ -212,7 +212,7 @@ public class Controller {
 
 							_ui.setStatus("Start Exploring");
 							exploreMaze();
-							
+
 						}
 						else
 						{
@@ -228,17 +228,17 @@ public class Controller {
 				}
 					return null;
 				}
-				
+
 			};
-			
+
 			connectWithRPi.execute();
 
-	
+
 		} else {
 			_ui.refreshExploreInput();
 		}
 	}
-	
+
     /**
      * Function will return the robot position in descriptor format.
      *
@@ -260,7 +260,7 @@ public class Controller {
     public UI getUI() {
         return _ui;
     }
-    
+
 
     /**
      * Function will return the PC client.
@@ -319,6 +319,18 @@ public class Controller {
     public void removeImage(JButton[][] mapGrids, int x, int y){
         mapGrids[x][y].setText("");
     }
+
+    /**
+     * Function to add image info to maze grids
+     * when image has been found during run
+     * @param x
+     * @param y
+     * @param imageId
+     * @param orientation
+     */
+    public void foundImage(int x, int y, int imageId, String orientation){
+		_ui.getMazeGrids()[x][y].setText(imageId + orientation);
+	}
 
     /**
      * Function to handle the logic behind switching of 2 different layout for the middle panel.
@@ -402,35 +414,35 @@ public class Controller {
 		} else {
 			for (int i = x - 1; i <= x + 1; i++) {
 				for (int j = y - 1; j <= y + 1; j++) {
-					mazeGrids[20 - j][i - 1].setBackground(Color.GREEN);		
+					mazeGrids[20 - j][i - 1].setBackground(Color.GREEN);
 				}
 			}
-			
+
 			//_robotOrientation = Orientation.NORTH;
-			
+
 			switch (_robotOrientation) {
 			case NORTH:
-				mazeGrids[19 - y][x - 1].setBackground(Color.BLUE);	
+				mazeGrids[19 - y][x - 1].setBackground(Color.BLUE);
 				break;
 			case SOUTH:
-				mazeGrids[21 - y][x - 1].setBackground(Color.BLUE);	
+				mazeGrids[21 - y][x - 1].setBackground(Color.BLUE);
 				break;
 			case EAST:
-				mazeGrids[20 - y][x].setBackground(Color.BLUE);	
+				mazeGrids[20 - y][x].setBackground(Color.BLUE);
 				break;
 			case WEST:
-				mazeGrids[20 - y][x - 2].setBackground(Color.BLUE);	
+				mazeGrids[20 - y][x - 2].setBackground(Color.BLUE);
 				break;
 			}
-			
+
 			_robotPosition[0] = x - 1;
 			_robotPosition[1] = y - 1;
-		
+
 			System.out.println("Robot initial position set at "+_robotPosition[0]+","+_robotPosition[1]);
 			_ui.setStatus("robot initial position set");
 		}
 	}
-    
+
     /**
      * Function to set way point in maze.
      *
@@ -438,24 +450,24 @@ public class Controller {
      * @param waypoint
      */
     public void setWayPointInMaze(JButton[][] mazeGrids, String waypoint) {
-		
+
 		if((_waypointPosition[1] != 0 && _waypointPosition[0] != 0) || waypoint.isEmpty())
-			mazeGrids[20-(_waypointPosition[1]+1)][(_waypointPosition[0]+1)-1].setText("");	
+			mazeGrids[20-(_waypointPosition[1]+1)][(_waypointPosition[0]+1)-1].setText("");
 		if(!waypoint.isEmpty()) {
 			int[] mazeWayPoint = getRobotPositionInput(waypoint);
 			int x = mazeWayPoint[0];
 			int y = mazeWayPoint[1];
-			
+
 			if(RobotSystem.isRealRun()) {
 				x+=1;
 				y+=1;
 			}
-			
+
 			if (x < 2 || x > 14 || y < 2 || y > 19) {
 				_ui.setStatus("warning: robot position out of range");
 				resetMaze(mazeGrids);
 			} else {
-				mazeGrids[20-y][x - 1].setText("WP");	
+				mazeGrids[20-y][x - 1].setText("WP");
 				_waypointPosition[0] = x - 1;
 				_waypointPosition[1] = y - 1;
 				System.out.println("Waypoint set at "+_waypointPosition[0]+", "+_waypointPosition[1]);
@@ -551,18 +563,18 @@ public class Controller {
      * This class handles exploration logic of the maze.
      */
     class ExploreTimeClass implements ActionListener {
-		int _counter; 
-		
+		int _counter;
+
 		public ExploreTimeClass(int timeLimit) {
 			_counter = timeLimit;
 		}
-		
+
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			
+
 			_counter--;
 			_ui.setTimer(_counter);
-			
+
 			if (_counter >= 0) {
 				SwingWorker<Void, Float> getThreshold = new SwingWorker<Void, Float>() {
 //					Path _backPath;
@@ -571,13 +583,13 @@ public class Controller {
 						//float threshold;
 						MazeExplorer explorer = MazeExplorer.getInstance();
 						AStarPathFinder pathFinder = AStarPathFinder.getInstance();
-						
+
 //						_backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], 
 //								MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
 //						System.out.println("Find fastest path back every turn");
 //						_fastestBackPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], 
 //								MazeExplorer.START[0], MazeExplorer.START[1], explorer.getMazeRef());
-						
+
 						//threshold = _backPath.getNumOfSteps() * (1 / (float)_speed) + THRESHOLD_BUFFER_TIME; //If need buffer.
 						publish((float)_counter);
 						return null;
@@ -585,26 +597,26 @@ public class Controller {
 					@Override
 					protected void process(List<Float> chunks) {
 						Float curThreshold = chunks.get(chunks.size() - 1);
-						
+
 						if (curThreshold == 0) {
 							_hasReachedTimeThreshold = true;
 						}
-						
+
 //						if (_counter <= curThreshold) {
 //							_hasReachedTimeThreshold = true;
 //						}
 					}
 				};
-				
+
 				if (_counter == 0) {
 					_exploreTimer.stop();
 					_ui.setTimerMessage("exploration: time out");
 					Toolkit.getDefaultToolkit().beep();
 				}
-				
+
 				getThreshold.execute();
-			
-			} 
+
+			}
 		}
 	}
 
@@ -612,7 +624,7 @@ public class Controller {
      * Function handles exploration of the maze.
      */
     public void exploreMaze() {
-    	
+
         if (!RobotSystem.isRealRun()) {
             if (!_ui.isIntExploreInput()) {
                 _ui.setStatus("invalid input for exploration");
@@ -626,7 +638,7 @@ public class Controller {
                 return;
             }
         }
-        
+
         MazeExplorer explorer = MazeExplorer.getInstance();
         Robot robot = Robot.getInstance();
 
@@ -645,9 +657,9 @@ public class Controller {
                     robot.setSpeed(_speed);
                 }
                 _hasReachedStart = false;
-                
+
                 explorer.explore(_robotPosition, _robotOrientation);
-              
+
                 //Compute the fastest path right after exploration for real run.
                 if (RobotSystem.isRealRun()) {
                     AStarPathFinder pathFinder = AStarPathFinder.getInstance();
@@ -697,8 +709,8 @@ public class Controller {
                 //Waiting for fastest path command for real run.
                 if (!RobotSystem.isRealRun()) {
                     _ui.setExploreBtnEnabled(true);
-                } 
-                else 
+                }
+                else
                 {
                 	//_robotOrientation = robot.calibrateAtStartZone(_robotOrientation);
 
@@ -715,7 +727,7 @@ public class Controller {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    
+
                 }
             }
         };
@@ -783,7 +795,7 @@ public class Controller {
     }
 
     public void findFastestPath(boolean s) {
-    	
+
     	 if (!RobotSystem.isRealRun()) {
 	            if (!_ui.isIntFFPInput()) {
 	                _ui.setStatus("invalid input for finding fastest path");
@@ -793,7 +805,7 @@ public class Controller {
 
 	            _ui.refreshFfpInput();
 	        }
-    	 
+
     	 //A *
     	if(s == true) {
     		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
@@ -843,21 +855,21 @@ public class Controller {
 	        _ffpTimer.start();
 	        _ui.setStatus("Robot finding fastest path");
 	        findFastestPath.execute();
-    	
+
     	}
     	else {
     		// Test
-    		
+
     		SwingWorker<Void, Void> findFastestPath = new SwingWorker<Void, Void>() {
     			@Override
     			protected Void doInBackground() throws Exception {
     				MazeExplorer explorer = MazeExplorer.getInstance();
     				AStarPathFinder pathFinder = AStarPathFinder.getInstance();
-    	
+
     				if(RobotSystem.isRealRun()) {
-    					_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1], 
+    					_fastestPath = pathFinder.findFastestPath(MazeExplorer.START[0], MazeExplorer.START[1],
     							_waypointPosition[0], _waypointPosition[1], explorer.getMazeRef());
-    					_fastestPath2 = pathFinder.findFastestPath(_waypointPosition[0], _waypointPosition[1], 
+    					_fastestPath2 = pathFinder.findFastestPath(_waypointPosition[0], _waypointPosition[1],
     							MazeExplorer.GOAL[0], MazeExplorer.GOAL[1], explorer.getMazeRef());
     	                System.out.println("combining steps");
     					_fastestPath.combineSteps(_fastestPath2.getSteps());
@@ -873,7 +885,7 @@ public class Controller {
     					int y = step.getY();
     					mazeGrids[19-y][x].setBackground(Color.YELLOW);
     				}
-    				
+
     				return null;
     			}
     			@Override
@@ -889,11 +901,11 @@ public class Controller {
     					_ui.setTimerMessage("fastest path: within time limit");
     				}
     				if (_ffpTimer.isRunning()) {
-    					_ffpTimer.stop(); 
+    					_ffpTimer.stop();
     				}
     			}
     		};
-    		
+
     		if (RobotSystem.isRealRun()) {
     			_ffpTimeLimit = FFP_TIME_LIMIT;
     		}
@@ -903,7 +915,7 @@ public class Controller {
     		_ui.setStatus("robot finding fastest path");
     		findFastestPath.execute();
     	}
-       
+
     }
 
     public void moveRobotForward() {

@@ -21,6 +21,7 @@ import simulator.arena.Arena;
 import simulator.robot.Robot;
 import simulator.robot.Sensor;
 import tcpcomm.PCClient;
+import tcpcomm.ThreadPoolImage;
 
 public class MazeExplorer {
 
@@ -1893,6 +1894,11 @@ public class MazeExplorer {
 		removeUnnecessaryImageRef3();
 		removeUnnecessaryImageRef2();
 		sortImageRef();
+
+		// todo start thread to communicate with RPI and android
+		Thread t1 = new Thread(new ThreadPoolImage());
+//		t1.start();
+
 		while (!arrayListOfImageRefs.isEmpty()) {
 			System.out.println(arrayListOfImageRefs.get(0).getX() + "," + arrayListOfImageRefs.get(0).getY());
 			VirtualMap virtualMap = VirtualMap.getInstance();
