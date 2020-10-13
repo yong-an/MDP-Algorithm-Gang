@@ -11,12 +11,19 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.Scanner;
+
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 
 //import org.json.JSONObject;
 
 import java.time.LocalTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import datatypes.ImageMsg;
+import datatypes.ImageRef;
 import datatypes.Message;
+import datatypes.Orientation;
 
 /**
  * This Java file handles the connection settings to RPI
@@ -29,7 +36,7 @@ public class PCClient {
     private Socket _clientSocket;
     private PrintWriter _toRPi;
     private Scanner _fromRPi;
-    
+
     private PCClient() {
 
     }
@@ -46,7 +53,7 @@ public class PCClient {
         }
         return _instance;
     }
-    
+
     /**
      * Main function that will setup connection to the RPI.
      * Once connected PC will send a message requesting for the sensor values.
@@ -60,14 +67,14 @@ public class PCClient {
         pcClient.setUpConnection(RPI_IP_ADDRESS, RPI_PORT);
         System.out.println("RPI Connected Successfully");
 
-       while(true) {
-    	    System.out.println(Message.READ_SENSOR_VALUES);
+        while (true) {
+            System.out.println(Message.READ_SENSOR_VALUES);
             pcClient.sendMessage(Message.READ_SENSOR_VALUES);
             String msgReceived = pcClient.readMessage();
             System.out.println("Message Received: " + msgReceived);
         }
     }
-    
+
 
     /**
      * This function will handle the connection to RPI
@@ -101,22 +108,23 @@ public class PCClient {
      * @throws IOException
      */
     public void sendMessage(String msg) throws IOException {
-		msg = "@s"+msg+"!";
-		_toRPi.print(msg);
-		_toRPi.flush(); 
-		System.out.println("Message sent to Arduino: " + msg+" - "+LocalTime.now());
-	}
+        msg = "@s" + msg + "!";
+        _toRPi.print(msg);
+        _toRPi.flush();
+        System.out.println("Message sent to Arduino: " + msg + " - " + LocalTime.now());
+    }
+
     /**
      * This function will handle sending message to Android.
      *
      * @param msg
      */
-	public void sendMessageToAndroid(String msg) {
-		msg = "@b"+msg+"!";
-		_toRPi.print(msg);
-		_toRPi.flush(); 
-		System.out.println("Message sent to Android: " + msg+" - "+LocalTime.now());
-	}
+    public void sendMessageToAndroid(String msg) {
+        msg = "@b" + msg + "!";
+        _toRPi.print(msg);
+        _toRPi.flush();
+        System.out.println("Message sent to Android: " + msg + " - " + LocalTime.now());
+    }
 	
 	/*public void sendJsonToAndroid(JSONObject msg) {
 		String payLoad;
@@ -125,18 +133,19 @@ public class PCClient {
 		_toRPi.flush();
 		System.out.println("JSON sent to Android: " + payLoad+" - "+LocalTime.now());
 	} */
-	
+
     /**
      * This function will handle sending message to R-PI.
      *
-     * @param msg 
+     * @param msg
      */
-	public void sendMsgToRPI(String msg){
-		msg = "@r"+msg+"!";
-		_toRPi.print(msg);
-		_toRPi.flush();
-		System.out.println("Message sent to RPI: " + msg+" - ");
-	}
+    public void sendMsgToRPI(String msg) {
+        msg = "@r" + msg + "!";
+        _toRPi.print(msg);
+        _toRPi.flush();
+        System.out.println("Message sent to RPI: " + msg + " - ");
+    }
+
     /**
      * This function will handle receiving message from RPI.
      *
@@ -148,20 +157,6 @@ public class PCClient {
         String messageReceived = _fromRPi.nextLine();
         System.out.println("Message Received: " + messageReceived);
         return messageReceived;
-    }
-    
-    public void poolDirectory () throws IOException, InterruptedException {
-    	WatchService watcher = FileSystems.getDefault().newWatchService();
-		Path dir = Paths.get("D:\\Sample");
-		WatchKey key = dir.register(watcher,ENTRY_CREATE);
-		
-	    while( (key = watcher.take()) != null) {
-	    	for(WatchEvent<?> event:key.pollEvents()) {
-	    		System.out.println("New File: " + event.kind() + " - " + event.context());
-	    	}
-	    	
-	    key.reset();
-	    }
     }
 
 }
