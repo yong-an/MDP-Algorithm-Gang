@@ -219,14 +219,22 @@ public class MazeExplorer {
 		}
 
 		// hasNextRun();
-
-		 if(startImageRun)
-		 findImage();
+		
+		if (startImageRun)
+		{
+			_robot = Robot.getInstance();
+			_robotOrientation = _robot.calibrateAfterExploration(_robotOrientation);
+			controller.setRobotOrientation(_robotOrientation);
+			//_robotOrientation = Orientation.WEST;
+			//adjustOrientationDynamic(tempOri);
+			
+	        findImage();
+		}
 
 		// Current robot position is not at start point, find fastest path back to start
 		// point
 		System.out.println("After end");
-		fastestPathBackToStart();
+		//fastestPathBackToStart();
 
 		/*
 		 * if (RobotSystem.isRealRun()) { //Send Arduino the signal that exploration is
@@ -1889,6 +1897,7 @@ public class MazeExplorer {
 	 */
 	public void findImage() {
 		System.out.println("*** Start findImage()");
+		
 		setImageRef();
 		
 		for (int i = 0; i < arrayListOfImageRefs.size(); ++i)
@@ -1904,7 +1913,7 @@ public class MazeExplorer {
 
 		// todo start thread to communicate with RPI and android
 		Thread t1 = new Thread(new ThreadPoolImage());
-//		t1.start();
+		t1.start();
 
 
 		while (!arrayListOfImageRefs.isEmpty()) {
@@ -1933,20 +1942,23 @@ public class MazeExplorer {
 			arrayListOfImageRefs.remove(0);
 
 		}
+		fastestPathBackToStart();
 	}
 
 	private Boolean sendPicToRPI(ImageRef _imageRef) {
+
+		
 		if (_imageRef == null) {
 			System.out.println("null error");
 			return false;
 		}
-
-		String msg = "@r," + _imageRef.getX() + "," + _imageRef.getY() + "," + _imageRef.getOrientation() + ","
+		
+		String msg = _imageRef.getX() + "," + _imageRef.getY() + "," + _imageRef.getOrientation() + ","
 				+ _imageRef.getTargetX() + "," + _imageRef.getTargetY() + "," + _imageRef.getTargetOrientation();
 
 		Controller controller = Controller.getInstance();
 		PCClient pcClient = controller.getPCClient();
-
+		
 		System.out.println("Send to RPI: " + msg);
 		if (RobotSystem.isRealRun()) {
 			try {
@@ -1956,7 +1968,9 @@ public class MazeExplorer {
 				pcClient.sendMsgToRPI(msg);
 				System.out.println("Sent Take Picture Command");
 				String feedback = pcClient.readMessage();
-				while (!feedback.equals(Message.DONE)) {
+				System.out.println("Sent Take Picture Command22222");
+				while (!feedback.equals(Message.RPI_DONE)) {
+					System.out.println("Sent Take Picture Command");
 					feedback = pcClient.readMessage();
 					System.out.println("Reading Picture Taking Command");
 					endDate = new Date();
@@ -2038,23 +2052,19 @@ public class MazeExplorer {
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.WEST;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.NORTH;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                 } else if (_robotOrientation == Orientation.EAST) {
 
                     _robot.turnLeft();
                     _robotOrientation = Orientation.NORTH;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                 } else if (_robotOrientation == Orientation.WEST) {
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.NORTH;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                 }
                 break;
@@ -2063,67 +2073,55 @@ public class MazeExplorer {
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.EAST;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.SOUTH;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                 } else if (_robotOrientation == Orientation.EAST) {
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.SOUTH;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                 } else if (_robotOrientation == Orientation.WEST) {
                     _robot.turnLeft();
                     _robotOrientation = Orientation.SOUTH;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
                 }
                 break;
             case EAST:
                 if (_robotOrientation == Orientation.NORTH) {
                     _robot.turnRight();
                     _robotOrientation = Orientation.EAST;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                 } else if (_robotOrientation == Orientation.SOUTH) {
 
                     _robot.turnLeft();
                     _robotOrientation = Orientation.EAST;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                 } else if (_robotOrientation == Orientation.WEST) {
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.NORTH;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.EAST;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
                 }
                 break;
             case WEST:
                 if (_robotOrientation == Orientation.NORTH) {
                     _robot.turnLeft();
                     _robotOrientation = Orientation.WEST;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
                 } else if (_robotOrientation == Orientation.SOUTH) {
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.WEST;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
                 } else if (_robotOrientation == Orientation.EAST) {
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.SOUTH;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
 
                     _robot.turnRight();
                     _robotOrientation = Orientation.WEST;
-                    setIsExplored(_robotPosition, _robotOrientation, true);
 
                 }
         }

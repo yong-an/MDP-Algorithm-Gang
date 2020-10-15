@@ -20,7 +20,6 @@ public class Message {
 	public static final String CALIBRATESTART = "S";
 	public static final String CALIBRATE_PATTERN = "[0-9]:[0-9]:[0-9]:1:1:1";
 	public static final String CALIBRATE_PATTERN_CENTRE = "[0-9]:[0-9]:1:[0-9]:[0-9]:[0-9]";
-	
 	//public static final String CALIBRATE_PATTERN_CENTRE_RIGHT = "[0-9]:[0-9]:1:[0-9]:1";
 	//public static final String CALIBRATE_PATTERN_LEFT_WALL = "1:[0-9]:[0-9]:[0-9]:[0-9]";
 	//public static final String CALIBRATE_PATTERN_RIGHT_WALL = "[0-9]:1:[0-9]:[0-9]:[0-9]";

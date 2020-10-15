@@ -134,9 +134,11 @@ public class AStarPathFinder {
 					for (int v = 0; v < count; v++) {
 						_robot.moveForward();
 						robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
+						//if(!isImageRun)
 						explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
 					}
-				} else {
+				} 
+				else {
 					System.out.println("AStarPathFinder: moving robot forward: "+count+" "+LocalTime.now());
 					if(count != 0)
 						_robot.moveForward(count);

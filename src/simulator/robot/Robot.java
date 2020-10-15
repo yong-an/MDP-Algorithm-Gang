@@ -519,6 +519,7 @@ public class Robot {
 	
 	/**
 	 * This function handles the sending of map descriptor to android.
+	 * @param string 
 	 */
 	public void sendToAndroid() {
 		Controller controller = Controller.getInstance();
@@ -594,7 +595,7 @@ public class Robot {
 				break;
 			case SOUTH:
 				turnRight();
-				calibrateRobotPositionViaStart();
+				//calibrateRobotPositionViaStart();
 				break;
 			case EAST:
 				calibrateRobotPositionViaStart();

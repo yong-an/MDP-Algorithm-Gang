@@ -49,7 +49,7 @@ public class ThreadPoolImage implements Runnable {
     private void poolDirectory() throws IOException, InterruptedException {
         WatchService watcher = FileSystems.getDefault().newWatchService();
 //		Path dir = Paths.get("D:\\Sample"); // todo update pooling folder path
-        Path dir = Paths.get("F:\\Sample");
+        Path dir = Paths.get("D:\\Downloads\\TrainYourOwnYOLO-master");
         WatchKey key = dir.register(watcher, ENTRY_CREATE);
 
         while ((key = watcher.take()) != null) {

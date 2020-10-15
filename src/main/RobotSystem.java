@@ -10,7 +10,7 @@ import tcpcomm.ThreadPoolImage;
  */
 public class RobotSystem {
 
-    private static boolean _isRealRun = false;
+    private static boolean _isRealRun = true;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
@@ -25,8 +25,8 @@ public class RobotSystem {
         c.run();
         System.out.println("We R Live Now");
 
-        Thread t1 = new Thread(new ThreadPoolImage());
-        t1.start(); // todo test thread, maybe move to findImage() instead
+        //Thread t1 = new Thread(new ThreadPoolImage());
+        //t1.start(); // todo test thread, maybe move to findImage() instead
     }
 
     public static boolean isRealRun() {
