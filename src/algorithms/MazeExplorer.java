@@ -1934,7 +1934,8 @@ public class MazeExplorer {
 				break;
 			}
 			fastestPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], obsX, obsY, _mazeRef);
-
+			System.out.println("MazeExplorer Ori: " + _robotOrientation);
+			System.out.println("Controller Ori: " + controller.getOrientation());
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true, true, true);
 			virtualMap.updateVirtualMap(_mazeRef);
 			adjustOrientationDynamic(arrayListOfImageRefs.get(0).getOrientation());
@@ -1989,6 +1990,8 @@ public class MazeExplorer {
 			}
 		}
 		System.out.println("Picture Command Completed");
+		//frontcalibrate call here
+		//right calirate here
 		return true;
 	}
 

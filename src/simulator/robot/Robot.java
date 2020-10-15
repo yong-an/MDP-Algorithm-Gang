@@ -595,7 +595,7 @@ public class Robot {
 				break;
 			case SOUTH:
 				turnRight();
-				//calibrateRobotPositionViaStart();
+				calibrateRobotPositionViaStart();
 				break;
 			case EAST:
 				calibrateRobotPositionViaStart();
