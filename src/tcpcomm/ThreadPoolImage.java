@@ -78,27 +78,39 @@ public class ThreadPoolImage implements Runnable {
 
     /**
      * convert string of new image file name to ImageMsg
+     * expected file name = robot-x,robot-y,robot-orien,img-id,img-x,img-y,img-orien
      *
      * @param fileName string of new image file
      * @return ImageMsg with image info
      */
     private ImageMsg fileNameToImageMsg(String fileName) {
         ImageMsg image = new ImageMsg();
-        String msg = "";
-        String o = "";
-        String str_digits = "";
 
-        Pattern patternAll = Pattern.compile("\\d+,\\d+,\\d+,(NORTH|SOUTH|EAST|WEST)");
+        Pattern patternAll = Pattern.compile("\\d+,\\d+,(NORTH|SOUTH|EAST|WEST),\\d+,\\d+,\\d+,(NORTH|SOUTH|EAST|WEST)");
         Matcher matcher1 = patternAll.matcher(fileName);
         if (matcher1.find()) {
-            msg = matcher1.group(); // matched string eg "13,5,4,EAST"
-            o = matcher1.group(1); // NORTH|SOUTH|EAST|WEST
-            image.setOrientation(Orientation.getOrientationFromStr(o));
+            String msg = matcher1.group(); // matched string eg "1,2,NORTH,13,5,4,EAST"
+            String robotOrien = matcher1.group(1); // 1st NORTH|SOUTH|EAST|WEST
+            String imageOrien = matcher1.group(2); // 2nd NORTH|SOUTH|EAST|WEST
 
-            String[] digits = msg.split(",");
-            image.setImageId(Integer.parseInt(digits[0])); // image id
-            image.setX(Integer.parseInt(digits[1])); // x-coord
-            image.setY(Integer.parseInt(digits[2])); // y-coord
+            String[] splitMsgs = msg.split(",");
+            /**
+             * expected file name = robot-x,robot-y,robot-orien,img-id,img-x,img-y,img-orien
+             * [0] = robot-x
+             * [1] = robot-y
+             * [2] = robot-orien
+             * [3] = img-id
+             * [4] = img-x
+             * [5] = img-y
+             * [6] = img-orien
+             */
+            image.setX(Integer.parseInt(splitMsgs[0])); // robot-x
+            image.setY(Integer.parseInt(splitMsgs[1])); // robot-y
+            image.setOrientation(Orientation.getOrientationFromStr(robotOrien)); // robot-orientation
+            image.setImageId(Integer.parseInt(splitMsgs[3])); // image id
+            image.setTargetX(Integer.parseInt(splitMsgs[4]));// image-x
+            image.setTargetY(Integer.parseInt(splitMsgs[5]));// image-y
+            image.setTargetOrientation(Orientation.getOrientationFromStr(imageOrien));// image-orientation
         }
 
         return image;
@@ -113,7 +125,7 @@ public class ThreadPoolImage implements Runnable {
         String msg = "[";
 
         for (ImageMsg i : imageMsgList) {
-            String s = "[" + i.getImageId() + "," + i.getX() + "," + i.getY() + "],";
+            String s = "[" + i.getImageId() + "," + i.getTargetX() + "," + i.getTargetY() + "],";
             msg += s;
         }
 

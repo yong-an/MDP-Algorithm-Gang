@@ -4,8 +4,10 @@ import java.util.Comparator;
 import simulator.arena.Arena;
 
 public class ImageRef implements Comparable<ImageRef> {
+	// robot's
 	private int x, y;
 	private Orientation orientation;
+	// obstacle's
 	private int targetX, targetY;
 	private Orientation targetOrientation;
 	
