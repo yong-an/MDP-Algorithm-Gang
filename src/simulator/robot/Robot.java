@@ -295,6 +295,7 @@ public class Robot {
 		
 		if (!RobotSystem.isRealRun()) {
 			int stepTime = 1000 / _speed;
+			_stepsSinceLastCalibration++;
 			try {
 				Thread.sleep(stepTime);
 			} catch (InterruptedException e) {

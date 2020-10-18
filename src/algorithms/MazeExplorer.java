@@ -224,6 +224,7 @@ public class MazeExplorer {
 			_robot = Robot.getInstance();
 			_robotOrientation = _robot.calibrateAfterExploration(_robotOrientation);
 			controller.setRobotOrientation(_robotOrientation);
+			_robot.resetStepsSinceLastCalibration();
 			findImage();
 		}
 
@@ -1777,12 +1778,12 @@ public class MazeExplorer {
 		ArrayList<ImageRef> sortedArrayListOfImageRefs = new ArrayList<ImageRef>();
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 		Path newPath;
-		ImageRef currNode = new ImageRef(1, 1, Orientation.NORTH);
+		ImageRef currNode = new ImageRef(1, 1, Orientation.EAST);
 		Path fastestPath = null;
 		int fastestNodeElement = 0;
 		while (!arrayListOfImageRefs.isEmpty()) {
 			for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
-				newPath = pathFinder.findFastestPath(currNode.getX(), currNode.getY(),
+				newPath = pathFinder.findFastestPath(currNode.getX(), currNode.getY(), currNode.getOrientation(),
 						arrayListOfImageRefs.get(i).getX(), arrayListOfImageRefs.get(i).getY(), _mazeRef);
 				if (fastestPath == null) {
 					fastestPath = newPath;
@@ -1975,7 +1976,12 @@ public class MazeExplorer {
 //			ImageRef imageRef = arrayListOfImageRefs.get(i);
 //			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation() + "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + "," + imageRef.getTargetOrientation());
 //		}
-		Collections.sort(arrayListOfImageRefs);
+		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
+			ImageRef imageRef = arrayListOfImageRefs.get(i);
+			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation()
+					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
+					+ imageRef.getTargetOrientation());
+		}
 		removeUnnecessaryImageRef3();
 		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
 			ImageRef imageRef = arrayListOfImageRefs.get(i);
@@ -1990,6 +1996,7 @@ public class MazeExplorer {
 					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
 					+ imageRef.getTargetOrientation());
 		}
+		Collections.sort(arrayListOfImageRefs);
 		sortImageRef();
 
 		// todo start thread to communicate with RPI and android
@@ -2013,7 +2020,7 @@ public class MazeExplorer {
 				System.out.println("Find Image: TIME OUT!");
 				break;
 			}
-			fastestPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], obsX, obsY, _mazeRef);
+			fastestPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1], _robotOrientation, obsX, obsY, _mazeRef);
 			System.out.println("MazeExplorer Ori: " + _robotOrientation);
 			System.out.println("Controller Ori: " + controller.getOrientation());
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true, true, true);
@@ -3210,7 +3217,47 @@ public class MazeExplorer {
 			return null;
 		}
 	}
-
+	/**
+	 * 0 - cant calibrate
+	 * 1 - calibrate front
+	 * 2 - calibrate right
+	 */
+	public int canCalibrateFront3(Orientation _ori)
+	{
+		Robot robot = Robot.getInstance();
+		int _x = _robotPosition[0];
+		int _y = _robotPosition[1];
+		if (robot.getStepsSinceLastCalibration() == 0)
+			return 0;
+		switch (_ori)
+		{
+		case NORTH:
+			if (_y == Arena.MAP_WIDTH-2 || (_mazeRef[_x][_y+2] == IS_OBSTACLE && _mazeRef[_x-1][_y+2] == IS_OBSTACLE && _mazeRef[_x+1][_y+2] == IS_OBSTACLE))
+				return 1;
+			else if (_x == Arena.MAP_LENGTH-2 || (_mazeRef[_x+2][_y] == IS_OBSTACLE && _mazeRef[_x+2][_y-1] == IS_OBSTACLE && _mazeRef[_x+2][_y+1] == IS_OBSTACLE))
+				return 2;
+			break;
+		case SOUTH:
+			if (_y == 1 || (_mazeRef[_x][_y-2] == IS_OBSTACLE && _mazeRef[_x-1][_y-2] == IS_OBSTACLE && _mazeRef[_x+1][_y-2] == IS_OBSTACLE))
+				return 1;
+			else if (_x == 1 || (_mazeRef[_x-2][_y] == IS_OBSTACLE && _mazeRef[_x-2][_y-1] == IS_OBSTACLE && _mazeRef[_x-2][_y+1] == IS_OBSTACLE))
+				return 2;		
+			break;
+		case EAST:
+			if (_x == Arena.MAP_LENGTH-2 || (_mazeRef[_x+2][_y] == IS_OBSTACLE && _mazeRef[_x+2][_y-1] == IS_OBSTACLE && _mazeRef[_x+2][_y+1] == IS_OBSTACLE))
+				return 1;
+			else if (_y == 1 || (_mazeRef[_x][_y-2] == IS_OBSTACLE && _mazeRef[_x-1][_y-2] == IS_OBSTACLE && _mazeRef[_x+1][_y-2] == IS_OBSTACLE))
+				return 2;	
+			break;
+		case WEST:
+			if (_x == 1 || (_mazeRef[_x-2][_y] == IS_OBSTACLE && _mazeRef[_x-2][_y-1] == IS_OBSTACLE && _mazeRef[_x-2][_y+1] == IS_OBSTACLE))
+				return 1;
+			else if (_y == Arena.MAP_WIDTH-2 || (_mazeRef[_x][_y+2] == IS_OBSTACLE && _mazeRef[_x-1][_y+2] == IS_OBSTACLE && _mazeRef[_x+1][_y+2] == IS_OBSTACLE))
+				return 2;
+			break;
+		}
+		return 0;
+	}
 	private Movement canCalibrateLeft(int[] robotPosition, Orientation ori) {
 		int x = robotPosition[0];
 		int y = robotPosition[1];
