@@ -295,6 +295,7 @@ public class Robot {
 		
 		if (!RobotSystem.isRealRun()) {
 			int stepTime = 1000 / _speed;
+			_stepsSinceLastCalibration++;
 			try {
 				Thread.sleep(stepTime);
 			} catch (InterruptedException e) {
@@ -519,6 +520,7 @@ public class Robot {
 	
 	/**
 	 * This function handles the sending of map descriptor to android.
+	 * @param string 
 	 */
 	public void sendToAndroid() {
 		Controller controller = Controller.getInstance();

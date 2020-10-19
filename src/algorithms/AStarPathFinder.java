@@ -30,6 +30,74 @@ public class AStarPathFinder {
     	return _instance;
     }
 	
+    public Path findFastestPath(int startX, int startY, Orientation _ori, int destinationX, int destinationY, int[][] mazeRef) {
+		System.out.println("findFastestPath Start "+LocalTime.now());
+		init(mazeRef);
+		
+		_closed.clear();
+		_open.clear();
+
+		_nodes[startX][startY]._pathCost = 0;
+		_nodes[startX][startY]._ori = _ori;
+		_open.add(_nodes[startX][startY]);
+
+		while (_open.size() != 0) {
+			Node current = _open.getFirstNode();
+			if (current == _nodes[destinationX][destinationY]) {
+				break;
+			}
+			_open.remove(current);
+			_closed.add(current);
+
+			for (int i = -1; i < 2; i++) {
+				for (int j = -1; j < 2; j++) {
+					if (i == 0 && j == 0) {
+						continue;
+					}
+					if ((i != 0) && (j != 0)) {
+						continue;
+					}
+
+					int neighborX = current._x + i;
+					int neighborY = current._y + j; 
+					
+					if (isValidLocation(_virtualMap.getCleared(), neighborX, neighborY)) {
+						int pathCostOfNeighbor = current._pathCost + getEdgeCost(current._ori, current._x, current._y, neighborX, neighborY);
+						int heuristicOfNeighbor = getHeuristicCost(neighborX, neighborY, destinationX, destinationY);
+						Node neighbor = _nodes[neighborX][neighborY];
+						if (_virtualMap.checkIfVisited(neighborX, neighborY) == false) {
+							neighbor._pathCost = pathCostOfNeighbor;
+							neighbor._heuristic = heuristicOfNeighbor;
+							neighbor._parent = current;
+							neighbor._ori = getOrientationIfMoveToNeighbor(current._x, current._y, neighborX, neighborY);
+							addToOpen(neighbor);
+							_virtualMap.setVisited(neighborX, neighborY);
+						} else if (isInOpenList(neighbor)){
+							if (pathCostOfNeighbor + heuristicOfNeighbor < neighbor._pathCost + neighbor._heuristic) {
+								removeFromOpen(neighbor);
+								neighbor._pathCost = pathCostOfNeighbor;
+								neighbor._heuristic = heuristicOfNeighbor;
+								neighbor._parent = current;
+								neighbor._ori = getOrientationIfMoveToNeighbor(current._x, current._y, neighborX, neighborY);
+								addToOpen(neighbor);	
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		Path path = new Path();
+		Node target = _nodes[destinationX][destinationY];
+		while (target != _nodes[startX][startY]) {
+			path.prependStep(0, target._x, target._y);
+			target = target._parent;
+		}
+		path.prependStep(0, startX,startY);
+		System.out.println("findFastestPath End "+LocalTime.now());
+		return path;
+	}
+    
 	public Path findFastestPath(int startX, int startY, int destinationX, int destinationY, int[][] mazeRef) {
 		System.out.println("findFastestPath Start "+LocalTime.now());
 		init(mazeRef);
@@ -134,9 +202,12 @@ public class AStarPathFinder {
 					for (int v = 0; v < count; v++) {
 						_robot.moveForward();
 						robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-						explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
+						robotCalibrate(currentOrientation);
+						if(!isImageRun)
+							explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
 					}
-				} else {
+				} 
+				else {
 					System.out.println("AStarPathFinder: moving robot forward: "+count+" "+LocalTime.now());
 					if(count != 0)
 						_robot.moveForward(count);
@@ -145,13 +216,15 @@ public class AStarPathFinder {
 				ChangeRobotOrientation(currentOrientation, nextOrientation, isExploring, hasCalibration);
 			}
 			currentOrientation = nextOrientation;
+			robotCalibrate(currentOrientation);
 		}
 		if (isExploring) {
 			for (int v = 0; v < count; v++) {
 				_robot.moveForward();
 				robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-				//if(!isImageRun)
-				explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
+				robotCalibrate(currentOrientation);
+				if(!isImageRun)
+					explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
 			}
 		} else {
 			_robot.moveForward(count);
@@ -438,6 +511,33 @@ public class AStarPathFinder {
 			} else {
 				return 0;
 			}
+		}
+	}
+	
+	/**
+	* call this function every movement of image rec
+	*/
+	private void robotCalibrate(Orientation _ori)
+	{
+		MazeExplorer explorer = MazeExplorer.getInstance();
+		
+		switch(explorer.canCalibrateFront3(_ori))
+		{
+		case 0:
+			break;
+		case 1:
+			System.out.println("calibrate front");
+			_robot.calibrateRobotPositionViaFront();
+			_robot.resetStepsSinceLastCalibration();
+			break;
+		case 2:
+			System.out.println("calibrate right");
+			_robot.calibrateRobotPosition();
+			_robot.resetStepsSinceLastCalibration();
+			break;
+			default:
+				System.out.println("robot calibrate image rec error");
+				break;
 		}
 	}
 
