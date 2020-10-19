@@ -62,7 +62,7 @@ public class ThreadPoolImage implements Runnable {
                     imageMsgList.add(image);
 
                     // update algo stimulator, show image info on stimulator
-                    controller.foundImage(image.getX(), image.getY(), image.getImageId(),
+                    controller.foundImage(image.getTargetX(), image.getTargetY(), image.getImageId(),
                             Orientation.getOrientationLetter(image.getOrientation()));
 
                     // send msg to android
