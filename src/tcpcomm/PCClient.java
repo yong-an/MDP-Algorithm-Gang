@@ -125,6 +125,13 @@ public class PCClient {
         _toRPi.flush();
         System.out.println("Message sent to Android: " + msg + " - " + LocalTime.now());
     }
+    
+    public void sendMessageToAndroidPicture(String msg) {
+        msg = "@o" + msg + "!";
+        _toRPi.print(msg);
+        _toRPi.flush();
+        System.out.println("Message sent to Android: " + msg + " - " + LocalTime.now());
+    }
 	
 	/*public void sendJsonToAndroid(JSONObject msg) {
 		String payLoad;

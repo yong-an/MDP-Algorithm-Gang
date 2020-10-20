@@ -68,7 +68,7 @@ public class ThreadPoolImage implements Runnable {
                     // send msg to android
                     String msgToAndroid = imageMsgListToString(imageMsgList);
                     System.out.println("Msg to be send to Android: " + msgToAndroid);
-//                    pcClient.sendMessageToAndroid(msgToAndroid); // todo need test if it works
+                    pcClient.sendMessageToAndroidPicture(msgToAndroid); // todo need test if it works
                 }
             }
 
