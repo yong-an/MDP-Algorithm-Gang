@@ -2,6 +2,7 @@ package tcpcomm;
 
 import datatypes.ImageMsg;
 import datatypes.Orientation;
+import main.RobotSystem;
 import simulator.Controller;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class ThreadPoolImage implements Runnable {
      */
     private void poolDirectory() throws IOException, InterruptedException {
         WatchService watcher = FileSystems.getDefault().newWatchService();
-//		Path dir = Paths.get("D:\\Sample"); // todo update pooling folder path
+//		Path dir = Paths.get("D:\\Sample");
         Path dir = Paths.get("D:\\Downloads\\TrainYourOwnYOLO-master\\Test");
         WatchKey key = dir.register(watcher, ENTRY_CREATE);
 
@@ -59,15 +60,14 @@ public class ThreadPoolImage implements Runnable {
                 // consider file only at ENTRY_CREATE
                 if (event.kind() == ENTRY_CREATE) {
                     ImageMsg image = fileNameToImageMsg(event.context().toString());
-//                    imageMsgList.add(image);
-
-                    // update algo stimulator, show image info on stimulator
-//                    controller.foundImage(image.getTargetX(), image.getTargetY(), image.getImageId(), Orientation.getOrientationLetter(image.getOrientation()));
 
                     // send msg to android
-                    String msgToAndroid = imageMsgListToString(image);
+                    String msgToAndroid = imageMsgToString(image);
                     System.out.println("Msg to be send to Android: " + msgToAndroid);
-                    pcClient.sendMessageToAndroidPic(msgToAndroid); // todo need test if it works
+                    if(RobotSystem.isRealRun()){
+                        // send msg to Android in real run
+                        pcClient.sendMessageToAndroidPic(msgToAndroid);
+                    }
                 }
             }
 
@@ -77,7 +77,7 @@ public class ThreadPoolImage implements Runnable {
 
     /**
      * convert string of new image file name to ImageMsg
-     * expected file name = robot-x,robot-y,robot-orien,img-id,img-x,img-y,img-orien
+     * expected file name = img-id,robot-x,robot-y,robot-orien,img-x,img-y,img-orien
      *
      * @param fileName string of new image file
      * @return ImageMsg with image info
@@ -88,48 +88,29 @@ public class ThreadPoolImage implements Runnable {
         Pattern patternAll = Pattern.compile("\\d+,\\d+,\\d+,(NORTH|SOUTH|EAST|WEST),\\d+,\\d+,(NORTH|SOUTH|EAST|WEST)");
         Matcher matcher1 = patternAll.matcher(fileName);
         if (matcher1.find()) {
-        	// 12161016,12,18,WEST,10,19,SOUTH!.png
-            String msg = matcher1.group(); // matched string eg "1,2,NORTH,13,5,4,EAST"
+            String msg = matcher1.group(); // matched string eg "13,1,2,NORTH,5,4,EAST"
 //            System.out.println(msg);
-            String robotOrien = matcher1.group(1); // 1st NORTH|SOUTH|EAST|WEST
             String imageOrien = matcher1.group(2); // 2nd NORTH|SOUTH|EAST|WEST
 
             String[] splitMsgs = msg.split(",");
-//            image.setX(Integer.parseInt(splitMsgs[0])); // robot-x
-//            image.setY(Integer.parseInt(splitMsgs[1])); // robot-y
-//            image.setOrientation(Orientation.getOrientationFromStr(robotOrien)); // robot-orientation
             image.setImageId(Integer.parseInt(splitMsgs[0])); // image id
             image.setTargetX(Integer.parseInt(splitMsgs[4]));// image-x
             image.setTargetY(Integer.parseInt(splitMsgs[5]));// image-y
             image.setTargetOrientation(Orientation.getOrientationFromStr(imageOrien));// image-orientation
-//            System.out.println(splitMsgs[0]);
-//            System.out.println(splitMsgs[4]);
-//            System.out.println(splitMsgs[5]);
-//            System.out.println(imageOrien);
             
         }
 
         return image;
-    } //todo RPI pls confirm image filename
+    }
+
 
     /**
      * convert all found images info, into a string of format [imageID,x-coord,y-coord]
-     * @param imageMsgList
-     * @return string with format [[imageID,x-coord,y-coord],[imageID,x-coord,y-coord]]
+     * @param i ImageMsg
+     * @return string of format [imageID,x-coord,y-coord]
      */
-    private String imageMsgListToString(ImageMsg i) {
-//        String msg = "[";
-
-//        for (ImageMsg i : imageMsgList) {
-//            String s = "[" + i.getImageId() + "," + i.getTargetX() + "," + i.getTargetY() + "],";
-//            msg += s;
-//        }
-        
+    private String imageMsgToString(ImageMsg i) {
         String s = "[" + i.getImageId() + "," + i.getTargetX() + "," + i.getTargetY() + "]";
-
-//        msg = msg.substring(0, msg.length()-1); // remove last ,
-//        msg += "]";
-//        return msg;
         return s;
     }
 }

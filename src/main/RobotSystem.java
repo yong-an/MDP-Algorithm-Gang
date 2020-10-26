@@ -3,7 +3,6 @@ package main;
 import java.awt.EventQueue;
 
 import simulator.Controller;
-import tcpcomm.ThreadPoolImage;
 
 /**
  * This Java file represent the main.java file and will detect if it's a real run or simulated run.
@@ -24,9 +23,6 @@ public class RobotSystem {
         Controller c = Controller.getInstance();
         c.run();
         System.out.println("We R Live Now");
-
-//        Thread t1 = new Thread(new ThreadPoolImage());
-//        t1.start(); // todo test thread, maybe move to findImage() instead
     }
 
     public static boolean isRealRun() {
