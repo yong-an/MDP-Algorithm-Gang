@@ -56,7 +56,9 @@ public class MazeExplorer {
 	private int[] lastCalibrate = new int[2];
 	private boolean leftGotObstacle = false;
 	private ArrayList<ImageRef> arrayListOfImageRefs = new ArrayList<ImageRef>();
-
+	private ArrayList<ImageRef> arrayListOfImageRefsExploration = new ArrayList<ImageRef>();
+	private boolean leftWallKiss = false;
+	
 	private MazeExplorer() {
 
 	}
@@ -207,6 +209,8 @@ public class MazeExplorer {
 			}
 		}
 		setIsExplored(_robotPosition, _robotOrientation, true);
+		Thread t1 = new Thread(new ThreadPoolImage());
+		t1.start();
 		exploreAlongWallClean(GOAL);
 
 		if (!controller.hasReachedTimeThreshold()) {
@@ -218,7 +222,7 @@ public class MazeExplorer {
 			_hasExploredTillGoal = false; // Timeout before reaching goal
 		}
 
-		// hasNextRun();
+		 hasNextRun();
 
 		if (startImageRun) {
 			_robot = Robot.getInstance();
@@ -1527,7 +1531,7 @@ public class MazeExplorer {
 					// check south
 					// exit condition based on minimum space for robot
 					offset2 = -1;
-					if (j + offset2 >= 0 && _mazeRef[i][j + offset2] != IS_OBSTACLE) {
+					if (j + offset2 -2 >= 0 && _mazeRef[i][j + offset2] != IS_OBSTACLE) {
 						ImageRef imageRef = new ImageRef();
 						offsetWall = 0;
 						alongWestWall = false;
@@ -1546,10 +1550,10 @@ public class MazeExplorer {
 							if (alongWestWall || alongEastWall)
 								k = 3;
 							// check west space
-							else if (i != 0 && k == 1)
+							else if (i > 1 && k == 1)
 								offsetWall = -1;
 							// check east space
-							else if (i != Arena.MAP_LENGTH - 1 && k == 2)
+							else if (i < Arena.MAP_LENGTH - 2 && k == 2)
 								offsetWall = 1;
 							if (_mazeRef[i + offsetWall][j + offset2] != IS_OBSTACLE
 									&& _mazeRef[i + offsetWall][j + offset2 - 1] != IS_OBSTACLE
@@ -1582,13 +1586,14 @@ public class MazeExplorer {
 								arrayListOfImageRefs.add(imageRef);
 								System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + ","
 										+ imageRef.getOrientation());
+								System.out.println("setimageref");
 							}
 						}
 					}
 					// check east
 					// exit condition based on minimum space for robot
 					offset2 = 1;
-					if (i + offset2 < Arena.MAP_LENGTH && _mazeRef[i + offset2][j] != IS_OBSTACLE) {
+					if (i + offset2 +2 < Arena.MAP_LENGTH && _mazeRef[i + offset2][j] != IS_OBSTACLE) {
 						ImageRef imageRef = new ImageRef();
 						offsetWall = 0;
 						alongNorthWall = false;
@@ -1607,10 +1612,10 @@ public class MazeExplorer {
 							if (alongNorthWall || alongSouthWall)
 								k = 3;
 							// check south space
-							else if (j != 0 && k == 1)
+							else if (j > 1 && k == 1)
 								offsetWall = -1;
 							// check north space
-							else if (j != Arena.MAP_WIDTH - 1 && k == 2)
+							else if (j < Arena.MAP_WIDTH - 2 && k == 2)
 								offsetWall = 1;
 							if (_mazeRef[i + offset2][j + offsetWall] != IS_OBSTACLE
 									&& _mazeRef[i + offset2 + 1][j + offsetWall] != IS_OBSTACLE
@@ -1644,13 +1649,14 @@ public class MazeExplorer {
 								arrayListOfImageRefs.add(imageRef);
 								System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + ","
 										+ imageRef.getOrientation());
+								System.out.println("setimageref2");
 							}
 						}
 					}
 					// check north
 					// exit condition based on minimum space for robot
 					offset2 = 1;
-					if (j + offset2 < Arena.MAP_WIDTH && _mazeRef[i][j + offset2] != IS_OBSTACLE) {
+					if (j + offset2 +2 < Arena.MAP_WIDTH && _mazeRef[i][j + offset2] != IS_OBSTACLE) {
 						ImageRef imageRef = new ImageRef();
 						offsetWall = 0;
 						alongWestWall = false;
@@ -1669,10 +1675,10 @@ public class MazeExplorer {
 							if (alongWestWall || alongEastWall)
 								k = 3;
 							// check west space
-							else if (i != 0 && k == 1)
+							else if (i > 1 && k == 1)
 								offsetWall = -1;
 							// check south space
-							else if (i != Arena.MAP_LENGTH - 1 && k == 2)
+							else if (i < Arena.MAP_LENGTH - 2 && k == 2)
 								offsetWall = 1;
 							if (_mazeRef[i + offsetWall][j + offset2] != IS_OBSTACLE
 									&& _mazeRef[i + offsetWall][j + offset2 + 1] != IS_OBSTACLE
@@ -1705,13 +1711,15 @@ public class MazeExplorer {
 								arrayListOfImageRefs.add(imageRef);
 								System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + ","
 										+ imageRef.getOrientation());
+								System.out.println("setimageref3");
 							}
 						}
 					}
 					// check west
 					// exit condition based on minimum space for robot
+					System.out.println("after setimageref3");
 					offset2 = -1;
-					if (i + offset2 >= 0 && _mazeRef[i + offset2][j] != IS_OBSTACLE) {
+					if (i + offset2 - 2 >= 0 && _mazeRef[i + offset2][j] != IS_OBSTACLE) {
 						ImageRef imageRef = new ImageRef();
 						offsetWall = 0;
 						alongNorthWall = false;
@@ -1730,10 +1738,10 @@ public class MazeExplorer {
 							if (alongNorthWall || alongSouthWall)
 								k = 3;
 							// check south space
-							else if (j != 0 && k == 1)
+							else if (j > 1 && k == 1)
 								offsetWall = -1;
 							// check north space
-							else if (j != Arena.MAP_WIDTH - 1 && k == 2)
+							else if (j < Arena.MAP_WIDTH - 2 && k == 2)
 								offsetWall = 1;
 							if (_mazeRef[i + offset2][j + offsetWall] != IS_OBSTACLE
 									&& _mazeRef[i + offset2 - 1][j + offsetWall] != IS_OBSTACLE
@@ -1758,7 +1766,7 @@ public class MazeExplorer {
 								}
 							}
 						}
-
+						System.out.println("beng is correct");
 						// check if already exists
 						if (!arrayListOfImageRefs.contains(imageRef)) {
 							ImageRef tempImageRef = new ImageRef();
@@ -1766,6 +1774,7 @@ public class MazeExplorer {
 								arrayListOfImageRefs.add(imageRef);
 								System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + ","
 										+ imageRef.getOrientation());
+								System.out.println("setimageref4");
 							}
 						}
 					}
@@ -1773,7 +1782,7 @@ public class MazeExplorer {
 			}
 		}
 	}
-
+	
 	private void sortImageRef() {
 		ArrayList<ImageRef> sortedArrayListOfImageRefs = new ArrayList<ImageRef>();
 		AStarPathFinder pathFinder = AStarPathFinder.getInstance();
@@ -1968,7 +1977,6 @@ public class MazeExplorer {
 	 */
 	public void findImage() {
 		System.out.println("*** Start findImage()");
-
 		setImageRef();
 
 //		for (int i = 0; i < arrayListOfImageRefs.size(); ++i)
@@ -1976,35 +1984,58 @@ public class MazeExplorer {
 //			ImageRef imageRef = arrayListOfImageRefs.get(i);
 //			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation() + "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + "," + imageRef.getTargetOrientation());
 //		}
-		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
-			ImageRef imageRef = arrayListOfImageRefs.get(i);
-			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation()
-					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
-					+ imageRef.getTargetOrientation());
-		}
+//		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
+//			ImageRef imageRef = arrayListOfImageRefs.get(i);
+//			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation()
+//					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
+//					+ imageRef.getTargetOrientation());
+//		}
 		removeUnnecessaryImageRef3();
-		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
-			ImageRef imageRef = arrayListOfImageRefs.get(i);
-			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation()
-					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
-					+ imageRef.getTargetOrientation());
-		}
+//		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
+//			ImageRef imageRef = arrayListOfImageRefs.get(i);
+//			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation()
+//					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
+//					+ imageRef.getTargetOrientation());
+//		}
 		removeUnnecessaryImageRef2();
-		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
-			ImageRef imageRef = arrayListOfImageRefs.get(i);
-			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation()
-					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
-					+ imageRef.getTargetOrientation());
+//		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
+//			ImageRef imageRef = arrayListOfImageRefs.get(i);
+//			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation()
+//					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
+//					+ imageRef.getTargetOrientation());
+//		}
+		{
+			int i = 0;
+			while (i < arrayListOfImageRefsExploration.size())
+			{
+				int j = 0;
+				while (j < arrayListOfImageRefs.size())
+				{
+					if (arrayListOfImageRefsExploration.get(i).equals(arrayListOfImageRefs.get(j)))
+					{
+						arrayListOfImageRefsExploration.remove(i);
+						arrayListOfImageRefs.remove(j);
+					}
+					++j;
+				}
+				++i;
+			}
 		}
 		Collections.sort(arrayListOfImageRefs);
 		sortImageRef();
-
+		System.out.println("how about now?");
+		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
+			ImageRef imageRef = arrayListOfImageRefs.get(i);
+			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation()
+					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
+					+ imageRef.getTargetOrientation());
+			System.out.println("pls see me");
+		}
 		// todo start thread to communicate with RPI and android
-		Thread t1 = new Thread(new ThreadPoolImage());
-		t1.start();
 
 		while (!arrayListOfImageRefs.isEmpty()) {
 			System.out.println(arrayListOfImageRefs.get(0).getX() + "," + arrayListOfImageRefs.get(0).getY());
+			System.out.println("pls see me 2");
 			// VirtualMap virtualMap = VirtualMap.getInstance();
 			AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 			Path fastestPath;
@@ -2028,6 +2059,9 @@ public class MazeExplorer {
 			adjustOrientationDynamic(arrayListOfImageRefs.get(0).getOrientation());
 			sendPicToRPI(arrayListOfImageRefs.get(0));
 			arrayListOfImageRefs.remove(0);
+			//_robot.moveForward();
+			//_robot.calibrateRobotPositionViaFront();
+			//_robot.moveBack();	
 
 		}
 		fastestPathBackToStart();
@@ -2215,6 +2249,97 @@ public class MazeExplorer {
 		}
 	}
 
+	public void adjustOrientationDynamicWithExplore(Orientation ori) {
+		switch (ori) {
+		case NORTH:
+			if (_robotOrientation == Orientation.SOUTH) {
+
+				_robot.turnRight();
+				_robotOrientation = Orientation.WEST;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+				_robot.turnRight();
+				_robotOrientation = Orientation.NORTH;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+
+			} else if (_robotOrientation == Orientation.EAST) {
+
+				_robot.turnLeft();
+				_robotOrientation = Orientation.NORTH;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+
+			} else if (_robotOrientation == Orientation.WEST) {
+
+				_robot.turnRight();
+				_robotOrientation = Orientation.NORTH;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+			}
+			break;
+		case SOUTH:
+			if (_robotOrientation == Orientation.NORTH) {
+
+				_robot.turnRight();
+				_robotOrientation = Orientation.EAST;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+				_robot.turnRight();
+				_robotOrientation = Orientation.SOUTH;
+				
+				setIsExplored(_robotPosition, _robotOrientation, true);
+
+			} else if (_robotOrientation == Orientation.EAST) {
+
+				_robot.turnRight();
+				_robotOrientation = Orientation.SOUTH;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+
+			} else if (_robotOrientation == Orientation.WEST) {
+				_robot.turnLeft();
+				_robotOrientation = Orientation.SOUTH;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+			}
+			break;
+		case EAST:
+			if (_robotOrientation == Orientation.NORTH) {
+				_robot.turnRight();
+				_robotOrientation = Orientation.EAST;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+			} else if (_robotOrientation == Orientation.SOUTH) {
+
+				_robot.turnLeft();
+				_robotOrientation = Orientation.EAST;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+
+			} else if (_robotOrientation == Orientation.WEST) {
+
+				_robot.turnRight();
+				_robotOrientation = Orientation.NORTH;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+				_robot.turnRight();
+				_robotOrientation = Orientation.EAST;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+			}
+			break;
+		case WEST:
+			if (_robotOrientation == Orientation.NORTH) {
+				_robot.turnLeft();
+				_robotOrientation = Orientation.WEST;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+			} else if (_robotOrientation == Orientation.SOUTH) {
+
+				_robot.turnRight();
+				_robotOrientation = Orientation.WEST;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+			} else if (_robotOrientation == Orientation.EAST) {
+
+				_robot.turnRight();
+				_robotOrientation = Orientation.SOUTH;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+				_robot.turnRight();
+				_robotOrientation = Orientation.WEST;
+				setIsExplored(_robotPosition, _robotOrientation, true);
+			}
+		}
+	}
+	
 	public void adjustOrientationTo(Orientation ori) {
 		System.out.println("bestori:" + ori);
 		_robotOrientation = Orientation.EAST;
@@ -2384,7 +2509,7 @@ public class MazeExplorer {
 					if (nextRobotPosition != null) {
 						isExhaustedViaFront = false;
 					} else {
-						// isExhaustedViaFront = true;
+						 //isExhaustedViaFront = true;
 						continue;
 					}
 
@@ -2396,15 +2521,15 @@ public class MazeExplorer {
 					virtualMap.updateVirtualMap(_mazeRef);
 
 					if (_robotPosition[0] > obsX) {
-						adjustOrientationTo(Orientation.WEST);
+						adjustOrientationDynamicWithExplore(Orientation.WEST);
 					} else if (_robotPosition[0] < obsX) {
-						adjustOrientationTo(Orientation.EAST);
+						adjustOrientationDynamicWithExplore(Orientation.EAST);
 					} else if (_robotPosition[1] > obsY) {
-						adjustOrientationTo(Orientation.SOUTH);
+						adjustOrientationDynamicWithExplore(Orientation.SOUTH);
 					} else if (_robotPosition[1] < obsY) {
-						adjustOrientationTo(Orientation.NORTH);
+						adjustOrientationDynamicWithExplore(Orientation.NORTH);
 					}
-
+					isExhaustedViaFront = true;
 					currentRobotPosition = nextRobotPosition;
 
 					checkExist = new int[2];
@@ -2449,14 +2574,15 @@ public class MazeExplorer {
 						virtualMap.updateVirtualMap(_mazeRef);
 
 						if (_robotPosition[0] > obsX) {
-							adjustOrientationTo(Orientation.WEST);
+							adjustOrientationDynamicWithExplore(Orientation.WEST);
 						} else if (_robotPosition[0] < obsX) {
-							adjustOrientationTo(Orientation.EAST);
+							adjustOrientationDynamicWithExplore(Orientation.EAST);
 						} else if (_robotPosition[1] > obsY) {
-							adjustOrientationTo(Orientation.SOUTH);
+							adjustOrientationDynamicWithExplore(Orientation.SOUTH);
 						} else if (_robotPosition[1] < obsY) {
-							adjustOrientationTo(Orientation.NORTH);
+							adjustOrientationDynamicWithExplore(Orientation.NORTH);
 						}
+
 						currentRobotPosition = nextRobotPosition;
 						if (positionHashMap2.containsKey(currentRobotPosition[0])) {
 							if (positionHashMap2.get(currentRobotPosition[0]) == currentRobotPosition[1]) {
@@ -2468,7 +2594,9 @@ public class MazeExplorer {
 				}
 			}
 		}
+
 		if (isExhaustedViaFront && isExhaustedViaFrontside) {
+			System.out.println("ISIT HERE");
 			fastestPath = pathFinder.findFastestPath(currentRobotPosition[0], currentRobotPosition[1],
 					MazeExplorer.START[0], MazeExplorer.START[1], _mazeRef);
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true, true, false);
@@ -2631,8 +2759,130 @@ public class MazeExplorer {
 		}
 		return false;
 	}
-
 	private void exploreAlongWallClean(int[] goalPos) {
+
+		Controller controller = Controller.getInstance();
+		int cali_threshold = -1;
+		int straight_cali_threshold = 0;
+		while (!isGoalPos(_robotPosition, goalPos) && !controller.hasReachedTimeThreshold()) {
+			int rightStatus = checkRightSide(_robotPosition, _robotOrientation);
+			if (rightStatus != RIGHT_NO_ACCESS) {
+
+				System.out.println("ENTER RIGHT CAN ACCESS" + rightStatus);
+
+				if (rightStatus == RIGHT_UNSURE_ACCESS) {
+					System.out.println("ENTER RIGHT CAN ACCESS + UNSURE ACCESS" + rightStatus);
+					_robot.turnRight();
+					updateRobotOrientation(Movement.TURN_RIGHT);
+					setIsExplored(_robotPosition, _robotOrientation, true);
+					canTakePicFront(_robotOrientation);
+					if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
+						System.out.println("ENTER RIGHT CAN ACCESS + UNSURE ACCESS + ACCESSIBLEFRONT" + rightStatus);
+						_robot.moveForward();
+						_robot.calibrateRobotPosition();
+						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+						setIsExplored(_robotPosition, _robotOrientation, true);
+						canTakePicFront(_robotOrientation);
+					} else {
+						System.out.println("ENTER RIGHT CAN ACCESS + UNSURE ACCESS + NO ACCESSIBLEFRONT" + rightStatus);
+						_robot.turnLeft();
+						_robot.calibrateRobotPositionViaFront();
+						updateRobotOrientation(Movement.TURN_LEFT);
+					}
+					straight_cali_threshold = 0;
+				}
+
+				else { // rightStatus == RIGHT_CANNOT_ACCESS
+					System.out.println("ENTER RIGHT CANNOT ACCESS" + rightStatus);
+					if (leftWallKiss)
+					{
+						leftWallKiss = false;
+						_robot.turnLeft();
+						updateRobotOrientation(Movement.TURN_LEFT);
+						_robot.calibrateRobotPositionViaFront();
+						_robot.turnRight();
+						updateRobotOrientation(Movement.TURN_RIGHT);
+					}
+					_robot.calibrateRobotPosition();
+					_robot.turnRight();
+
+					updateRobotOrientation(Movement.TURN_RIGHT);
+					setIsExplored(_robotPosition, _robotOrientation, true);
+					canTakePicFront(_robotOrientation);
+
+					if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
+						System.out.println("HAF ACCESSIBLE FRONT" + rightStatus);
+						_robot.moveForward();
+						_robot.calibrateRobotPosition();
+						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+						setIsExplored(_robotPosition, _robotOrientation, true);
+						canTakePicFront(_robotOrientation);
+					} else {
+						System.out.println("NO HAF ACCESSIBLE FRONT" + rightStatus);
+						_robot.calibrateRobotPositionViaFront();
+						_robot.turnLeft();
+						_robot.calibrateRobotPosition();
+						straight_cali_threshold = 0;
+						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+						setIsExplored(_robotPosition, _robotOrientation, true);
+						canTakePicFront(_robotOrientation);
+					}
+
+				}
+
+			}
+
+			else if (hasAccessibleFront(_robotPosition, _robotOrientation)) {	
+				if (straight_cali_threshold == 6) {
+					//check right sensor both == 1, then do below
+					_robot.turnRight();
+					_robot.calibrateRobotPositionViaFront();
+					_robot.turnLeft();
+					_robot.calibrateRobotPosition();
+					straight_cali_threshold = 0;
+					System.out.println("Calibrating via Front while walking straight paths");
+				}
+				_robot.moveForward();
+				_robot.calibrateRobotPosition();
+				updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
+				setIsExplored(_robotPosition, _robotOrientation, true);
+				canTakePicFront(_robotOrientation);
+				straight_cali_threshold++;
+			}
+
+			else {
+					if (rightStatus == RIGHT_NO_ACCESS && !hasAccessibleFront(_robotPosition, _robotOrientation)) {
+						cali_threshold++;
+						if (cali_threshold == 0) {
+							//check right sensor both == 1, then do below
+							_robot.calibrateRobotPositionViaFront();
+							_robot.turnRight();
+							updateRobotOrientation(Movement.TURN_RIGHT);
+							_robot.calibrateRobotPositionViaFront();
+							canTakePicFront(_robotOrientation);
+							_robot.turnLeft();
+							updateRobotOrientation(Movement.TURN_LEFT);
+							cali_threshold = -2;
+							System.out.println("Calibrating via Front while corner");
+						}
+						cali_threshold++;
+					}
+				_robot.turnLeft();
+				updateRobotOrientation(Movement.TURN_LEFT);
+				if(!hasAccessibleFront(_robotPosition, _robotOrientation))
+				{
+					leftWallKiss = true;
+				}
+				setIsExplored(_robotPosition, _robotOrientation, true);
+				canTakePicFront(_robotOrientation);
+				straight_cali_threshold = 0;
+			}
+		}
+
+	}
+	
+
+	private void exploreAlongWallClean2(int[] goalPos) {
 
 		Controller controller = Controller.getInstance();
 
@@ -2704,7 +2954,6 @@ public class MazeExplorer {
 		}
 
 	}
-
 	private void exploreAlongWall(int[] goalPos) { // todo when confirm is oudated, remove
 		Controller controller = Controller.getInstance();
 
@@ -3258,6 +3507,102 @@ public class MazeExplorer {
 		}
 		return 0;
 	}
+	public void canTakePicFront(Orientation _ori)
+	{
+		Robot robot = Robot.getInstance();
+		int _x = _robotPosition[0];
+		int _y = _robotPosition[1];
+		
+		boolean doITakePic = false;
+		ImageRef imageRef = new ImageRef();
+		switch (_ori)
+		{
+		case NORTH:
+			if (_y < Arena.MAP_WIDTH-2)
+			{
+				if (_mazeRef[_x][_y+2] == IS_OBSTACLE || _mazeRef[_x-1][_y+2] == IS_OBSTACLE || _mazeRef[_x+1][_y+2] == IS_OBSTACLE)
+				{
+					imageRef.setTargetX(_x);
+					imageRef.setTargetY(_y+2);
+					doITakePic = true;
+				}
+				else if (_y < Arena.MAP_WIDTH-3 && (_mazeRef[_x][_y+3] == IS_OBSTACLE || _mazeRef[_x-1][_y+3] == IS_OBSTACLE || _mazeRef[_x+1][_y+3] == IS_OBSTACLE))
+				{
+					imageRef.setTargetX(_x);
+					imageRef.setTargetY(_y+3);
+					doITakePic = true;
+				}
+				imageRef.setOrientation(Orientation.SOUTH);
+			}
+				break;
+		case SOUTH:
+			if (_y > 1)		
+			{
+				if (_mazeRef[_x][_y-2] == IS_OBSTACLE || _mazeRef[_x-1][_y-2] == IS_OBSTACLE || _mazeRef[_x+1][_y-2] == IS_OBSTACLE)
+				{
+					imageRef.setTargetX(_x);
+					imageRef.setTargetY(_y-2);
+					doITakePic = true;
+				}
+				else if (_y > 2 && (_mazeRef[_x][_y-3] == IS_OBSTACLE || _mazeRef[_x-1][_y-3] == IS_OBSTACLE || _mazeRef[_x+1][_y-3] == IS_OBSTACLE))
+				{
+					imageRef.setTargetX(_x);
+					imageRef.setTargetY(_y-3);
+					doITakePic = true;
+				}
+				imageRef.setOrientation(Orientation.NORTH);
+			}
+				break;
+		case EAST:
+			if (_x < Arena.MAP_LENGTH-2)
+			{
+				if (_mazeRef[_x+2][_y] == IS_OBSTACLE || _mazeRef[_x+2][_y-1] == IS_OBSTACLE || _mazeRef[_x+2][_y+1] == IS_OBSTACLE)
+				{
+					imageRef.setTargetX(_x+2);
+					imageRef.setTargetY(_y);	
+					doITakePic = true;
+				}
+				else if (_x < Arena.MAP_LENGTH-3 && (_mazeRef[_x+3][_y] == IS_OBSTACLE || _mazeRef[_x+3][_y-1] == IS_OBSTACLE || _mazeRef[_x+3][_y+1] == IS_OBSTACLE))
+				{
+					imageRef.setTargetX(_x+3);
+					imageRef.setTargetY(_y);	
+					doITakePic = true;
+				}
+				imageRef.setOrientation(Orientation.WEST);
+			}	
+				break;
+		case WEST:
+			if (_x > 1)
+			{
+				if (_mazeRef[_x-2][_y] == IS_OBSTACLE || _mazeRef[_x-2][_y-1] == IS_OBSTACLE || _mazeRef[_x-2][_y+1] == IS_OBSTACLE)
+				{
+					imageRef.setTargetX(_x-2);
+					imageRef.setTargetY(_y);
+					doITakePic = true;
+				}
+				else if (_x > 2 && (_mazeRef[_x-3][_y] == IS_OBSTACLE || _mazeRef[_x-3][_y-1] == IS_OBSTACLE || _mazeRef[_x-3][_y+1] == IS_OBSTACLE))
+				{
+					imageRef.setTargetX(_x-3);
+					imageRef.setTargetY(_y);
+					doITakePic = true;
+				}
+			}
+			imageRef.setOrientation(Orientation.EAST);
+				break;
+		}
+		
+		if (doITakePic)
+		{
+			imageRef.setX(_x);
+			imageRef.setY(_y);
+			imageRef.setOrientation(_robotOrientation);
+			
+			arrayListOfImageRefsExploration.add(imageRef);
+			System.out.println("taking pic now");
+			sendPicToRPI(imageRef);
+		}		
+	}
+	
 	private Movement canCalibrateLeft(int[] robotPosition, Orientation ori) {
 		int x = robotPosition[0];
 		int y = robotPosition[1];

@@ -7,6 +7,7 @@ public class Message {
 	public static final String TURN_LEFT = "A";
 	public static final String TURN_RIGHT = "D";
 	public static final String MOVE_FORWARD = "W";
+	public static final String MOVE_BACK = "B";
 	public static final String EXPLORE_DONE = "X";
 	public static final String CALIBRATEFRONT = "F";
 	public static final String oneEighty = "Q";

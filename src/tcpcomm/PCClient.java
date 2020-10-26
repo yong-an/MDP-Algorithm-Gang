@@ -126,7 +126,7 @@ public class PCClient {
         System.out.println("Message sent to Android: " + msg + " - " + LocalTime.now());
     }
     
-    public void sendMessageToAndroidPicture(String msg) {
+    public void sendMessageToAndroidPic(String msg) {
         msg = "@o" + msg + "!";
         _toRPi.print(msg);
         _toRPi.flush();

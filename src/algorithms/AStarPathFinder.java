@@ -94,7 +94,7 @@ public class AStarPathFinder {
 			target = target._parent;
 		}
 		path.prependStep(0, startX,startY);
-		System.out.println("findFastestPath End "+LocalTime.now());
+		//System.out.println("findFastestPath End "+LocalTime.now());
 		return path;
 	}
     
@@ -170,8 +170,8 @@ public class AStarPathFinder {
 		return moveRobotAlongFastestPath(fastestPath, currentOrientation, false, false, false);
 	}
 	
-	public Orientation moveRobotAlongFastestPath(Path fastestPath, Orientation currentOrientation, boolean isExploring, 
-													boolean hasCalibration, boolean isImageRun) {
+	public Orientation moveRobotAlongFastestPath(Path fastestPath, Orientation currentOrientation, boolean isExploring,
+			boolean hasCalibration, boolean isImageRun) {
 
 		int[] tempPosition = new int[2];
 		int[] robotPosition;
@@ -180,20 +180,19 @@ public class AStarPathFinder {
 		ArrayList<Path.Step> steps = fastestPath.getSteps();
 		MazeExplorer explorer = MazeExplorer.getInstance();
 		robotPosition = fastestPath.getStep(0);
-		
+
 		int count = 0;
 		String moveMessage = "";
-		System.out.println("Fastest Path Start via AStarPathFinder "+LocalTime.now());
+		//System.out.println("Fastest Path Start via AStarPathFinder " + LocalTime.now());
 		for (int i = 0; i < steps.size() - 1; i++) {
-			
+
 			tempPosition[0] = steps.get(i).getX();
 			tempPosition[1] = steps.get(i).getY();
-			nextPosition[0] = steps.get(i+1).getX();
-			nextPosition[1] = steps.get(i+1).getY();
+			nextPosition[0] = steps.get(i + 1).getX();
+			nextPosition[1] = steps.get(i + 1).getY();
 
-			nextOrientation = getOrientationIfMoveToNeighbor(
-					tempPosition[0], tempPosition[1],
-					nextPosition[0], nextPosition[1]);
+			nextOrientation = getOrientationIfMoveToNeighbor(tempPosition[0], tempPosition[1], nextPosition[0],
+					nextPosition[1]);
 			if (nextOrientation == currentOrientation) {
 				count++;
 
@@ -203,17 +202,20 @@ public class AStarPathFinder {
 						_robot.moveForward();
 						robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
 						robotCalibrate(currentOrientation);
-						if(!isImageRun)
+						if (isImageRun == false) {
 							explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
+						}
 					}
-				} 
-				else {
-					System.out.println("AStarPathFinder: moving robot forward: "+count+" "+LocalTime.now());
-					if(count != 0)
+				} else {
+					System.out.println("AStarPathFinder: moving robot forward: " + count + " " + LocalTime.now());
+					if (count != 0)
 						_robot.moveForward(count);
 				}
 				count = 1;
-				ChangeRobotOrientation(currentOrientation, nextOrientation, isExploring, hasCalibration);
+				if (isImageRun == false)
+					ChangeRobotOrientation(currentOrientation, nextOrientation, isExploring, hasCalibration);
+				else
+					ChangeRobotOrientationWihoutExploration(currentOrientation, nextOrientation, isExploring, hasCalibration);
 			}
 			currentOrientation = nextOrientation;
 			robotCalibrate(currentOrientation);
@@ -223,17 +225,17 @@ public class AStarPathFinder {
 				_robot.moveForward();
 				robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
 				robotCalibrate(currentOrientation);
-				if(!isImageRun)
+				if (isImageRun == false) {
 					explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
+				}
 			}
 		} else {
 			_robot.moveForward(count);
 		}
 		System.out.println("moveRobotAlongFastestPath Ends");
 		return currentOrientation;
-		
-	}
 
+	}
 
 
 	public Orientation getBestInitialOrientation(Path fastestPath) {
@@ -258,6 +260,112 @@ public class AStarPathFinder {
 			}
 		}
 		_robot = Robot.getInstance();
+	}
+	
+	private void ChangeRobotOrientationWihoutExploration(Orientation curOri, Orientation nextOri, boolean isExploring, boolean hasCalibration) {
+		MazeExplorer explorer = MazeExplorer.getInstance();
+		
+		switch (curOri) {
+			case NORTH:
+				if (nextOri == Orientation.EAST) {
+					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						
+					}
+				} else if (nextOri == Orientation.WEST) {
+					_robot.turnLeft();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_LEFT);
+						
+					}
+				} else if (nextOri == Orientation.SOUTH) {
+					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						
+					}
+					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						
+					}
+				}
+				break;
+			case SOUTH:
+				if (nextOri == Orientation.EAST) {
+					_robot.turnLeft();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_LEFT);
+						
+					}
+				} else if (nextOri == Orientation.WEST) {
+					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						
+					}
+				} else if (nextOri == Orientation.NORTH) {
+					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						
+					}
+					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						
+					}
+				}
+				break;
+			case EAST:
+				if (nextOri == Orientation.NORTH) {
+					_robot.turnLeft();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_LEFT);
+						
+					}
+				} else if (nextOri == Orientation.SOUTH) {
+					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						
+					}
+				} else if (nextOri == Orientation.WEST) {
+					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						
+					}
+					_robot.turnRight();
+					if (isExploring) {
+						explorer.updateRobotOrientation(Movement.TURN_RIGHT);
+						
+					}
+				}
+				break;
+			case WEST:
+				if (nextOri == Orientation.NORTH) {
+					_robot.turnRight();
+					if (isExploring) {
+						
+					}
+				} else if (nextOri == Orientation.SOUTH) {
+					_robot.turnLeft();
+					if (isExploring) {
+						
+					}
+				} else if (nextOri == Orientation.EAST) {
+					_robot.turnRight();
+					if (isExploring) {
+						
+					}
+					_robot.turnRight();
+					if (isExploring) {
+						
+					}
+				}
+		}
 	}
 
 	private void ChangeRobotOrientation(Orientation curOri, Orientation nextOri, boolean isExploring, boolean hasCalibration) {

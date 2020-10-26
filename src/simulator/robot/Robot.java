@@ -321,6 +321,41 @@ public class Robot {
 		
 		sendToAndroid();
 	}
+	
+	public void moveBack() {
+		Controller controller = Controller.getInstance();
+		PCClient pcClient = controller.getPCClient();
+		MazeExplorer mc = MazeExplorer.getInstance();
+		
+		if (!RobotSystem.isRealRun()) {
+			int stepTime = 1000 / _speed;
+			_stepsSinceLastCalibration++;
+			try {
+				Thread.sleep(stepTime);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else {
+			try {
+				pcClient.sendMessage(Message.MOVE_BACK + Message.SEPARATOR);
+				String feedback = pcClient.readMessage();
+				while (!feedback.equals(Message.DONE)) {
+					feedback = pcClient.readMessage();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			_stepsSinceLastCalibration++;
+		}
+		
+		controller.moveRobotBackward();
+		
+		if(mc.getleftGotObstacle())
+			mc.setLeftCoundown();
+		
+		sendToAndroid();
+	}
+
 
 	/**
 	 * This function overloads the previous function by allowing you to select the amount of grids to move forward.
