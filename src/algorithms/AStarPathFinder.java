@@ -201,7 +201,7 @@ public class AStarPathFinder {
 					for (int v = 0; v < count; v++) {
 						_robot.moveForward();
 						robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-						robotCalibrate(currentOrientation);
+						//robotCalibrate(currentOrientation);
 						if (isImageRun == false) {
 							explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
 						}
@@ -218,13 +218,13 @@ public class AStarPathFinder {
 					ChangeRobotOrientationWihoutExploration(currentOrientation, nextOrientation, isExploring, hasCalibration);
 			}
 			currentOrientation = nextOrientation;
-			robotCalibrate(currentOrientation);
+			//robotCalibrate(currentOrientation);
 		}
 		if (isExploring) {
 			for (int v = 0; v < count; v++) {
 				_robot.moveForward();
 				robotPosition = explorer.updateRobotPositionAfterMF(currentOrientation, robotPosition);
-				robotCalibrate(currentOrientation);
+				//robotCalibrate(currentOrientation);
 				if (isImageRun == false) {
 					explorer.setIsExplored(robotPosition, currentOrientation, hasCalibration);
 				}

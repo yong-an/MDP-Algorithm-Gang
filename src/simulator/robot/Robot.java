@@ -627,17 +627,17 @@ public class Robot {
 		switch (ori) {
 			case NORTH:
 				turnLeft();
-				calibrateRobotPositionViaStart();
+				//calibrateRobotPositionViaStart();
 				break;
 			case SOUTH:
 				turnRight();
-				calibrateRobotPositionViaStart();
+				//calibrateRobotPositionViaStart();
 				break;
 			case EAST:
-				calibrateRobotPositionViaStart();
+				//calibrateRobotPositionViaStart();
 				break;
 			case WEST:
-				calibrateRobotPositionViaStart();
+				//calibrateRobotPositionViaStart();
 		}
 		return Orientation.EAST;
 	}

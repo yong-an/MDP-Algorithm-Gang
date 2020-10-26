@@ -2057,7 +2057,7 @@ public class MazeExplorer {
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true, true, true);
 			// virtualMap.updateVirtualMap(_mazeRef);
 			adjustOrientationDynamic(arrayListOfImageRefs.get(0).getOrientation());
-			sendPicToRPI(arrayListOfImageRefs.get(0));
+			//sendPicToRPI(arrayListOfImageRefs.get(0));
 			arrayListOfImageRefs.remove(0);
 			//_robot.moveForward();
 			//_robot.calibrateRobotPositionViaFront();
@@ -2779,14 +2779,14 @@ public class MazeExplorer {
 					if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
 						System.out.println("ENTER RIGHT CAN ACCESS + UNSURE ACCESS + ACCESSIBLEFRONT" + rightStatus);
 						_robot.moveForward();
-						_robot.calibrateRobotPosition();
+						//_robot.calibrateRobotPosition();
 						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						canTakePicFront(_robotOrientation);
 					} else {
 						System.out.println("ENTER RIGHT CAN ACCESS + UNSURE ACCESS + NO ACCESSIBLEFRONT" + rightStatus);
 						_robot.turnLeft();
-						_robot.calibrateRobotPositionViaFront();
+						//_robot.calibrateRobotPositionViaFront();
 						updateRobotOrientation(Movement.TURN_LEFT);
 					}
 					straight_cali_threshold = 0;
@@ -2799,11 +2799,11 @@ public class MazeExplorer {
 						leftWallKiss = false;
 						_robot.turnLeft();
 						updateRobotOrientation(Movement.TURN_LEFT);
-						_robot.calibrateRobotPositionViaFront();
+						//_robot.calibrateRobotPositionViaFront();
 						_robot.turnRight();
 						updateRobotOrientation(Movement.TURN_RIGHT);
 					}
-					_robot.calibrateRobotPosition();
+					//_robot.calibrateRobotPosition();
 					_robot.turnRight();
 
 					updateRobotOrientation(Movement.TURN_RIGHT);
@@ -2813,7 +2813,7 @@ public class MazeExplorer {
 					if (hasAccessibleFront(_robotPosition, _robotOrientation)) {
 						System.out.println("HAF ACCESSIBLE FRONT" + rightStatus);
 						_robot.moveForward();
-						_robot.calibrateRobotPosition();
+						//_robot.calibrateRobotPosition();
 						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
 						setIsExplored(_robotPosition, _robotOrientation, true);
 						canTakePicFront(_robotOrientation);
@@ -2821,7 +2821,7 @@ public class MazeExplorer {
 						System.out.println("NO HAF ACCESSIBLE FRONT" + rightStatus);
 						_robot.calibrateRobotPositionViaFront();
 						_robot.turnLeft();
-						_robot.calibrateRobotPosition();
+						//_robot.calibrateRobotPosition();
 						straight_cali_threshold = 0;
 						updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
 						setIsExplored(_robotPosition, _robotOrientation, true);
@@ -2836,14 +2836,14 @@ public class MazeExplorer {
 				if (straight_cali_threshold == 6) {
 					//check right sensor both == 1, then do below
 					_robot.turnRight();
-					_robot.calibrateRobotPositionViaFront();
+					//_robot.calibrateRobotPositionViaFront();
 					_robot.turnLeft();
-					_robot.calibrateRobotPosition();
+					//_robot.calibrateRobotPosition();
 					straight_cali_threshold = 0;
 					System.out.println("Calibrating via Front while walking straight paths");
 				}
 				_robot.moveForward();
-				_robot.calibrateRobotPosition();
+				//_robot.calibrateRobotPosition();
 				updateRobotPositionAfterMF(_robotOrientation, _robotPosition);
 				setIsExplored(_robotPosition, _robotOrientation, true);
 				canTakePicFront(_robotOrientation);
@@ -2855,10 +2855,10 @@ public class MazeExplorer {
 						cali_threshold++;
 						if (cali_threshold == 0) {
 							//check right sensor both == 1, then do below
-							_robot.calibrateRobotPositionViaFront();
+							//_robot.calibrateRobotPositionViaFront();
 							_robot.turnRight();
 							updateRobotOrientation(Movement.TURN_RIGHT);
-							_robot.calibrateRobotPositionViaFront();
+							//_robot.calibrateRobotPositionViaFront();
 							canTakePicFront(_robotOrientation);
 							_robot.turnLeft();
 							updateRobotOrientation(Movement.TURN_LEFT);
