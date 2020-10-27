@@ -43,12 +43,12 @@ public class MazeExplorer {
 
 	private static MazeExplorer _instance;
 	private Boolean[][] _isExplored;
-	private int[][] _mazeRef, rightWallRef, imageRef, weightageRef;
+	private int[][] _mazeRef, _rightWallRef, _imageRef, _weightageRef;
 	private Robot _robot;
 	private int[] _robotPosition;
 	private Orientation _robotOrientation;
 	private boolean _hasExploredTillGoal;
-	private boolean startImageRun = true, nextRun = false, isFastestPathBack = false, leftObstacleSelected = false;
+	private boolean _startImageRun = true, _nextRun = false, isFastestPathBack = false, leftObstacleSelected = false;
 	private Path _fastestPathBack = null;
 	private AStarPathFinder _pathFinder;
 	private int leftTurnCounter = 0;
@@ -108,7 +108,7 @@ public class MazeExplorer {
 	}
 
 	public int[][] getWeightageRef() {
-		return weightageRef;
+		return _weightageRef;
 	}
 
 	public void setMazeReObstacle(int x, int y) {
@@ -203,9 +203,9 @@ public class MazeExplorer {
 			for (int j = robotPosition[1] - 1; j <= robotPosition[1] + 1; j++) {
 				_isExplored[i][j] = true;
 				_mazeRef[i][j] = IS_EMPTY;
-				rightWallRef[i][j] = IS_EMPTY;
-				imageRef[i][j] = IS_EMPTY;
-				weightageRef[i][j] = IS_EMPTY;
+				_rightWallRef[i][j] = IS_EMPTY;
+				_imageRef[i][j] = IS_EMPTY;
+				_weightageRef[i][j] = IS_EMPTY;
 			}
 		}
 		setIsExplored(_robotPosition, _robotOrientation, true);
@@ -224,7 +224,7 @@ public class MazeExplorer {
 
 		 hasNextRun();
 
-		if (startImageRun) {
+		if (_startImageRun) {
 			_robot = Robot.getInstance();
 			_robotOrientation = _robot.calibrateAfterExploration(_robotOrientation);
 			controller.setRobotOrientation(_robotOrientation);
@@ -277,7 +277,7 @@ public class MazeExplorer {
 		HashMap<Integer, int[]> positionHashMap = new HashMap<Integer, int[]>();
 		HashMap<Integer, Integer> positionHashMap2 = new HashMap<Integer, Integer>();
 		while (!controller.hasReachedTimeThreshold() && !areAllExplored() && !end) {
-			nextRun = true;
+			_nextRun = true;
 			end = ExploreNextRound(_robotPosition, positionHashMap, positionHashMap2);
 		}
 	}
@@ -287,7 +287,7 @@ public class MazeExplorer {
 
 		for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
 			for (int obsY = 0; obsY < Arena.MAP_WIDTH; obsY++) {
-				if (imageRef[obsX][obsY] == IS_OBSTACLE) {
+				if (_imageRef[obsX][obsY] == IS_OBSTACLE) {
 					obsPos[0] = obsX;
 					obsPos[1] = obsY;
 					return obsPos;
@@ -2467,9 +2467,9 @@ public class MazeExplorer {
 		lastCalibrate[1] = 2;
 		_isExplored = new Boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_mazeRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
-		rightWallRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
-		imageRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
-		weightageRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
+		_rightWallRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
+		_imageRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
+		_weightageRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 
 		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
 			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
@@ -2479,9 +2479,9 @@ public class MazeExplorer {
 		for (int i = 0; i < Arena.MAP_LENGTH; i++) {
 			for (int j = 0; j < Arena.MAP_WIDTH; j++) {
 				_mazeRef[i][j] = UNEXPLORED;
-				rightWallRef[i][j] = UNEXPLORED;
-				imageRef[i][j] = UNEXPLORED;
-				weightageRef[i][j] = 0;
+				_rightWallRef[i][j] = UNEXPLORED;
+				_imageRef[i][j] = UNEXPLORED;
+				_weightageRef[i][j] = 0;
 			}
 		}
 	}
@@ -3099,25 +3099,25 @@ public class MazeExplorer {
 			switch (ori) {
 			case NORTH:
 				if ((curPos[0] + 2) != 15 && _mazeRef[curPos[0] + 2][curPos[1] + i] == IS_OBSTACLE) {
-					rightWallRef[curPos[0] + 2][curPos[1] + i] = RIGHT_CHECK;
+					_rightWallRef[curPos[0] + 2][curPos[1] + i] = RIGHT_CHECK;
 					hasObs = true;
 				}
 				break;
 			case SOUTH:
 				if ((curPos[0] - 2) != -1 && _mazeRef[curPos[0] - 2][curPos[1] + i] == IS_OBSTACLE) {
-					rightWallRef[curPos[0] - 2][curPos[1] + i] = RIGHT_CHECK;
+					_rightWallRef[curPos[0] - 2][curPos[1] + i] = RIGHT_CHECK;
 					hasObs = true;
 				}
 				break;
 			case EAST:
 				if ((curPos[1] - 2) != -1 && _mazeRef[curPos[0] + i][curPos[1] - 2] == IS_OBSTACLE) {
-					rightWallRef[curPos[0] + i][curPos[1] - 2] = RIGHT_CHECK;
+					_rightWallRef[curPos[0] + i][curPos[1] - 2] = RIGHT_CHECK;
 					hasObs = true;
 				}
 				break;
 			case WEST:
 				if ((curPos[1] + 2) != 20 && _mazeRef[curPos[0] + i][curPos[1] + 2] == IS_OBSTACLE) {
-					rightWallRef[curPos[0] + i][curPos[1] + 2] = RIGHT_CHECK;
+					_rightWallRef[curPos[0] + i][curPos[1] + 2] = RIGHT_CHECK;
 					hasObs = true;
 				}
 				break;
@@ -3140,32 +3140,32 @@ public class MazeExplorer {
 			switch (ori) {
 			case NORTH:
 				if ((curPos[0] + 2) != 15 && _mazeRef[curPos[0] + 2][curPos[1] + i] == IS_OBSTACLE) {
-					imageRef[curPos[0] + 2][curPos[1] + i] = IS_EMPTY;
+					_imageRef[curPos[0] + 2][curPos[1] + i] = IS_EMPTY;
 					hasObs = true;
 				}
 				break;
 			case SOUTH:
 				if ((curPos[0] - 2) != -1 && _mazeRef[curPos[0] - 2][curPos[1] + i] == IS_OBSTACLE) {
-					imageRef[curPos[0] - 2][curPos[1] + i] = IS_EMPTY;
+					_imageRef[curPos[0] - 2][curPos[1] + i] = IS_EMPTY;
 					hasObs = true;
 				}
 				break;
 			case EAST:
 				if ((curPos[1] - 2) != -1 && _mazeRef[curPos[0] + i][curPos[1] - 2] == IS_OBSTACLE) {
-					imageRef[curPos[0] + i][curPos[1] - 2] = IS_EMPTY;
+					_imageRef[curPos[0] + i][curPos[1] - 2] = IS_EMPTY;
 					hasObs = true;
 				}
 				break;
 			case WEST:
 				if ((curPos[1] + 2) != 20 && _mazeRef[curPos[0] + i][curPos[1] + 2] == IS_OBSTACLE) {
-					imageRef[curPos[0] + i][curPos[1] + 2] = IS_EMPTY;
+					_imageRef[curPos[0] + i][curPos[1] + 2] = IS_EMPTY;
 					hasObs = true;
 				}
 				break;
 			}
 		}
 
-		if (hasObs && startImageRun) {
+		if (hasObs && _startImageRun) {
 			try {
 				sendObstaclePos(curPos, ori);
 			} catch (IOException e1) {

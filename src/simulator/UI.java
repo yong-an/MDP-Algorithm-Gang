@@ -274,10 +274,10 @@ public class UI extends JFrame implements ActionListener {
         JLabel[] ffpCtrlLabels = new JLabel[2];
         _ffpTextFields = new JTextField[2];
         btnAStar = new JRadioButton("A * ", true);
-        btnFloodFill = new JRadioButton("Test");
-        ButtonGroup algorithmBtnGrp = new ButtonGroup();
-        algorithmBtnGrp.add(btnAStar);
-        algorithmBtnGrp.add(btnFloodFill);
+//        btnFloodFill = new JRadioButton("Test");
+//        ButtonGroup algorithmBtnGrp = new ButtonGroup();
+//        algorithmBtnGrp.add(btnAStar);
+//        algorithmBtnGrp.add(btnFloodFill);
 
         _ffpBtn = new JButton("Navigate");
 
@@ -298,13 +298,13 @@ public class UI extends JFrame implements ActionListener {
             }
         }
 
-        JPanel ffpInputPane = new JPanel(new GridLayout(5, 5));
+        JPanel ffpInputPane = new JPanel(new GridLayout(2, 2));
         ffpInputPane.add(ffpCtrlLabels[0]);
         ffpInputPane.add(_ffpTextFields[0]);
         ffpInputPane.add(ffpCtrlLabels[1]);
-        ffpInputPane.add(_ffpTextFields[1]);
+//        ffpInputPane.add(_ffpTextFields[1]);
         ffpInputPane.add(btnAStar);
-        ffpInputPane.add(btnFloodFill);
+//        ffpInputPane.add(btnFloodFill);
 
         if (!RobotSystem.isRealRun()) {
             ffpCtrlLabels[0].setFont(new Font("Tahoma", Font.PLAIN, 14));
