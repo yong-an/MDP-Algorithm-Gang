@@ -282,7 +282,7 @@ public class MazeExplorer {
 		}
 	}
 
-	private int[] getPos() { // todo when confirm is outdated, remove
+	private int[] getPos() {
 		int[] obsPos = new int[2];
 
 		for (int obsX = 0; obsX < Arena.MAP_LENGTH; obsX++) {
@@ -297,9 +297,8 @@ public class MazeExplorer {
 		return null;
 	}
 
-	public void sendObsPosLeft(int[] robotPosition, Orientation ori, int x, int y, int blockAway) { // todo when confirm
-																									// is outdated,
-																									// remove
+	public void sendObsPosLeft(int[] robotPosition, Orientation ori, int x, int y, int blockAway) {
+
 		Robot robot = Robot.getInstance();
 		String msg = "";
 
@@ -346,8 +345,8 @@ public class MazeExplorer {
 
 	}
 
-	public void sendObstaclePos(int[] robotPosition, Orientation ori) throws IOException { // todo when confirm is
-																							// outdated, remove
+	public void sendObstaclePos(int[] robotPosition, Orientation ori) throws IOException {
+
 		String msg = "";
 
 		if (ori == Orientation.NORTH && (robotPosition[0] + 2) != 15)
@@ -2031,7 +2030,7 @@ public class MazeExplorer {
 					+ imageRef.getTargetOrientation());
 			System.out.println("pls see me");
 		}
-		// todo start thread to communicate with RPI and android
+
 
 		while (!arrayListOfImageRefs.isEmpty()) {
 			System.out.println(arrayListOfImageRefs.get(0).getX() + "," + arrayListOfImageRefs.get(0).getY());
@@ -2954,7 +2953,7 @@ public class MazeExplorer {
 		}
 
 	}
-	private void exploreAlongWall(int[] goalPos) { // todo when confirm is oudated, remove
+	private void exploreAlongWall(int[] goalPos) {
 		Controller controller = Controller.getInstance();
 
 		while (!isGoalPos(_robotPosition, goalPos) && !controller.hasReachedTimeThreshold()) {
@@ -3030,7 +3029,7 @@ public class MazeExplorer {
 		}
 	}
 
-	private void findImageAlongWall(int[] goalPos, int[] initial) { // todo when confirm is outdated, remove
+	private void findImageAlongWall(int[] goalPos, int[] initial) {
 		int move = 0;
 		Controller controller = Controller.getInstance();
 		PCClient pc = PCClient.getInstance();
@@ -3094,7 +3093,7 @@ public class MazeExplorer {
 		return false;
 	}
 
-	private void updateWall(int[] curPos, Orientation ori) { // todo when confirm outdated, remove
+	private void updateWall(int[] curPos, Orientation ori) {
 		boolean hasObs = false;
 		for (int i = -1; i < 2; i++) {
 			switch (ori) {
@@ -3134,7 +3133,7 @@ public class MazeExplorer {
 		}
 	}
 
-	private void eraseWall(int[] curPos, Orientation ori) { // todo when confirm is outdated, remove
+	private void eraseWall(int[] curPos, Orientation ori) {
 
 		boolean hasObs = false;
 		for (int i = -1; i < 2; i++) {

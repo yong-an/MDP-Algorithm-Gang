@@ -471,7 +471,6 @@ public class Robot {
 				}
 	
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -578,7 +577,6 @@ public class Robot {
 			JSON1.put("ori",controller.getOrientation());
 			
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
 
