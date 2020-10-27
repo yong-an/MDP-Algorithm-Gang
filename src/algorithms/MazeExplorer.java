@@ -48,35 +48,35 @@ public class MazeExplorer {
 	private int[] _robotPosition;
 	private Orientation _robotOrientation;
 	private boolean _hasExploredTillGoal;
-	private boolean _startImageRun = true, _nextRun = false, isFastestPathBack = false, leftObstacleSelected = false;
+	private boolean _startImageRun = true, _nextRun = false, _isFastestPathBack = false, _leftObstacleSelected = false;
 	private Path _fastestPathBack = null;
 	private AStarPathFinder _pathFinder;
-	private int leftTurnCounter = 0;
-	private int leftCountdown = 2;
-	private int[] lastCalibrate = new int[2];
-	private boolean leftGotObstacle = false;
-	private ArrayList<ImageRef> arrayListOfImageRefs = new ArrayList<ImageRef>();
-	private ArrayList<ImageRef> arrayListOfImageRefsExploration = new ArrayList<ImageRef>();
-	private boolean leftWallKiss = false;
+	private int _leftTurnCounter = 0;
+	private int _leftCountdown = 2;
+	private int[] _lastCalibrate = new int[2];
+	private boolean _leftGotObstacle = false;
+	private ArrayList<ImageRef> _imageRefsList = new ArrayList<ImageRef>();
+	private ArrayList<ImageRef> _imageRefsExplorationList = new ArrayList<ImageRef>();
+	private boolean _leftWallKiss = false;
 	
 	private MazeExplorer() {
 
 	}
 
 	public void setLeftCoundown() {
-		leftCountdown--;
+		_leftCountdown--;
 	}
 
 	public void setLeftCountdownBack() {
-		leftCountdown = 2;
+		_leftCountdown = 2;
 	}
 
 	public boolean getleftGotObstacle() {
-		return leftGotObstacle;
+		return _leftGotObstacle;
 	}
 
 	public void setleftGotObstacle() {
-		leftGotObstacle = false;
+		_leftGotObstacle = false;
 	}
 
 	public void setOrientation(Orientation orientation) {
@@ -302,7 +302,7 @@ public class MazeExplorer {
 		Robot robot = Robot.getInstance();
 		String msg = "";
 
-		if (leftCountdown == 0 && leftGotObstacle == true) {
+		if (_leftCountdown == 0 && _leftGotObstacle == true) {
 			robot.turnRight();
 			robot.turnRight();
 
@@ -339,8 +339,8 @@ public class MazeExplorer {
 			}
 			robot.turnRight();
 			robot.turnRight();
-			leftCountdown = 3;
-			leftGotObstacle = false;
+			_leftCountdown = 3;
+			_leftGotObstacle = false;
 		}
 
 	}
@@ -1579,10 +1579,10 @@ public class MazeExplorer {
 							}
 						}
 						// check if already exists
-						if (!arrayListOfImageRefs.contains(imageRef)) {
+						if (!_imageRefsList.contains(imageRef)) {
 							ImageRef tempImageRef = new ImageRef();
 							if (!imageRef.equalsAbsolute(tempImageRef)) {
-								arrayListOfImageRefs.add(imageRef);
+								_imageRefsList.add(imageRef);
 								System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + ","
 										+ imageRef.getOrientation());
 								System.out.println("setimageref");
@@ -1642,10 +1642,10 @@ public class MazeExplorer {
 							}
 						}
 						// check if already exists
-						if (!arrayListOfImageRefs.contains(imageRef)) {
+						if (!_imageRefsList.contains(imageRef)) {
 							ImageRef tempImageRef = new ImageRef();
 							if (!imageRef.equalsAbsolute(tempImageRef)) {
-								arrayListOfImageRefs.add(imageRef);
+								_imageRefsList.add(imageRef);
 								System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + ","
 										+ imageRef.getOrientation());
 								System.out.println("setimageref2");
@@ -1704,10 +1704,10 @@ public class MazeExplorer {
 							}
 						}
 						// check if already exists
-						if (!arrayListOfImageRefs.contains(imageRef)) {
+						if (!_imageRefsList.contains(imageRef)) {
 							ImageRef tempImageRef = new ImageRef();
 							if (!imageRef.equalsAbsolute(tempImageRef)) {
-								arrayListOfImageRefs.add(imageRef);
+								_imageRefsList.add(imageRef);
 								System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + ","
 										+ imageRef.getOrientation());
 								System.out.println("setimageref3");
@@ -1767,10 +1767,10 @@ public class MazeExplorer {
 						}
 						System.out.println("beng is correct");
 						// check if already exists
-						if (!arrayListOfImageRefs.contains(imageRef)) {
+						if (!_imageRefsList.contains(imageRef)) {
 							ImageRef tempImageRef = new ImageRef();
 							if (!imageRef.equalsAbsolute(tempImageRef)) {
-								arrayListOfImageRefs.add(imageRef);
+								_imageRefsList.add(imageRef);
 								System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + ","
 										+ imageRef.getOrientation());
 								System.out.println("setimageref4");
@@ -1789,10 +1789,10 @@ public class MazeExplorer {
 		ImageRef currNode = new ImageRef(1, 1, Orientation.EAST);
 		Path fastestPath = null;
 		int fastestNodeElement = 0;
-		while (!arrayListOfImageRefs.isEmpty()) {
-			for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
+		while (!_imageRefsList.isEmpty()) {
+			for (int i = 0; i < _imageRefsList.size(); ++i) {
 				newPath = pathFinder.findFastestPath(currNode.getX(), currNode.getY(), currNode.getOrientation(),
-						arrayListOfImageRefs.get(i).getX(), arrayListOfImageRefs.get(i).getY(), _mazeRef);
+						_imageRefsList.get(i).getX(), _imageRefsList.get(i).getY(), _mazeRef);
 				if (fastestPath == null) {
 					fastestPath = newPath;
 					fastestNodeElement = 0;
@@ -1801,13 +1801,13 @@ public class MazeExplorer {
 					fastestNodeElement = i;
 				}
 			}
-			sortedArrayListOfImageRefs.add(new ImageRef(arrayListOfImageRefs.get(fastestNodeElement)));
+			sortedArrayListOfImageRefs.add(new ImageRef(_imageRefsList.get(fastestNodeElement)));
 			currNode = sortedArrayListOfImageRefs.get(sortedArrayListOfImageRefs.size() - 1);
-			System.out.println(arrayListOfImageRefs.size());
-			arrayListOfImageRefs.remove(fastestNodeElement);
+			System.out.println(_imageRefsList.size());
+			_imageRefsList.remove(fastestNodeElement);
 			fastestPath = null;
 		}
-		arrayListOfImageRefs = new ArrayList<ImageRef>(sortedArrayListOfImageRefs);
+		_imageRefsList = new ArrayList<ImageRef>(sortedArrayListOfImageRefs);
 	}
 
 	private boolean isThereAdjacentObstacleEastAndWest(int _x, int _y) {
@@ -1855,56 +1855,56 @@ public class MazeExplorer {
 	 */
 	private void removeUnnecessaryImageRef3() {
 		int i = 0;
-		while (!arrayListOfImageRefs.isEmpty()) {
-			ImageRef imageRefToCheck = arrayListOfImageRefs.get(i);
+		while (!_imageRefsList.isEmpty()) {
+			ImageRef imageRefToCheck = _imageRefsList.get(i);
 			// check and remove groups of 3 horizontal imageRef
 			if (imageRefToCheck.distanceFromTarget() == 1
 					&& isThereAdjacentObstacleEastAndWest(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY())) {
-				for (int j = 0; j < arrayListOfImageRefs.size(); ++j) {
-					ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
+				for (int j = 0; j < _imageRefsList.size(); ++j) {
+					ImageRef imageRefToCheckAgainst = _imageRefsList.get(j);
 					if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst))
 						continue;
 					if (imageRefToCheck.getOrientation().equals(imageRefToCheckAgainst.getOrientation())) {
 						if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(),
 								imageRefToCheckAgainst.getY(), Orientation.EAST)) {
-							arrayListOfImageRefs.remove(j);
+							_imageRefsList.remove(j);
 							--j;
 						} else if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(),
 								imageRefToCheckAgainst.getY(), Orientation.WEST)) {
-							arrayListOfImageRefs.remove(j);
+							_imageRefsList.remove(j);
 							--j;
 						}
 					}
 					// exceed arraylist bounds when removing last element
-					if (j >= arrayListOfImageRefs.size())
+					if (j >= _imageRefsList.size())
 						break;
 				}
 			}
 			// check and remove groups of 3 vertical imageRef
 			if (imageRefToCheck.distanceFromTarget() == 1 && isThereAdjacentObstacleNorthAndSouth(
 					imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY())) {
-				for (int j = 0; j < arrayListOfImageRefs.size(); ++j) {
-					ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
+				for (int j = 0; j < _imageRefsList.size(); ++j) {
+					ImageRef imageRefToCheckAgainst = _imageRefsList.get(j);
 					if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst))
 						continue;
 					if (imageRefToCheck.getOrientation().equals(imageRefToCheckAgainst.getOrientation())) {
 						if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(),
 								imageRefToCheckAgainst.getY(), Orientation.NORTH)) {
-							arrayListOfImageRefs.remove(j);
+							_imageRefsList.remove(j);
 							--j;
 						} else if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(),
 								imageRefToCheckAgainst.getY(), Orientation.SOUTH)) {
-							arrayListOfImageRefs.remove(j);
+							_imageRefsList.remove(j);
 							--j;
 						}
 					}
 					// exceed arraylist bounds when removing last element
-					if (j >= arrayListOfImageRefs.size())
+					if (j >= _imageRefsList.size())
 						break;
 				}
 			}
 			++i;
-			if (i >= arrayListOfImageRefs.size())
+			if (i >= _imageRefsList.size())
 				return;
 		}
 	}
@@ -1914,58 +1914,58 @@ public class MazeExplorer {
 	 */
 	private void removeUnnecessaryImageRef2() {
 		int i = 0;
-		while (!arrayListOfImageRefs.isEmpty()) {
-			ImageRef imageRefToCheck = arrayListOfImageRefs.get(i);
+		while (!_imageRefsList.isEmpty()) {
+			ImageRef imageRefToCheck = _imageRefsList.get(i);
 			// check and remove groups of 2 horizontal imageRef
 			if (imageRefToCheck.distanceFromTarget() == 1
 					&& isThereAdjacentObstacleEastOrWest(imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY())) {
-				for (int j = 0; j < arrayListOfImageRefs.size(); ++j) {
-					ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
+				for (int j = 0; j < _imageRefsList.size(); ++j) {
+					ImageRef imageRefToCheckAgainst = _imageRefsList.get(j);
 					if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst)
 							|| imageRefToCheck.getTargetY() != imageRefToCheckAgainst.getTargetY())
 						continue;
 					if (imageRefToCheck.getOrientation().equals(imageRefToCheckAgainst.getOrientation())) {
 						if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(),
 								imageRefToCheckAgainst.getY(), Orientation.EAST)) {
-							arrayListOfImageRefs.remove(j);
+							_imageRefsList.remove(j);
 							--j;
 						} else if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(),
 								imageRefToCheckAgainst.getY(), Orientation.WEST)) {
-							arrayListOfImageRefs.remove(j);
+							_imageRefsList.remove(j);
 							--j;
 						}
 					}
 					// exceed arraylist bounds when removing last element
-					if (j >= arrayListOfImageRefs.size())
+					if (j >= _imageRefsList.size())
 						break;
 				}
 			}
 			// check and remove groups of 2 vertical imageRef
 			if (imageRefToCheck.distanceFromTarget() == 1 && isThereAdjacentObstacleNorthOrSouth(
 					imageRefToCheck.getTargetX(), imageRefToCheck.getTargetY())) {
-				for (int j = 0; j < arrayListOfImageRefs.size(); ++j) {
-					ImageRef imageRefToCheckAgainst = arrayListOfImageRefs.get(j);
+				for (int j = 0; j < _imageRefsList.size(); ++j) {
+					ImageRef imageRefToCheckAgainst = _imageRefsList.get(j);
 					if (imageRefToCheck.equalsAbsolute(imageRefToCheckAgainst)
 							|| imageRefToCheck.getTargetX() != imageRefToCheckAgainst.getTargetX())
 						continue;
 					if (imageRefToCheck.getOrientation().equals(imageRefToCheckAgainst.getOrientation())) {
 						if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(),
 								imageRefToCheckAgainst.getY(), Orientation.NORTH)) {
-							arrayListOfImageRefs.remove(j);
+							_imageRefsList.remove(j);
 							--j;
 						} else if (imageRefToCheck.isThereAdjacentImageRef(imageRefToCheckAgainst.getX(),
 								imageRefToCheckAgainst.getY(), Orientation.SOUTH)) {
-							arrayListOfImageRefs.remove(j);
+							_imageRefsList.remove(j);
 							--j;
 						}
 					}
 					// exceed arraylist bounds when removing last element
-					if (j >= arrayListOfImageRefs.size())
+					if (j >= _imageRefsList.size())
 						break;
 				}
 			}
 			++i;
-			if (i >= arrayListOfImageRefs.size())
+			if (i >= _imageRefsList.size())
 				return;
 		}
 	}
@@ -2005,26 +2005,26 @@ public class MazeExplorer {
 //		}
 		{
 			int i = 0;
-			while (i < arrayListOfImageRefsExploration.size())
+			while (i < _imageRefsExplorationList.size())
 			{
 				int j = 0;
-				while (j < arrayListOfImageRefs.size())
+				while (j < _imageRefsList.size())
 				{
-					if (arrayListOfImageRefsExploration.get(i).equals(arrayListOfImageRefs.get(j)))
+					if (_imageRefsExplorationList.get(i).equals(_imageRefsList.get(j)))
 					{
-						arrayListOfImageRefsExploration.remove(i);
-						arrayListOfImageRefs.remove(j);
+						_imageRefsExplorationList.remove(i);
+						_imageRefsList.remove(j);
 					}
 					++j;
 				}
 				++i;
 			}
 		}
-		Collections.sort(arrayListOfImageRefs);
+		Collections.sort(_imageRefsList);
 		sortImageRef();
 		System.out.println("how about now?");
-		for (int i = 0; i < arrayListOfImageRefs.size(); ++i) {
-			ImageRef imageRef = arrayListOfImageRefs.get(i);
+		for (int i = 0; i < _imageRefsList.size(); ++i) {
+			ImageRef imageRef = _imageRefsList.get(i);
 			System.out.println("Image Ref: " + imageRef.getX() + "," + imageRef.getY() + "," + imageRef.getOrientation()
 					+ "," + imageRef.getTargetX() + "," + imageRef.getTargetY() + ","
 					+ imageRef.getTargetOrientation());
@@ -2032,8 +2032,8 @@ public class MazeExplorer {
 		}
 
 
-		while (!arrayListOfImageRefs.isEmpty()) {
-			System.out.println(arrayListOfImageRefs.get(0).getX() + "," + arrayListOfImageRefs.get(0).getY());
+		while (!_imageRefsList.isEmpty()) {
+			System.out.println(_imageRefsList.get(0).getX() + "," + _imageRefsList.get(0).getY());
 			System.out.println("pls see me 2");
 			// VirtualMap virtualMap = VirtualMap.getInstance();
 			AStarPathFinder pathFinder = AStarPathFinder.getInstance();
@@ -2041,8 +2041,8 @@ public class MazeExplorer {
 			Controller controller = Controller.getInstance();
 			// virtualMap.updateVirtualMap(_mazeRef);
 
-			int obsX = arrayListOfImageRefs.get(0).getX();
-			int obsY = arrayListOfImageRefs.get(0).getY();
+			int obsX = _imageRefsList.get(0).getX();
+			int obsY = _imageRefsList.get(0).getY();
 
 			System.out.println("Next Point: " + obsX + "," + obsY);
 			System.out.println("Time Reach?: " + controller.hasReachedTimeThreshold());
@@ -2055,9 +2055,9 @@ public class MazeExplorer {
 			System.out.println("Controller Ori: " + controller.getOrientation());
 			_robotOrientation = pathFinder.moveRobotAlongFastestPath(fastestPath, _robotOrientation, true, true, true);
 			// virtualMap.updateVirtualMap(_mazeRef);
-			adjustOrientationDynamic(arrayListOfImageRefs.get(0).getOrientation());
-			sendPicToRPI(arrayListOfImageRefs.get(0));
-			arrayListOfImageRefs.remove(0);
+			adjustOrientationDynamic(_imageRefsList.get(0).getOrientation());
+			sendPicToRPI(_imageRefsList.get(0));
+			_imageRefsList.remove(0);
 			//_robot.moveForward();
 			//_robot.calibrateRobotPositionViaFront();
 			//_robot.moveBack();	
@@ -2463,8 +2463,8 @@ public class MazeExplorer {
 		_robotOrientation = robotOrientation;
 		_hasExploredTillGoal = false;
 		_pathFinder = AStarPathFinder.getInstance();
-		lastCalibrate[0] = 2;
-		lastCalibrate[1] = 2;
+		_lastCalibrate[0] = 2;
+		_lastCalibrate[1] = 2;
 		_isExplored = new Boolean[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_mazeRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
 		_rightWallRef = new int[Arena.MAP_LENGTH][Arena.MAP_WIDTH];
@@ -2793,9 +2793,9 @@ public class MazeExplorer {
 
 				else { // rightStatus == RIGHT_CANNOT_ACCESS
 					System.out.println("ENTER RIGHT CANNOT ACCESS" + rightStatus);
-					if (leftWallKiss)
+					if (_leftWallKiss)
 					{
-						leftWallKiss = false;
+						_leftWallKiss = false;
 						_robot.turnLeft();
 						updateRobotOrientation(Movement.TURN_LEFT);
 						_robot.calibrateRobotPositionViaFront();
@@ -2870,7 +2870,7 @@ public class MazeExplorer {
 				updateRobotOrientation(Movement.TURN_LEFT);
 				if(!hasAccessibleFront(_robotPosition, _robotOrientation))
 				{
-					leftWallKiss = true;
+					_leftWallKiss = true;
 				}
 				setIsExplored(_robotPosition, _robotOrientation, true);
 				canTakePicFront(_robotOrientation);
@@ -2990,11 +2990,11 @@ public class MazeExplorer {
 					if (checkGhostWall(_robotPosition, _robotOrientation)) {
 						AStarPathFinder pathFinder = AStarPathFinder.getInstance();
 						Path backPath = pathFinder.findFastestPath(_robotPosition[0], _robotPosition[1],
-								lastCalibrate[0], lastCalibrate[1], _mazeRef);
+								_lastCalibrate[0], _lastCalibrate[1], _mazeRef);
 						_robotOrientation = pathFinder.moveRobotAlongFastestPath(backPath, _robotOrientation, false,
 								false, false);
-						_robotPosition[0] = lastCalibrate[0];
-						_robotPosition[1] = lastCalibrate[1];
+						_robotPosition[0] = _lastCalibrate[0];
+						_robotPosition[1] = _lastCalibrate[1];
 
 						_robot.turn180();
 						switch (_robotOrientation) {
@@ -3596,7 +3596,7 @@ public class MazeExplorer {
 			imageRef.setY(_y);
 			imageRef.setOrientation(_robotOrientation);
 			
-			arrayListOfImageRefsExploration.add(imageRef);
+			_imageRefsExplorationList.add(imageRef);
 			System.out.println("taking pic now");
 			sendPicToRPI(imageRef);
 		}		
