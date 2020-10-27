@@ -519,7 +519,6 @@ public class Robot {
 	
 	/**
 	 * This function handles the robot position calibration via front.
-	 * @param m
 	 */
 	public void calibrateRobotPositionViaStart() {
 		Controller controller = Controller.getInstance();
@@ -555,7 +554,6 @@ public class Robot {
 	
 	/**
 	 * This function handles the sending of map descriptor to android.
-	 * @param string 
 	 */
 	public void sendToAndroid() {
 		Controller controller = Controller.getInstance();
@@ -647,7 +645,7 @@ public class Robot {
 	 * @param ori
 	 * @return
 	 */
-	public Orientation calibrateAtEndZone(Orientation ori) {	
+	public Orientation calibrateAtEndZone(Orientation ori) {
 		switch (ori) {
 			case NORTH:
 				calibrateRobotPosition();
@@ -658,6 +656,11 @@ public class Robot {
 			case EAST:
 				calibrateRobotPosition();
 				turnLeft();
+				calibrateRobotPosition();
+				break;
+			case WEST:
+				calibrateRobotPosition();
+				turnRight();
 				calibrateRobotPosition();
 				break;
 		}
