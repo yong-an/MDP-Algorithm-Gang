@@ -689,10 +689,6 @@ public class Controller {
                 System.out.println("P1 descriptor: " + P1Descriptor);
                 System.out.println("P2 descriptor: " + P2Descriptor);
 
-                // fix issue of robot facing WEST when done explore at end zone
-				Robot robot = Robot.getInstance();
-				_robotOrientation = robot.calibrateAtEndZone(_robotOrientation);
-
                 //Set simulator console status.
                 _ui.setCoverageUpdate("actual coverage (%): " + String.format("%.1f", _actualCoverage));
                 if (!_ui.getTimerMessage().equals("exploration: time out")) {
