@@ -518,7 +518,6 @@ public class Robot {
 	
 	/**
 	 * This function handles the robot position calibration via front.
-	 * @param m
 	 */
 	public void calibrateRobotPositionViaStart() {
 		Controller controller = Controller.getInstance();
@@ -554,7 +553,6 @@ public class Robot {
 	
 	/**
 	 * This function handles the sending of map descriptor to android.
-	 * @param string 
 	 */
 	public void sendToAndroid() {
 		Controller controller = Controller.getInstance();
